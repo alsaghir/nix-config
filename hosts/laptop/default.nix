@@ -128,6 +128,37 @@
     };
   };
 
+  ############################
+  # Audio (Low Latency PipeWire)
+  ############################
+  services.pipewire = {
+    enable = true;
+    alsa.enable = true;
+    alsa.support32Bit = true;
+    pulse.enable = true;
+    jack.enable = true;
+    # Optional low-latency tuning; remove if undesired
+    extraConfig.pipewire."92-low-latency" = {
+      "context.properties" = {
+        "default.clock.rate" = 48000;
+        "default.clock.quantum" = 32;
+        "default.clock.min-quantum" = 32;
+        "default.clock.max-quantum" = 128;
+      };
+    };
+  };
+
+  ############################
+  # Environment Variables (Minimal)
+  ############################
+  environment.sessionVariables = {
+    MOZ_ENABLE_WAYLAND = "1";     # Native Wayland Firefox/Electron hint
+    KWIN_LOW_LATENCY = "1";       # Slightly smoother frame pacing
+    NIXOS_OZONE_WL = "1";         # Encourage Electron apps to use Wayland
+    # Uncomment only if needed:
+    # LIBVA_DRIVER_NAME = "nvidia";
+    # __GLX_VENDOR_LIBRARY_NAME = "nvidia";
+  };
 
   # Host-specific settings
   networking.hostName = "asus-nixos";

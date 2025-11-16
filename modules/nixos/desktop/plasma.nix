@@ -10,6 +10,8 @@
 
   services.xserver.videoDrivers = [ "nvidia" ];
 
+  services.libinput.enable = true;
+
   # PipeWire audio
   services.pulseaudio.enable = false;
   security.rtkit.enable = true;
