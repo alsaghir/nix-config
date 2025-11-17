@@ -1,10 +1,8 @@
-# /hosts/laptop/default.nix
-#
 # This is the main configuration file for your 'laptop' host.
 # It imports the common configuration and then layers host-specific
 # settings on top.
 
-{ config, pkgs, pkgsUnstable, ... }:
+{ config, pkgs, pkgsUnstable, lib, ... }:
 {
   imports = [
     # Import the common base configuration.
@@ -15,10 +13,12 @@
 
     # Laptop-specific modules.
     ../../modules/nixos/desktop/plasma.nix
+    ../../modules/nixos/desktop/fonts.nix
     ../../modules/nixos/hardware/nvidia-hybrid.nix
     ../../modules/nixos/hardware/bluetooth.nix
     ../../modules/nixos/services/printing.nix
     ../../modules/nixos/services/gaming.nix
+    ../../modules/flatpak.nix
 
     # OS-level user
     ../../users/ahmed/user.nix
@@ -36,17 +36,20 @@
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
   specialisation = {
+    kernel-latest.configuration = {
+      boot.kernelPackages = lib.mkForce pkgs.linuxPackages_latest;
+    };
     kernel-66.configuration = {
-      boot.kernelPackages = pkgs.linuxPackages_6_6;
+      boot.kernelPackages = lib.mkForce pkgs.linuxPackages_6_6;
     };
     kernel-zen.configuration = {
-      boot.kernelPackages = pkgs.linuxKernel.packages.linux_zen;
+      boot.kernelPackages = lib.mkForce pkgs.linuxPackages_zen;
     };
     kernel-lqx.configuration = {
-      boot.kernelPackages = pkgs.linuxKernel.packages.linux_lqx;
+      boot.kernelPackages = lib.mkForce pkgs.linuxPackages_lqx;
     };
      kernel-xanmod.configuration = {
-      boot.kernelPackages = pkgs.linuxKernel.packages.linux_xanmod_stable;
+      boot.kernelPackages = lib.mkForce pkgs.linuxPackages_xanmod_stable;
     };
   };
 
@@ -60,9 +63,6 @@
   swapDevices = [
     { device = "/swap/swapfiles/swapfile"; priority = 50; }
   ];
-
-  # Desktop app distribution support is laptop-specific (not for minimal servers)
-  services.flatpak.enable = true;
 
   # =========================
   # Power management (TLP)
@@ -148,17 +148,7 @@
     };
   };
 
-  ############################
-  # Environment Variables (Minimal)
-  ############################
-  environment.sessionVariables = {
-    MOZ_ENABLE_WAYLAND = "1";     # Native Wayland Firefox/Electron hint
-    KWIN_LOW_LATENCY = "1";       # Slightly smoother frame pacing
-    NIXOS_OZONE_WL = "1";         # Encourage Electron apps to use Wayland
-    # Uncomment only if needed:
-    # LIBVA_DRIVER_NAME = "nvidia";
-    # __GLX_VENDOR_LIBRARY_NAME = "nvidia";
-  };
+ 
 
   # Host-specific settings
   networking.hostName = "asus-nixos";

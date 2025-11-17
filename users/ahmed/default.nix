@@ -1,8 +1,14 @@
-{ config, pkgs, pkgsUnstable ? null, lib, ... }:
+{
+  config,
+  pkgs,
+  pkgsUnstable ? null,
+  lib,
+  ...
+}:
 {
   home.username = "ahmed";
   home.homeDirectory = "/home/ahmed";
-  
+
   # Zsh
   programs.zsh = {
     enable = true;
@@ -38,7 +44,7 @@
         zshConfig = lib.mkOrder 1000 ''echo "General Config init"'';
         zshConfigLastToRun = lib.mkOrder 1500 ''
           echo "Last to run init"
-    
+
           # Mise activation for zsh
           # eval "$(mise activate zsh)"
 
@@ -69,11 +75,12 @@
     vulkan-tools
     fastfetch
 
-    pkgsUnstable.mise
+    pkgsUnstable.kotlin
+    temurin-bin-21
 
+    nixfmt-rfc-style
     statix
     deadnix
-    alejandra
     nix-output-monitor
     nvd
     nix-diff
@@ -98,23 +105,23 @@
   };
 
   programs.ssh = {
-  enable = true;
-  extraConfig = ''
-    Host github
-      HostName github.com
-      User git
-      IdentityFile ~/.ssh/id_ed25519
-      AddKeysToAgent yes
-      IdentitiesOnly yes
-      PreferredAuthentications publickey
+    enable = true;
+    extraConfig = ''
+      Host github
+        HostName github.com
+        User git
+        IdentityFile ~/.ssh/id_ed25519
+        AddKeysToAgent yes
+        IdentitiesOnly yes
+        PreferredAuthentications publickey
 
-    Host *
-      AddKeysToAgent yes
-      IdentityFile ~/.ssh/id_ed25519
-      IdentitiesOnly yes
-      User git
-  '';
-};
+      Host *
+        AddKeysToAgent yes
+        IdentityFile ~/.ssh/id_ed25519
+        IdentitiesOnly yes
+        User git
+    '';
+  };
 
   # Shell and small conveniences
   home.shellAliases = {

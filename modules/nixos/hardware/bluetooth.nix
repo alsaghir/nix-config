@@ -29,5 +29,15 @@
       PollInterval = 300;
     };
   };
- 
+
+  # https://wiki.archlinux.org/title/Bluetooth#Wake_from_suspend
+  powerManagement.enable = true;
+  services.udev.extraRules = ''
+    # Enable wake from suspend for Bluetooth USB wireless class devices
+    ACTION=="add", SUBSYSTEM=="usb", DRIVERS=="usb", \
+      ATTR{bDeviceClass}=="e0", \
+      ATTR{bDeviceProtocol}=="01", \
+      ATTR{bDeviceSubClass}=="01", \
+      ATTR{power/wakeup}="enabled"
+  '';
 }
