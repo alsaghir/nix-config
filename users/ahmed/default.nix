@@ -77,6 +77,7 @@
 
     pkgsUnstable.kotlin
     temurin-bin-21
+    pkgsUnstable.gemini-cli
 
     nixfmt-rfc-style
     statix
