@@ -4,7 +4,7 @@
   services.xserver = {
     displayManager.gdm.enable = true;
     desktopManager.gnome.enable = true;
-  }
+  };
 
   services.displayManager.gdm.enable = true;
   services.desktopManager.gnome.enable = true;
@@ -17,6 +17,15 @@
   services.gnome.games.enable = false;
   environment.gnome.excludePackages = with pkgs; [ 
     gnome-tour
+    cheese
+    epiphany
+    gnome-maps
+    gnome-contacts
+    gnome-calendar
+    gnome-photos
+    gnome-clocks
+    gnome-music
+    gnome-weather
     gnome-user-docs
   ];
 

@@ -5,7 +5,7 @@
     packages = with pkgs; [
       nerd-fonts.jetbrains-mono
       noto-fonts
-      noto-fonts-emoji
+      noto-fonts-color-emoji
       dejavu_fonts
       liberation_ttf
     ];

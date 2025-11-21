@@ -2,11 +2,11 @@
   description = "Zephyrus G15 – NixOS + Home Manager";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
-    nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-25.05";
 
     home-manager = {
-      url = "github:nix-community/home-manager/release-25.05";
+      url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs"; # Use the SAME nixpkgs input (commit/revision) that my top-level flake uses
       # “follows” is a feature of the flake input specification. It is not a Nix language keyword. It simply aliases one input’s revision to another.
     };
@@ -14,16 +14,23 @@
     nix-flatpak = {
       url = "github:gmodena/nix-flatpak/?ref=latest";
     };
+
+    nixos-cosmic = {
+      url = "github:lilyinstarlight/nixos-cosmic";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  # nixpkgs-unstable defined in inputs and here it represents the root of the nixpkgs source tree at the unstable channel commit pinned in flake.lock
+  # nixpkgs-stable defined in inputs and here it represents the root of the nixpkgs
+  # source tree at the stable channel commit pinned in flake.lock
   outputs =
     {
       self,
       nixpkgs,
-      nixpkgs-unstable,
+      nixpkgs-stable,
       home-manager,
       nix-flatpak,
+      nixos-cosmic,
       ...
     }:
     let
@@ -33,9 +40,9 @@
       # The system architecture for your machines.
       system = "x86_64-linux";
 
-      # Create a pkgs instance for unstable packages
+      # Create a pkgs instance for stable packages
       # `import` turns that into the exported function defined by nixpkgs (the big package set generator)
-      pkgsUnstable = import nixpkgs-unstable {
+      pkgsStable = import nixpkgs-stable {
         # loads `default.nix` from that source tree. In `nixpkgs`, `default.nix` is a function that expects an attribute set.
         inherit system; # syntactic sugar for system = system;
         config.allowUnfree = true;
@@ -47,9 +54,12 @@
       nixosConfigurations = {
         laptop = lib.mkNixosSystem {
 
-          inherit nixpkgs system pkgsUnstable;
+          inherit nixpkgs system pkgsStable;
 
           modules = [
+            # COSMIC module set from the external flake (provides services.desktopManager.cosmic.*)
+            nixos-cosmic.nixosModules.default
+
             # This is the main entry point for your laptop configuration.
             ./hosts/laptop/default.nix
 
@@ -64,7 +74,7 @@
 
         # Example for a future server:
         # server = lib.mkNixosSystem {
-        #   inherit nixpkgs system pkgsUnstable;
+        #   inherit nixpkgs system pkgsStable;
         #   modules = [ ./hosts/server ];
         # };
       };

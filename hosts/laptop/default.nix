@@ -2,7 +2,7 @@
 # It imports the common configuration and then layers host-specific
 # settings on top.
 
-{ config, pkgs, pkgsUnstable, lib, ... }:
+{ config, pkgs, pkgsStable, lib, ... }:
 {
   imports = [
     # Import the common base configuration.
@@ -11,9 +11,11 @@
     # Hardware-specific configuration for this machine.
     ./hardware-configuration.nix
 
-    # Laptop-specific modules.
+    # Desktop
     ../../modules/nixos/desktop/common.nix
     ../../modules/nixos/desktop/cosmic.nix
+
+    # Other Laptop-specific modules
     ../../modules/nixos/desktop/fonts.nix
     ../../modules/nixos/hardware/nvidia-hybrid.nix
     ../../modules/nixos/hardware/bluetooth.nix
@@ -30,7 +32,7 @@
     useGlobalPkgs = true;                                 # Share pkgs with NixOS
     useUserPackages = true;                               # Keep user apps in user profile
     users.ahmed = { imports = [ ../../users/ahmed/default.nix ]; };  # HM module for ahmed
-    extraSpecialArgs = { inherit pkgsUnstable; };         # Allow a few unstable apps in HM
+    extraSpecialArgs = { inherit pkgsStable; };         # Allow a few stable apps in HM
   };
 
   # Laptop-only kernel choice (keep servers/VMs on default kernel)

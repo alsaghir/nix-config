@@ -1,7 +1,7 @@
 {
   config,
   pkgs,
-  pkgsUnstable ? null,
+  pkgsStable,
   lib,
   ...
 }:
@@ -75,9 +75,9 @@
     vulkan-tools
     fastfetch
 
-    pkgsUnstable.kotlin
+    kotlin
     temurin-bin-21
-    pkgsUnstable.gemini-cli
+    gemini-cli
 
     nixfmt-rfc-style
     statix
