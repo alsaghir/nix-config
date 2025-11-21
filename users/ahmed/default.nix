@@ -74,6 +74,7 @@
     mesa-demos
     vulkan-tools
     fastfetch
+    kdePackages.konsole
 
     kotlin
     temurin-bin-21
