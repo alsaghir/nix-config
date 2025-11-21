@@ -12,7 +12,8 @@
     ./hardware-configuration.nix
 
     # Laptop-specific modules.
-    ../../modules/nixos/desktop/plasma.nix
+    ../../modules/nixos/desktop/common.nix
+    ../../modules/nixos/desktop/cosmic.nix
     ../../modules/nixos/desktop/fonts.nix
     ../../modules/nixos/hardware/nvidia-hybrid.nix
     ../../modules/nixos/hardware/bluetooth.nix
@@ -131,6 +132,8 @@
   ############################
   # Audio (Low Latency PipeWire)
   ############################
+  services.pulseaudio.enable = false;
+  security.rtkit.enable = true;
   services.pipewire = {
     enable = true;
     alsa.enable = true;
@@ -147,8 +150,6 @@
       };
     };
   };
-
- 
 
   # Host-specific settings
   networking.hostName = "asus-nixos";
