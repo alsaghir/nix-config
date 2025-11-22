@@ -13,7 +13,7 @@
 
     # Desktop
     ../../modules/nixos/desktop/common.nix
-    ../../modules/nixos/desktop/cosmic.nix
+    ../../modules/nixos/desktop/gnome.nix
 
     # Other Laptop-specific modules
     ../../modules/nixos/desktop/fonts.nix
