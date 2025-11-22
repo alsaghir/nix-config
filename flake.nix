@@ -2,8 +2,8 @@
   description = "Zephyrus G15 – NixOS + Home Manager";
 
   inputs = {
-        nixpkgs.follows = "nixos-cosmic/nixpkgs"; # NOTE: change "nixpkgs" to "nixpkgs-stable" to use stable NixOS release
-    #nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-25.05";
 
     home-manager = {
@@ -16,10 +16,6 @@
       url = "github:gmodena/nix-flatpak/?ref=latest";
     };
 
-    nixos-cosmic = {
-      url = "github:lilyinstarlight/nixos-cosmic";
-      #inputs.nixpkgs.follows = "nixpkgs";
-    };
   };
 
   # nixpkgs-stable defined in inputs and here it represents the root of the nixpkgs
@@ -31,7 +27,6 @@
       nixpkgs-stable,
       home-manager,
       nix-flatpak,
-      nixos-cosmic,
       ...
     }:
     let
@@ -58,9 +53,6 @@
           inherit nixpkgs system pkgsStable;
 
           modules = [
-            # COSMIC module set from the external flake (provides services.desktopManager.cosmic.*)
-            nixos-cosmic.nixosModules.default
-
             # This is the main entry point for your laptop configuration.
             ./hosts/laptop/default.nix
 

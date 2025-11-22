@@ -9,13 +9,11 @@
   services.xserver.videoDrivers = [ "nvidia" ];
   services.libinput.enable = true;
   programs.firefox.enable = true;
+  
 
   # Generic desktop session environment vars (Wayland + Electron + Firefox)
   environment.sessionVariables = {
     MOZ_ENABLE_WAYLAND = "1";
     NIXOS_OZONE_WL = "1";
-    # Uncomment only if needed:
-    # LIBVA_DRIVER_NAME = "nvidia";
-    # __GLX_VENDOR_LIBRARY_NAME = "nvidia";
   };
 }

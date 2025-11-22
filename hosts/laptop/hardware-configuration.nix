@@ -11,7 +11,9 @@
   boot.initrd.availableKernelModules = [ "nvme" "xhci_pci" "usbhid" "usb_storage" "sd_mod" "sdhci_pci" ];
   boot.initrd.kernelModules = [ ];
   boot.kernelModules = [ "kvm-amd" ];
-  boot.extraModulePackages = [ ];
+  boot.extraModulePackages = [
+    config.boot.kernelPackages.nvidia_x11
+  ];
 
     # Btrfs mounts with recommended options
   fileSystems."/" = {

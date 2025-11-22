@@ -1,8 +1,17 @@
-{ config, pkgs, lib, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 {
   # Modern graphics option
   hardware.graphics.enable = true;
-  hardware.graphics.enable32Bit = true;  # 32‑bit GL/Vulkan for Steam/Wine
+  hardware.graphics.enable32Bit = true; # 32‑bit GL/Vulkan for Steam/Wine
+  hardware.graphics.extraPackages = with pkgs; [
+    # For NVIDIA/VAAPI support (required for HWA in browsers)
+    nvidia-vaapi-driver
+  ];
 
   hardware.nvidia = {
     package = config.boot.kernelPackages.nvidiaPackages.production;
@@ -14,8 +23,8 @@
     prime = {
       offload.enable = true;
       # Bus IDs: get them via `lspci | grep -E "VGA|3D"`; format: PCI:<bus>:<device>:0
-      amdgpuBusId = "PCI:6:0:0";   # iGPU (example from your system)
-      nvidiaBusId = "PCI:1:0:0";   # dGPU
+      amdgpuBusId = "PCI:6:0:0"; # iGPU (example from your system)
+      nvidiaBusId = "PCI:1:0:0"; # dGPU
     };
   };
 
