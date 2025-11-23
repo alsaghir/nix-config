@@ -3,8 +3,12 @@
   pkgs,
   pkgsStable,
   lib,
+  osConfig,
   ...
 }:
+let
+  isGnome = osConfig.services.desktopManager.gnome.enable or false;
+in
 {
   home.username = "ahmed";
   home.homeDirectory = "/home/ahmed";
@@ -70,25 +74,42 @@
   programs.fzf.enable = true;
 
   # User-level packages (not strictly needed system-wide)
-  home.packages = with pkgs; [
-    mesa-demos
-    vulkan-tools
-    fastfetch
-    kdePackages.konsole
+  home.packages =
+    with pkgs;
+    [
+      bash
+      usbutils
+      mesa-demos
+      vulkan-tools
+      fastfetch
+      kdePackages.konsole
+      terminator
 
-    kotlin
-    temurin-bin-21
-    gemini-cli
+      kotlin
+      temurin-bin-21
+      gemini-cli
 
-    nixfmt-rfc-style
-    statix
-    deadnix
-    nix-output-monitor
-    nvd
-    nix-diff
-    nix-tree
-    nix-index
-  ];
+      nixfmt-rfc-style
+      statix
+      deadnix
+      nix-output-monitor
+      nvd
+      nix-diff
+      nix-tree
+      nix-index
+    ]
+    ++ lib.optionals isGnome (
+      with pkgs.gnomeExtensions;
+      [
+        appindicator
+        bing-wallpaper-changer
+        caffeine
+        clipboard-indicator
+        ddterm
+        gpu-supergfxctl-switch
+        battery-health-charging
+      ]
+    );
 
   programs.vscode = {
     enable = true;
@@ -108,21 +129,27 @@
 
   programs.ssh = {
     enable = true;
-    extraConfig = ''
-      Host github
-        HostName github.com
-        User git
-        IdentityFile ~/.ssh/id_ed25519
-        AddKeysToAgent yes
-        IdentitiesOnly yes
-        PreferredAuthentications publickey
-
-      Host *
-        AddKeysToAgent yes
-        IdentityFile ~/.ssh/id_ed25519
-        IdentitiesOnly yes
-        User git
-    '';
+    enableDefaultConfig = false;
+    matchBlocks = {
+      "github" = {
+        hostname = "github.com";
+        user = "git";
+        identityFile = "~/.ssh/id_ed25519";
+        extraOptions = {
+          AddKeysToAgent = "yes";
+          IdentitiesOnly = "yes";
+          PreferredAuthentications = "publickey";
+        };
+      };
+      "*" = {
+        identityFile = "~/.ssh/id_ed25519";
+        extraOptions = {
+          AddKeysToAgent = "yes";
+          IdentitiesOnly = "yes";
+        };
+        user = "git";
+      };
+    };
   };
 
   # Shell and small conveniences
@@ -132,6 +159,43 @@
   };
 
   programs.git.enable = true;
+
+  # Gnome configurations using home manager
+  # Just placeholder if wanted to install and activate
+  # extensions using different way
+  programs.gnome-shell = lib.mkIf isGnome {
+    enable = false;
+    extensions = [
+      { package = pkgs.gnomeExtensions.caffeine; }
+    ];
+  };
+  dconf = lib.mkIf isGnome {
+    enable = true;
+    settings = {
+      "org/gnome/shell" = {
+        # disable-user-extensions = true; # Optionally disable user extensions entirely
+        enabled-extensions = [
+          "appindicatorsupport@rgcjonas.gmail.com"
+          "auto-move-windows@gnome-shell-extensions.gcampax.github.com"
+          "Battery-Health-Charging@maniacx.github.com"
+          "BingWallpaper@ineffable-gmail.com"
+          "caffeine@patapon.info"
+          "clipboard-indicator@tudmotu.com"
+          "ddterm@amezin.github.com"
+          "drive-menu@gnome-shell-extensions.gcampax.github.com"
+          "gpu-switcher-supergfxctl@chikobara.github.io"
+          "light-style@gnome-shell-extensions.gcampax.github.com"
+          "native-window-placement@gnome-shell-extensions.gcampax.github.com"
+          "places-menu@gnome-shell-extensions.gcampax.github.com"
+          "status-icons@gnome-shell-extensions.gcampax.github.com"
+          "system-monitor@gnome-shell-extensions.gcampax.github.com"
+          "user-theme@gnome-shell-extensions.gcampax.github.com"
+          "windowsNavigator@gnome-shell-extensions.gcampax.github.com"
+          "workspace-indicator@gnome-shell-extensions.gcampax.github.com"
+        ];
+      };
+    };
+  };
 
   # Set HM state version (match current release; do not bump casually)
   home.stateVersion = "25.05";

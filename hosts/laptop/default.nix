@@ -2,7 +2,13 @@
 # It imports the common configuration and then layers host-specific
 # settings on top.
 
-{ config, pkgs, pkgsStable, lib, ... }:
+{
+  config,
+  pkgs,
+  pkgsStable,
+  lib,
+  ...
+}:
 {
   imports = [
     # Import the common base configuration.
@@ -29,14 +35,16 @@
 
   # Home Manager: declarative user environment layered on top of NixOS
   home-manager = {
-    useGlobalPkgs = true;                                 # Share pkgs with NixOS
-    useUserPackages = true;                               # Keep user apps in user profile
-    users.ahmed = { imports = [ ../../users/ahmed/default.nix ]; };  # HM module for ahmed
-    extraSpecialArgs = { inherit pkgsStable; };         # Allow a few stable apps in HM
+    useGlobalPkgs = true; # Share pkgs with NixOS
+    useUserPackages = true; # Keep user apps in user profile
+    users.ahmed = {
+      imports = [ ../../users/ahmed/default.nix ];
+    }; # HM module for ahmed
+    extraSpecialArgs = { inherit pkgsStable; }; # Allow a few stable apps in HM
   };
 
   # Laptop-only kernel choice (keep servers/VMs on default kernel)
-  boot.kernelPackages = pkgs.linuxPackages_latest;
+  boot.kernelPackages = pkgs.linuxPackages_xanmod_stable;
 
   specialisation = {
     kernel-latest.configuration = {
@@ -51,8 +59,11 @@
     kernel-lqx.configuration = {
       boot.kernelPackages = lib.mkForce pkgs.linuxPackages_lqx;
     };
-     kernel-xanmod.configuration = {
+    kernel-xanmod-stable.configuration = {
       boot.kernelPackages = lib.mkForce pkgs.linuxPackages_xanmod_stable;
+    };
+    kernel-xanmod-latest.configuration = {
+      boot.kernelPackages = lib.mkForce pkgs.linuxPackages_xanmod_latest;
     };
   };
 
@@ -64,9 +75,25 @@
     priority = 100;
   };
   swapDevices = [
-    { device = "/swap/swapfiles/swapfile"; priority = 50; }
+    {
+      device = "/swap/swapfiles/swapfile";
+      priority = 50;
+    }
   ];
 
+  security.polkit.enable = true;
+  services.hardware.openrgb = { 
+  enable = true; 
+  package = pkgs.openrgb-with-all-plugins; 
+  };
+  hardware.i2c.enable = true;
+  services.supergfxd.enable = true;
+  services = {
+    asusd = {
+      enable = true;
+      enableUserService = true;
+    };
+  };
   # =========================
   # Power management (TLP)
   # =========================
@@ -75,7 +102,7 @@
   services.power-profiles-daemon.enable = false;
 
   services.tlp = {
-    enable = true;
+    enable = false;
 
     # This becomes /etc/tlp.conf (generated). Values below are safe defaults for Ryzen 5000 laptops.
     settings = {
