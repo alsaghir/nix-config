@@ -161,6 +161,12 @@ in
   programs.git.enable = true;
 
   # Gnome configurations using home manager
+  xdg.mimeApps = lib.mkIf isGnome {
+    enable = true;
+    defaultApplications = {
+      "inode/directory" = "nemo.desktop";
+    };
+  };
   # Just placeholder if wanted to install and activate
   # extensions using different way
   programs.gnome-shell = lib.mkIf isGnome {

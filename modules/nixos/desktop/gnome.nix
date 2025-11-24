@@ -8,7 +8,7 @@
 
   # To disable installing GNOME's suite of applications
   # and only be left with GNOME shell.
-  services.gnome.core-apps.enable = false;
+  services.gnome.core-apps.enable = true;
   services.gnome.core-developer-tools.enable = false;
   services.gnome.games.enable = false;
   environment.gnome.excludePackages = with pkgs; [
@@ -26,6 +26,7 @@
     totem # video player
     gnome-tour
     cheese
+    nautilus
     gnome-maps
     gnome-contacts
     gnome-calendar
@@ -60,5 +61,13 @@
     platformTheme = "gnome";
     style = "adwaita-dark";
   };
+
+  networking.networkmanager.settings = {
+  connectivity = {
+    # Set to 0 to disable the check and remove the question mark
+    # Or set to a reliable URL: "http://connectivity-check.ubuntu.com/"
+    interval = 0; 
+  };
+};
 
 }
