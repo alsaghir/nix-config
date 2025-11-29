@@ -17,6 +17,8 @@
     # Keep build outputs referenced
     substituters = [
       "https://cosmic.cachix.org"
+      "https://mirror.sjtu.edu.cn/nix-channels/store" # China mirrors (fast globally)
+      "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store"
       "https://cache.nixos.org"
       "https://nix-community.cachix.org"
     ];

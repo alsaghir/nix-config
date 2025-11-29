@@ -27,14 +27,21 @@
     "i2c-nct6775"
     "asus-wmi"
     "asus-nb-wmi"
+    "asus-armoury"
   ];
   boot.blacklistedKernelModules = [ "nouveau" ];
   boot.extraModulePackages = [
     config.boot.kernelPackages.nvidia_x11
+    config.boot.kernelPackages.asus-ec-sensors
   ];
   boot.kernelParams = [
     "nvidia-drm.modeset=1"
     "acpi_backlight=native"
+    "mem_sleep_default=deep"
+    "button.lid_init_state=open"
+    "amdgpu.exp_hw_support=0"
+    "amdgpu.powerplay=0"
+    "amdgpu.dce_slow_cpu_access=1"
   ];
 
   # Btrfs mounts with recommended options

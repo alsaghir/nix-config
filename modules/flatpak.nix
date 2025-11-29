@@ -23,6 +23,12 @@
       "com.microsoft.Edge"
       "io.missioncenter.MissionCenter"
       "com.biglybt.BiglyBT"
+      "org.gtk.Gtk3theme.Orchis"
+      "org.gtk.Gtk3theme.Orchis-Dark"
+      "org.gtk.Gtk3theme.Yaru"
+      "org.gtk.Gtk3theme.Yaru-dark"
+      "org.gtk.Gtk3theme.adw-gtk3"
+      "org.gtk.Gtk3theme.adw-gtk3-dark"
       # You can mix forms:
       # { appId = "com.brave.Browser"; origin = "flathub"; }
     ];
@@ -43,5 +49,31 @@
     #     GTK_THEME = "Adwaita:dark";
     #   };
     # };
+
+    overrides = {
+            global = {
+              Context = {
+                filesystems = [
+                  "/nix/store:ro"
+                  "/run/current-system/sw/bin:ro"
+                  "xdg-config/fontconfig:ro"
+                  "xdg-config/gtkrc:ro"
+                  "xdg-config/gtkrc-2.0:ro"
+                  "xdg-config/gtk-2.0:ro"
+                  "xdg-config/gtk-3.0:ro"
+                  "xdg-config/gtk-4.0:ro"
+                  "xdg-data/themes:ro"
+                  "xdg-data/icons:ro"
+                ];
+              };
+              Environment = {
+                # Wrong cursor in flatpaks fix
+                XCURSOR_PATH = "/run/host/user-share/icons:/run/host/share/icons";
+              };
+            };
+          };
+    uninstallUnmanaged = false;
+      
   };
+
 }

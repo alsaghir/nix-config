@@ -7,6 +7,7 @@
   pkgs,
   pkgsStable,
   lib,
+  self,
   ...
 }:
 {
@@ -81,6 +82,7 @@
     }
   ];
 
+  # Asus stuff
   security.polkit.enable = true;
   services.hardware.openrgb = { 
   enable = true; 
@@ -92,6 +94,27 @@
     asusd = {
       enable = true;
       enableUserService = true;
+    };
+  };
+  # This service forces the desired profile after boot
+  systemd.services.set-asus-profile = {
+    description = "Set Default ASUS Profile to Balanced";
+    
+    # 1. Ensure it runs after the required services are up
+    after = [ "supergfxd.service" "asusd.service" ];
+    requires = [ "asusd.service" ];
+    
+    # 2. Tell Systemd that the service is only needed when multi-user is running
+    wantedBy = [ "multi-user.target" ];
+    
+    serviceConfig = {
+      Type = "oneshot"; # The command runs once and then exits
+      User = "root";   # Required for hardware control commands
+      
+      # Execute the command to set the power profile
+      # You need to call 'asusctl profile' to set the power profile
+      # We use 'lib.makeBinPath' to ensure the 'asusctl' binary is found in the Nix store.
+      ExecStart = "${pkgs.lib.makeBinPath [ pkgs.asusctl ]}/asusctl profile --profile-set Balanced";
     };
   };
   # =========================
@@ -179,6 +202,18 @@
       };
     };
   };
+
+system.activationScripts.patchBiglyBT = {
+    text = ''
+      # 1. SETUP ENVIRONMENT
+      # Added 'pkgs.gzip' so tar can handle .tar.gz files
+      export PATH=${lib.makeBinPath [ pkgs.flatpak pkgs.unzip pkgs.gnutar pkgs.gzip pkgs.coreutils ]}:$PATH
+
+      echo "Hello World" >&2 
+    '';
+    deps = [];
+  };
+
 
   # Host-specific settings
   networking.hostName = "asus-nixos";

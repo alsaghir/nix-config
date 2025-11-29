@@ -77,6 +77,7 @@ in
   home.packages =
     with pkgs;
     [
+      jetbrains-toolbox
       bash
       usbutils
       mesa-demos
@@ -84,6 +85,9 @@ in
       fastfetch
       kdePackages.konsole
       terminator
+      kdePackages.kcalc
+      code-cursor
+      unzip
 
       kotlin
       temurin-bin-21
@@ -97,34 +101,39 @@ in
       nix-diff
       nix-tree
       nix-index
+      nil
     ]
     ++ lib.optionals isGnome (
       with pkgs.gnomeExtensions;
       [
         appindicator
-        bing-wallpaper-changer
+        battery-health-charging
+        bluetooth-quick-connect
+        blur-my-shell
         caffeine
         clipboard-indicator
         ddterm
+        gnome-40-ui-improvements
         gpu-supergfxctl-switch
-        battery-health-charging
+        gsconnect
+        light-style
+        native-window-placement
+        places-status-indicator
+        removable-drive-menu
+        system-monitor
+        transparent-window-moving
+        user-themes
+        workspace-indicator
+        wallpaper-slideshow
+
+        paperwm
+        tiling-shell
       ]
     );
 
   programs.vscode = {
     enable = true;
-    package = pkgs.vscode; # or pkgs.vscodium if you prefer the FOSS build
-    # Manage extensions with Nix (examples):
-    # extensions = with pkgs.vscode-extensions; [
-    #   ms-python.python
-    #   ms-vscode.cpptools
-    #   rust-lang.rust-analyzer
-    # ];
-    # User settings example:
-    # userSettings = {
-    #   "editor.fontLigatures" = true;
-    #   "terminal.integrated.inheritEnv" = true;
-    # };
+    package = pkgs.vscode;
   };
 
   programs.ssh = {
@@ -161,12 +170,23 @@ in
   programs.git.enable = true;
 
   # Gnome configurations using home manager
+  gtk.theme = lib.mkIf isGnome {
+    name = "Orchis-Dark";
+    package = pkgs.orchis-theme;
+  };
+
   xdg.mimeApps = lib.mkIf isGnome {
     enable = true;
     defaultApplications = {
       "inode/directory" = "nemo.desktop";
+      "application/x-gnome-saved-search" = [ "nemo.desktop" ];
     };
   };
+  xdg.desktopEntries.nemo = {
+    name = "Nemo";
+    exec = "${pkgs.nemo-with-extensions}/bin/nemo";
+  };
+
   # Just placeholder if wanted to install and activate
   # extensions using different way
   programs.gnome-shell = lib.mkIf isGnome {
@@ -181,25 +201,46 @@ in
       "org/gnome/shell" = {
         # disable-user-extensions = true; # Optionally disable user extensions entirely
         enabled-extensions = [
+          "azwallpaper@azwallpaper.gitlab.com"
           "appindicatorsupport@rgcjonas.gmail.com"
           "auto-move-windows@gnome-shell-extensions.gcampax.github.com"
           "Battery-Health-Charging@maniacx.github.com"
-          "BingWallpaper@ineffable-gmail.com"
+          "bluetooth-quick-connect@bjarosze.gmail.com"
+          "blur-my-shell@aunetx"
           "caffeine@patapon.info"
           "clipboard-indicator@tudmotu.com"
           "ddterm@amezin.github.com"
           "drive-menu@gnome-shell-extensions.gcampax.github.com"
+          "gnome-ui-tune@itstime.tech"
           "gpu-switcher-supergfxctl@chikobara.github.io"
+          "gsconnect@andyholmes.github.io"
           "light-style@gnome-shell-extensions.gcampax.github.com"
           "native-window-placement@gnome-shell-extensions.gcampax.github.com"
           "places-menu@gnome-shell-extensions.gcampax.github.com"
-          "status-icons@gnome-shell-extensions.gcampax.github.com"
           "system-monitor@gnome-shell-extensions.gcampax.github.com"
+          "transparent-window-moving@noobsai.github.com"
           "user-theme@gnome-shell-extensions.gcampax.github.com"
-          "windowsNavigator@gnome-shell-extensions.gcampax.github.com"
           "workspace-indicator@gnome-shell-extensions.gcampax.github.com"
+          "paperwm@paperwm.github.com"
         ];
+
+        disabled-extensions = [
+          "windowsNavigator@gnome-shell-extensions.gcampax.github.com"
+          "status-icons@gnome-shell-extensions.gcampax.github.com"
+          "tilingshell@ferrarodomenico.com"
+          "apps-menu@gnome-shell-extensions.gcampax.github.com"
+          "auto-move-windows@gnome-shell-extensions.gcampax.github.com"
+          "BingWallpaper@sonichy"
+          "window-list@gnome-shell-extensions.gcampax.github.com"
+        ];
+
       };
+      "system/locale" = {
+        region = osConfig.i18n.defaultLocale or "en_GB.UTF-8";
+      };
+      "org/cinnamon/desktop/applications/terminal" = {
+            exec = "konsole";
+        };
     };
   };
 

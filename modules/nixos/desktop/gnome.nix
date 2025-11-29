@@ -4,7 +4,11 @@
   services.displayManager.gdm.enable = true;
   services.desktopManager.gnome.enable = true;
   programs.dconf.enable = true;
-  
+    # Explicitly disable logind idle handling to let GNOME manage it.
+  services.logind.settings.Login  = {
+    IdleAction = "ignore";
+    IdleActionSec = "0";
+  };
 
   # To disable installing GNOME's suite of applications
   # and only be left with GNOME shell.
@@ -12,21 +16,19 @@
   services.gnome.core-developer-tools.enable = false;
   services.gnome.games.enable = false;
   environment.gnome.excludePackages = with pkgs; [
-    atomix # puzzle game
-    cheese # webcam tool
-    epiphany # web browser
-    evince # document viewer
-    geary # email reader
-    gedit # text editor
-    gnome-characters
+    atomix 
+    cheese
+    epiphany
+    evince
+    geary
+    gedit
     gnome-terminal
-    hitori # sudoku game
-    iagno # go game
-    tali # poker game
-    totem # video player
+    hitori
+    iagno
+    tali
+    totem
     gnome-tour
     cheese
-    nautilus
     gnome-maps
     gnome-contacts
     gnome-calendar
@@ -35,17 +37,45 @@
     gnome-music
     gnome-weather
     gnome-user-docs
+    gnome-calculator
+    gnome-console
+    simple-scan
+    decibels
   ];
 
   # Helpful GNOME tooling
   environment.systemPackages = with pkgs; [
-    nemo
+    ffmpeg-headless
+    ffmpegthumbnailer
+    imagemagick
+    gst_all_1.gstreamer
+    gst_all_1.gst-plugins-base
+    gst_all_1.gst-plugins-good
+    gst_all_1.gst-plugins-bad
+    gst_all_1.gst-plugins-ugly
+    gst_all_1.gst-libav
+    gst_all_1.gst-vaapi
+    gnome-desktop
+    nemo-with-extensions
     refine
     gnome-tweaks
     gnome-shell-extensions
     gnome-extension-manager
     wl-clipboard
+    adwaita-fonts
     adwaita-icon-theme
+    baobab
+    orchis-theme
+    whitesur-icon-theme
+    whitesur-gtk-theme
+    whitesur-cursors
+    yaru-theme
+    kdePackages.qtstyleplugin-kvantum
+    libsForQt5.qt5.qtgraphicaleffects
+    themechanger
+    dconf-editor
+    file-roller
+    nautilus
   ];
 
   # Wayland-friendly env
@@ -53,8 +83,18 @@
     QT_STYLE_OVERRIDE = "adwaita-dark";
   };
 
-  xdg.portal.enable = true;
-  xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-gnome ];
+  xdg.portal = {
+    enable = true;
+    extraPortals = [ 
+      pkgs.xdg-desktop-portal-gnome
+      pkgs.xdg-desktop-portal-gtk
+     ];
+    config.common.default = [
+      "gnome"
+      "gtk"
+      "*"
+    ];
+  };
 
   qt = {
     enable = true;
