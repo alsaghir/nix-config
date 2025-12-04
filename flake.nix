@@ -3,8 +3,8 @@
 
   inputs = {
 
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-25.05";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
+    nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
 
     home-manager = {
       url = "github:nix-community/home-manager";
@@ -31,7 +31,7 @@
 
       # Create a pkgs instance for stable packages
       # `import` turns that into the exported function defined by nixpkgs (the big package set generator)
-      pkgsStable = import inputs.nixpkgs-stable {
+      pkgsUnstable = import inputs.nixpkgs-unstable {
         # loads `default.nix` from that source tree. In `nixpkgs`, `default.nix` is a function that expects an attribute set.
         inherit system; # syntactic sugar for system = system;
         config.allowUnfree = true;
@@ -43,8 +43,8 @@
       nixosConfigurations = {
         laptop = lib.mkNixosSystem {
 
-          inherit (inputs) nixpkgs pkgsStable;
-          inherit system;
+          inherit (inputs) nixpkgs;
+          inherit system pkgsUnstable;
 
           modules = [
             # This is the main entry point for your laptop configuration.
@@ -61,7 +61,7 @@
 
         # Example for a future server:
         # server = lib.mkNixosSystem {
-        #   inherit nixpkgs system pkgsStable;
+        #   inherit nixpkgs system pkgsUnstable;
         #   modules = [ ./hosts/server ];
         # };
       };

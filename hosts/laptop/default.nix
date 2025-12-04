@@ -5,7 +5,7 @@
 {
   config,
   pkgs,
-  pkgsStable,
+  pkgsUnstable,
   lib,
   self,
   ...
@@ -33,7 +33,7 @@
     users.ahmed = {
       imports = [ ../../users/ahmed.nix ];
     }; # HM module for ahmed
-    extraSpecialArgs = { inherit pkgsStable; }; # Allow a few stable apps in HM
+    extraSpecialArgs = { inherit pkgsUnstable; }; # Allow a few un-stable apps in HM
   };
 
   # Laptop-only kernel choice (keep servers/VMs on default kernel)

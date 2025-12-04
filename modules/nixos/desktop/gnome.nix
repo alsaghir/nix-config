@@ -81,6 +81,7 @@
   # Wayland-friendly env
   environment.sessionVariables = {
     QT_STYLE_OVERRIDE = "adwaita-dark";
+    GTK_THEME = "Adwaita:dark";
   };
 
   xdg.portal = {

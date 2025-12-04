@@ -21,7 +21,6 @@
       "info.smplayer.SMPlayer"
       "com.discordapp.Discord"
       "com.microsoft.Edge"
-      "io.missioncenter.MissionCenter"
       "com.biglybt.BiglyBT"
       "org.gtk.Gtk3theme.Orchis"
       "org.gtk.Gtk3theme.Orchis-Dark"

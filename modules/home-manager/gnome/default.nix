@@ -10,11 +10,11 @@ let
 in
 {
   programs.gnome-shell = lib.mkIf isGnome {
-    enable = true; 
+    enable = true;
     extensions = with pkgs.gnomeExtensions; [
       { package = appindicator; }
       { package = battery-health-charging; }
-      { package =  bluetooth-quick-connect; }
+      { package = bluetooth-quick-connect; }
       { package = blur-my-shell; }
       { package = caffeine; }
       { package = clipboard-indicator; }
@@ -36,10 +36,19 @@ in
     ];
   };
 
+  # Wayland, X, etc. support for session vars
+  systemd.user.sessionVariables = config.home.sessionVariables;
+
   # Gnome configurations using home manager
   gtk.theme = lib.mkIf isGnome {
-    name = "Orchis-Dark";
-    package = pkgs.orchis-theme;
+    name = "Adwaita-dark";
+    package = pkgs.gnome.gnome-themes-extra;
+    gtk3.extraConfig = {
+      gtk-application-prefer-dark-theme = 1;
+    };
+    gtk4.extraConfig = {
+      gtk-application-prefer-dark-theme = 1;
+    };
   };
 
   xdg.mimeApps = lib.mkIf isGnome {
@@ -51,7 +60,16 @@ in
   };
   xdg.desktopEntries.nemo = lib.mkIf isGnome {
     name = "Nemo";
-    exec = "${pkgs.nemo-with-extensions}/bin/nemo";
+    exec = "env GTK_THEME=Adwaita:dark ${pkgs.nemo-with-extensions}/bin/nemo %U";
+    mimeType = [ "inode/directory" "application/x-gnome-saved-search" ];
+    icon = "nemo";
+  };
+  xdg.desktopEntries."org.kde.kcalc" = lib.mkIf isGnome {
+    name = "KCalc";
+    exec = "env QT_STYLE_OVERRIDE=adwaita kcalc"; 
+    icon = "kcalc";
+    comment = "Scientific Calculator";
+    categories = [ "Utility" "Calculator" ];
   };
 
   # We can now remove the hardcoded 'enabled-extensions' list
@@ -76,6 +94,10 @@ in
           "BingWallpaper@sonichy"
           "window-list@gnome-shell-extensions.gcampax.github.com"
         ];
+      };
+      "org/gnome/desktop/interface" = {
+        color-scheme = "prefer-dark";
+        gtk-theme = "Adwaita-dark";
       };
     };
   };
