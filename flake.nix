@@ -7,7 +7,7 @@
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
 
     home-manager = {
-      url = "github:nix-community/home-manager";
+      url = "github:nix-community/home-manager/release-25.11";
       inputs.nixpkgs.follows = "nixpkgs"; # Use the SAME nixpkgs input (commit/revision) that my top-level flake uses
       # “follows” is a feature of the flake input specification. It is not a Nix language keyword. It simply aliases one input’s revision to another.
     };
