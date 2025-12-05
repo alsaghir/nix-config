@@ -1,5 +1,7 @@
 { config, pkgs, ... }:
 {
+  i18n.inputMethod.enable = true;
+  i18n.inputMethod.type = "ibus";
   time.timeZone = "Africa/Cairo";
   i18n.defaultLocale = "en_GB.UTF-8";
   i18n.extraLocaleSettings = {

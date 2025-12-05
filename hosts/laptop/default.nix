@@ -25,6 +25,8 @@
     # User definitions
     ../../users/user.nix
   ];
+  
+  system.configurationRevision = self.rev or self.dirtyRev or null;
 
   # Home Manager: declarative user environment layered on top of NixOS
   home-manager = {
@@ -40,9 +42,9 @@
   boot.kernelPackages = pkgs.linuxPackages_xanmod_stable;
 
   specialisation = {
-    kernel-latest.configuration = {
-      boot.kernelPackages = lib.mkForce pkgs.linuxPackages_latest;
-    };
+    # kernel-latest.configuration = {
+    #   boot.kernelPackages = lib.mkForce pkgs.linuxPackages_latest;
+    # };
     kernel-66.configuration = {
       boot.kernelPackages = lib.mkForce pkgs.linuxPackages_6_6;
     };

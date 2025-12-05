@@ -65,24 +65,17 @@
     adwaita-fonts
     adwaita-icon-theme
     baobab
-    orchis-theme
-    whitesur-icon-theme
-    whitesur-gtk-theme
-    whitesur-cursors
-    yaru-theme
     kdePackages.qtstyleplugin-kvantum
     libsForQt5.qt5.qtgraphicaleffects
-    themechanger
     dconf-editor
     file-roller
     nautilus
   ];
 
   # Wayland-friendly env
-  environment.sessionVariables = {
-    QT_STYLE_OVERRIDE = "adwaita-dark";
-    GTK_THEME = "Adwaita:dark";
-  };
+   environment.sessionVariables = {
+     QT_STYLE_OVERRIDE = "adwaita-dark";
+   };
 
   xdg.portal = {
     enable = true;
@@ -101,7 +94,7 @@
     enable = true;
     platformTheme = "gnome";
     style = "adwaita-dark";
-  };
+   };
 
   networking.networkmanager.settings = {
   connectivity = {

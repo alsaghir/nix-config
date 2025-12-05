@@ -22,12 +22,7 @@
       "com.discordapp.Discord"
       "com.microsoft.Edge"
       "com.biglybt.BiglyBT"
-      "org.gtk.Gtk3theme.Orchis"
-      "org.gtk.Gtk3theme.Orchis-Dark"
-      "org.gtk.Gtk3theme.Yaru"
-      "org.gtk.Gtk3theme.Yaru-dark"
-      "org.gtk.Gtk3theme.adw-gtk3"
-      "org.gtk.Gtk3theme.adw-gtk3-dark"
+
       # You can mix forms:
       # { appId = "com.brave.Browser"; origin = "flathub"; }
     ];
@@ -75,21 +70,19 @@
 
   };
 
-  system.activationScripts.patchBiglyBT = {
+  system.activationScripts.someScriptUsingSudo = {
     text = ''
       export PATH=${
         lib.makeBinPath [
-          pkgs.flatpak
           pkgs.unzip
-          pkgs.gnutar
-          pkgs.gzip
-          pkgs.coreutils
         ]
       }:$PATH
 
-      echo "Patching BiglyBT..." >&2
+      echo "Running some script using Sudo ..." >&2
     '';
     deps = [ ]; # deps are usually inferred, leaving it empty is fine
   };
 
 }
+
+

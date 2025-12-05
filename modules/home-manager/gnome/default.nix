@@ -42,13 +42,13 @@ in
 
     # Gnome configurations using home manager
     gtk.theme = {
-      name = "Adwaita-dark";
+      name = "Adwaita-dark"; # or Adwaita-dark
       package = pkgs.gnome.gnome-themes-extra;
       gtk3.extraConfig = {
-        gtk-application-prefer-dark-theme = 1;
+        gtk-application-prefer-dark-theme = 1; # or 1 for dark theme
       };
       gtk4.extraConfig = {
-        gtk-application-prefer-dark-theme = 1;
+        gtk-application-prefer-dark-theme = 1; # or 1 for dark theme
       };
     };
 
@@ -61,7 +61,8 @@ in
     };
     xdg.desktopEntries.nemo = {
       name = "Nemo";
-      exec = "env GTK_THEME=Adwaita:dark ${pkgs.nemo-with-extensions}/bin/nemo %U";
+      # or Adwaita:dark
+      exec = "env GTK_THEME=Adwaita ${pkgs.nemo-with-extensions}/bin/nemo %U";
       mimeType = [
         "inode/directory"
         "application/x-gnome-saved-search"
@@ -71,7 +72,7 @@ in
     xdg.desktopEntries."org.kde.kcalc" = {
       name = "KCalc";
       exec = "env QT_STYLE_OVERRIDE=adwaita kcalc";
-      icon = "kcalc";
+      icon = "accessories-calculator";
       comment = "Scientific Calculator";
       categories = [
         "Utility"
@@ -92,6 +93,29 @@ in
         # Home Manager will now automatically populate 'enabled-extensions'
         # You can keep this block if you need to manage disabled ones.
         "org/gnome/shell" = {
+          enabled-extensions = [
+            "azwallpaper@azwallpaper.gitlab.com"
+            "appindicatorsupport@rgcjonas.gmail.com"
+            "auto-move-windows@gnome-shell-extensions.gcampax.github.com"
+            "Battery-Health-Charging@maniacx.github.com"
+            "bluetooth-quick-connect@bjarosze.gmail.com"
+            "blur-my-shell@aunetx"
+            "caffeine@patapon.info"
+            "clipboard-indicator@tudmotu.com"
+            "ddterm@amezin.github.com"
+            "drive-menu@gnome-shell-extensions.gcampax.github.com"
+            "gnome-ui-tune@itstime.tech"
+            "gpu-switcher-supergfxctl@chikobara.github.io"
+            "gsconnect@andyholmes.github.io"
+            "light-style@gnome-shell-extensions.gcampax.github.com"
+            "native-window-placement@gnome-shell-extensions.gcampax.github.com"
+            "places-menu@gnome-shell-extensions.gcampax.github.com"
+            "system-monitor@gnome-shell-extensions.gcampax.github.com"
+            "transparent-window-moving@noobsai.github.com"
+            "user-theme@gnome-shell-extensions.gcampax.github.com"
+            "workspace-indicator@gnome-shell-extensions.gcampax.github.com"
+            "paperwm@paperwm.github.com"
+          ];
           disabled-extensions = [
             "windowsNavigator@gnome-shell-extensions.gcampax.github.com"
             "status-icons@gnome-shell-extensions.gcampax.github.com"
@@ -101,10 +125,6 @@ in
             "BingWallpaper@sonichy"
             "window-list@gnome-shell-extensions.gcampax.github.com"
           ];
-        };
-        "org/gnome/desktop/interface" = {
-          color-scheme = "prefer-dark";
-          gtk-theme = "Adwaita-dark";
         };
       };
     };

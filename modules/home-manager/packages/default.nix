@@ -12,6 +12,7 @@
     kdePackages.kcalc
     code-cursor
     unzip
+    just
 
     kotlin
     temurin-bin-21

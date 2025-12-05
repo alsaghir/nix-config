@@ -44,7 +44,7 @@
         laptop = lib.mkNixosSystem {
 
           inherit (inputs) nixpkgs;
-          inherit system pkgsUnstable;
+          inherit system pkgsUnstable self;
 
           modules = [
             # This is the main entry point for your laptop configuration.
