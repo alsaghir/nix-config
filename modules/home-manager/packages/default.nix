@@ -14,9 +14,8 @@
     unzip
     just
 
-    kotlin
-    temurin-bin-21
     gemini-cli
+    kdePackages.kate
 
     nixfmt-rfc-style
     statix

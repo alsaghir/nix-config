@@ -1,4 +1,4 @@
-{ pkgs, ... }: # <-- Add pkgs here
+{ pkgs, ... }:
 {
   imports = [
     ../modules/home-manager/cli
