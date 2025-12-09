@@ -26,5 +26,7 @@
     nix-tree
     nix-index
     nil
+
+    podman-compose
   ];
 }

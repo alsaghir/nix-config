@@ -37,7 +37,7 @@
   boot.kernelParams = [
     "nvidia-drm.modeset=1"
     "acpi_backlight=native"
-    "mem_sleep_default=deep"
+    "mem_sleep_default=s2idle"
     "button.lid_init_state=open"
     "amdgpu.exp_hw_support=0"
     "amdgpu.powerplay=0"
