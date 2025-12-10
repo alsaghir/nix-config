@@ -39,4 +39,49 @@
       exec "$@"
     '')
   ];
+
+  # https://gitlab.gnome.org/GNOME/gnome-settings-daemon/-/issues/903#note_2619256
+  # TODO temp fix to prevent auto suspend after waking up
+  systemd.services.nvidia-suspend = {
+    # Add ConditionPathExists to the [Unit] section
+    unitConfig = {
+      ConditionPathExists = "/proc/driver/nvidia/suspend";
+    };
+    # Replace the ExecStart command in the [Service] section
+    serviceConfig = {
+      # The empty string "" clears the previous ExecStart command
+      ExecStart = [
+        ""
+        "${pkgs.bash}/bin/bash -c 'echo \"suspend\" > /proc/driver/nvidia/suspend'"
+      ];
+    };
+  };
+
+  # Override for nvidia-resume.service
+  systemd.services.nvidia-resume = {
+    unitConfig = {
+      ConditionPathExists = "/proc/driver/nvidia/suspend";
+    };
+    serviceConfig = {
+      ExecStart = [
+        ""
+        "${pkgs.bash}/bin/bash -c 'echo \"resume\" > /proc/driver/nvidia/suspend'"
+      ];
+    };
+  };
+
+  # Override for nvidia-suspend-then-hibernate.service
+  # Note: This is required even if you don't use this feature.
+  systemd.services.nvidia-suspend-then-hibernate = {
+    unitConfig = {
+      ConditionPathExists = "/proc/driver/nvidia/suspend";
+    };
+    serviceConfig = {
+      # We replace the command with the new 'suspend' echo command.
+      ExecStart = [
+        ""
+        "${pkgs.bash}/bin/bash -c 'echo \"suspend\" > /proc/driver/nvidia/suspend'"
+      ];
+    };
+  };
 }
