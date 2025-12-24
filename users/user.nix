@@ -3,9 +3,14 @@
   users.users.ahmed = {
     isNormalUser = true;
     description = "Ahmed";
-    extraGroups = [ "networkmanager" "wheel" ];
-    packages = with pkgs; [
-      kdePackages.kate
+    extraGroups = [
+      "networkmanager"
+      "wheel"
+      "i2c"
+      "video"
+      "render"
+      "input"
+      "podman"
     ];
     shell = pkgs.zsh;
   };

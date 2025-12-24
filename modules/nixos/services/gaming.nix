@@ -1,4 +1,4 @@
-{ config, pkgs, pkgsUnstable ? null, ... }:
+{ config, pkgs, ... }:
 {
   # Steam + Gamemode (Gamescope optional)
   programs.steam.enable = false;
