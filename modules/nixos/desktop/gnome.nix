@@ -48,6 +48,9 @@ in
     decibels
   ];
 
+  # for trash support in file managers
+  services.gvfs.enable = true;
+
   # Helpful GNOME tooling
   environment.systemPackages = with pkgs; [
     adwaita-fonts
@@ -68,7 +71,6 @@ in
     gst_all_1.gst-plugins-ugly
     gst_all_1.gst-vaapi
     gst_all_1.gstreamer
-    gvfs # for trash support in file managers
     imagemagick
     kdePackages.qtstyleplugin-kvantum
     libsForQt5.qt5.qtgraphicaleffects

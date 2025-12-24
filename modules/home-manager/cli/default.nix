@@ -57,6 +57,16 @@
       ];
   };
 
+  # direnv with nix-direnv
+  # direnv watches your .envrc files and loads/unloads environment variables automatically
+  # nix-direnv allows direnv to work seamlessly with Nix projects via caching, much faster
+  # without nix-direnv, direnv would have to build the Nix expressions every time it loads an .envrc
+  programs.direnv = {
+    enable = true;
+    enableZshIntegration = true;
+    nix-direnv.enable = true;
+  };
+
   # Proper starship via HM
   programs.starship.enable = true;
 

@@ -28,7 +28,7 @@
     "asus-nb-wmi"
     "asus-armoury"
   ];
-  boot.blacklistedKernelModules = [ "nouveau" ];
+  boot.blacklistedKernelModules = [ "nouveau" "nova_core" "nova" ];
   boot.extraModulePackages = [
     config.boot.kernelPackages.nvidia_x11
     config.boot.kernelPackages.asus-ec-sensors

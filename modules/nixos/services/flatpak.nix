@@ -70,6 +70,10 @@
             "xdg-data/themes:ro"
             "xdg-data/icons:ro"
           ];
+          talk-name = [
+            "org.freedesktop.portal.Trash"
+            "org.gtk.vfs.*"
+          ];
         };
         Environment = {
           # Wrong cursor in flatpaks fix
