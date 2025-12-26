@@ -16,19 +16,21 @@
     # Sample application: Firefox (choose one that you do NOT already install via nixpkgs
     # if you want Flatpak auto-update behavior).
     packages = [
-      "com.biglybt.BiglyBT"
       "com.bitwarden.desktop"
       "com.discordapp.Discord"
       "com.github.IsmaelMartinez.teams_for_linux"
       "com.github.tchx84.Flatseal"
       "com.microsoft.Edge"
       "com.slack.Slack"
+      "im.nheko.Nheko"
       "info.smplayer.SMPlayer"
       "io.missioncenter.MissionCenter"
       "org.gnome.Evolution"
+      "org.gnome.Fractal"
       "org.kde.kate"
       "org.kde.kcalc"
       "org.kde.konsole"
+      "org.kde.neochat"
       "org.videolan.VLC"
 
       # You can mix forms:

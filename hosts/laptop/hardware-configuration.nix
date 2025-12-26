@@ -35,6 +35,7 @@
   ];
   boot.kernelParams = [
     "nvidia-drm.modeset=1"
+    "nvidia-drm.fbdev=1"
     "acpi_backlight=native"
     "mem_sleep_default=s2idle"
     "button.lid_init_state=open"

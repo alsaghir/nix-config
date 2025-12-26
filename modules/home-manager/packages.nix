@@ -34,5 +34,7 @@
     nil
 
     podman-compose
+
+    biglybt
   ];
 }
