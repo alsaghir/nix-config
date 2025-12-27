@@ -23,29 +23,24 @@
     "kvm-amd"
     "i2c-dev"
     "i2c-piix4"
-    "i2c-nct6775"
     "asus-wmi"
     "asus-nb-wmi"
-    "asus-armoury"
   ];
   boot.blacklistedKernelModules = [ "nouveau" "nova_core" "nova" ];
   boot.extraModulePackages = [
-    config.boot.kernelPackages.nvidia_x11
     config.boot.kernelPackages.asus-ec-sensors
   ];
   boot.kernelParams = [
+    "tsc=unstable"
+    "iommu.strict=1"
     "nvidia-drm.modeset=1"
-    "nvidia-drm.fbdev=1"
     "acpi_backlight=native"
     "mem_sleep_default=s2idle"
     "button.lid_init_state=open"
-    "amdgpu.exp_hw_support=0"
-    "amdgpu.powerplay=0"
-    "amdgpu.dce_slow_cpu_access=1"
     "loglevel=3" # 0-7 range, lower is less verbose
     "quiet" # Further reduce kernel log verbosity
     "mitigations=auto" # Enable CPU vulnerability mitigations
-    "pcie_aspm=force" # Enable PCIe Active State Power Management
+    "pcie_aspm=on" # Enable PCIe Active State Power Management
   ];
 
   # Btrfs mounts with recommended options

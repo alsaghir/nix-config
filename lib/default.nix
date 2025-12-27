@@ -16,13 +16,26 @@ in
       modules,
       pkgsUnstable,
       self,
+      inputs,
       overlays ? [ ],
     }:
+    let
+      # Single import of nixpkgs for this system, with overlays applied
+      pkgs = import nixpkgs {
+        inherit system;
+        overlays = overlays;
+        config = {
+          allowUnfree = true;
+          nvidia.acceptLicense = true;
+        };
+        # Do NOT set config here to avoid changing behavior; keep your existing config in modules
+      };
+    in
     nixpkgs.lib.nixosSystem {
-      inherit system;
-      modules = modules ++ [ { nixpkgs.overlays = overlays; } ];
+      inherit system pkgs;
+      modules = modules;
       # This makes pkgsUnstable available to all modules.
-      specialArgs = { inherit pkgsUnstable self; };
+      specialArgs = { inherit pkgsUnstable self inputs; };
 
     };
 

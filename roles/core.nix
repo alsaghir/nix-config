@@ -45,8 +45,6 @@
     automatic = true;
   };
 
-  nixpkgs.config.allowUnfree = true;
-
   # Enable zsh system-wide (required if any user’s shell = zsh)
   programs.zsh.enable = true;
 

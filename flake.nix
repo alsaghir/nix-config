@@ -6,12 +6,6 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
 
-    home-manager = {
-      url = "github:nix-community/home-manager/release-25.11";
-      inputs.nixpkgs.follows = "nixpkgs"; # Use the SAME nixpkgs input (commit/revision) that my top-level flake uses
-      # “follows” is a feature of the flake input specification. It is not a Nix language keyword. It simply aliases one input’s revision to another.
-    };
-
     nix-flatpak = {
       url = "github:gmodena/nix-flatpak/?ref=latest";
     };
@@ -43,6 +37,7 @@
         # loads `default.nix` from that source tree. In `nixpkgs`, `default.nix` is a function that expects an attribute set.
         inherit system; # syntactic sugar for system = system;
         config.allowUnfree = true;
+        nvidia.acceptLicense = true;
       };
     in
     {
@@ -52,7 +47,7 @@
         asus-laptop = lib.mkNixosSystem {
 
           inherit (inputs) nixpkgs;
-          inherit system pkgsUnstable self;
+          inherit system pkgsUnstable self inputs;
 
           overlays = customOverlays;
 
@@ -60,10 +55,6 @@
             # This is the main entry point for your laptop configuration.
             ./hosts/laptop/default.nix
 
-            # Enable Home Manager for this host. Import HM as a NixOS module so 'home-manager.*' options exist.
-            # HM flake publishes several outputs. One is an attr set named nixosModules which contains a module called home-manager
-            # here we import that module into NixOS module.
-            inputs.home-manager.nixosModules.home-manager
             inputs.nix-flatpak.nixosModules.nix-flatpak
             inputs.sops-nix.nixosModules.sops
           ];

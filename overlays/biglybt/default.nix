@@ -46,6 +46,51 @@ final: prev: rec {
         --set JAVA_HOME $out/jre
         --set BIGLYBT_ICON $out/share/biglybt/biglybt.svg
       )
+
+      VMOPTS="$(cat <<EOV
+--patch-module=java.base=$out/share/biglybt/ghostfucker_utils.jar
+--add-exports=java.base/sun.net.www.protocol=ALL-UNNAMED
+--add-exports=java.base/sun.net.www.protocol.http=ALL-UNNAMED
+--add-exports=java.base/sun.net.www.protocol.https=ALL-UNNAMED
+--add-opens=java.base/java.net=ALL-UNNAMED
+-Dorg.glassfish.jaxb.runtime.v2.bytecode.ClassTailor.noOptimize=true
+--add-opens=java.base/java.io=ALL-UNNAMED
+--add-opens=java.base/java.lang.reflect=ALL-UNNAMED
+--add-opens=java.base/java.lang=ALL-UNNAMED
+--add-opens=java.base/java.util.concurrent=ALL-UNNAMED
+--add-opens=java.base/java.util=ALL-UNNAMED
+--add-opens=java.base/sun.nio.ch=ALL-UNNAMED
+-Djava.security.properties="/app/biglybt/java-security-override.properties"
+-Dsecurity.overridePropertiesFile=true
+-Dsun.java2d.opengl=false
+-Dsun.java2d.xrender=false
+-Dsun.java2d.d3d=false
+-Dsun.java2d.dpiaware=true
+-Djava.awt.focusWindowByDefault=false
+-Dawt.toolkit.name=WLToolkit
+-Djava.awt.headless=false
+-Dawt.useSystemAAFontSettings=on
+-Dgdk.backend=wayland
+-DGDK_BACKEND=wayland
+-Dsun.awt.disablegrab=true
+-Dsun.java2d.pmoffscreen=false
+-Dsun.awt.noerasebackground=true
+-Dswing.aatext=true
+--enable-native-access=ALL-UNNAMED
+-Dcom.biglybt.ui.swt.enableGTK3=true
+-Djdk.gtk.version=3
+-D_JAVA_AWT_WM_NONREPARENTING=1
+EOV
+)"
+      VMOPTS="''${VMOPTS//$'\n'/ }"
+
+      # Inject VM options and Wayland-related env into the wrapped launcher
+      gappsWrapperArgs+=(
+        --set JAVA_TOOL_OPTIONS "''${VMOPTS}"
+        --set GDK_BACKEND wayland
+        --set _JAVA_AWT_WM_NONREPARENTING 1
+        --set JDK_GTK_VERSION 3
+      )
       '';
 
     meta = oldAttrs.meta // {

@@ -30,32 +30,24 @@ in
     ./hardware-configuration.nix
 
     # System profiles
-    ../../modules/nixos/desktop
-    ../../modules/nixos/hardware
-    ../../modules/nixos/services
+    ../../nixos/desktop
+    ../../nixos/hardware
+    ../../nixos/services
 
     # Hardware profiles
-    ../../profiles/kernels.nix
+    # ../../profiles/kernels.nix
 
     # User definitions
     ../../users/user.nix
+    
+    # Host-specific justfile
+    ./justfile.nix
   ];
 
   system.configurationRevision = self.rev or self.dirtyRev or null;
 
-  # Home Manager: declarative user environment layered on top of NixOS
-  home-manager = {
-    useGlobalPkgs = true; # Share pkgs with NixOS
-    useUserPackages = true; # Keep user apps in user profile
-    users.${primaryUsername} = {
-      imports = [ ../../users/${primaryUsername}.nix ];
-    }; # HM module for ahmed
-    extraSpecialArgs = { inherit pkgsUnstable; }; # Allow a few un-stable apps in HM
-  };
-
   # Laptop-only kernel choice (keep servers/VMs on default kernel)
   boot.kernelPackages = pkgs.linuxPackages_zen;
-
 
   # Laptop memory tuning: fast compressed RAM swap; keep a small swapfile fallback
   zramSwap = {
@@ -70,10 +62,9 @@ in
       priority = 50;
     }
   ];
-
-  # SSH key secrets
-  # Ensure ~/.ssh exists early with correct perms/ownership
+  
   systemd.tmpfiles.rules = [
+    # Ensure ~/.ssh exists early with correct perms/ownership
     "d ${userConfig.homeDirectory}/.ssh 0700 ${primaryUsername} users -"
   ];
 

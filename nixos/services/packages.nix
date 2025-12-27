@@ -1,15 +1,16 @@
-{ pkgs, pkgsUnstable, ... }:
-{
-  home.packages = with pkgs; [
+{ pkgs, lib, pkgsUnstable ? null, ... }:
+
+let
+  basePackages = with pkgs; [
     jetbrains-toolbox
     bash
     usbutils
     mesa-demos
     vulkan-tools
     fastfetch
-    terminator
     unzip
     just
+    vim
 
     eza
     lsd
@@ -33,8 +34,19 @@
     nix-index
     nil
 
-    podman-compose
-
+    podman-tui
+    kubectl
+    postman
     biglybt
   ];
+
+  unstablePackages = [
+    pkgsUnstable.docker-compose
+    pkgsUnstable.podman-compose
+    pkgsUnstable.vscode
+  ];
+in
+{
+  environment.systemPackages = basePackages ++ unstablePackages;
+
 }

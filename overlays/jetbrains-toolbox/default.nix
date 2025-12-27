@@ -22,7 +22,8 @@ final: prev: {
 
       let
         pname = "jetbrains-toolbox";
-        version = "3.1.2.64642";
+        version = "3.2.0.65851";
+        sha256 = "sha256-cIpA9FEIe9Ilnzg/m6Ryl49EwZrUGtQNorTpKgbePS4=";
 
         meta = {
           description = "JetBrains Toolbox";
@@ -60,7 +61,7 @@ final: prev: {
               x86_64 = "";
             };
             hash = selectSystem {
-              x86_64-linux = "sha256-la8Duq+2xLCwigPp9sI4jmSlUBOgYms/oc6FSTPkpXQ=";
+              x86_64-linux = sha256;
             };
           in
           selectKernel {
@@ -87,11 +88,11 @@ final: prev: {
                 libappindicator-gtk3
               ]
               ++ appimageTools.defaultFhsEnvArgs.multiPkgs pkgs;
-            runScript = "${src}/jetbrains-toolbox-${version}/bin/jetbrains-toolbox --update-failed";
+            runScript = "${src}/bin/jetbrains-toolbox --update-failed";
 
             extraInstallCommands = ''
-              install -Dm0644 ${src}/jetbrains-toolbox-${version}/bin/jetbrains-toolbox.desktop -t $out/share/applications
-              install -Dm0644 ${src}/jetbrains-toolbox-${version}/bin/toolbox-tray-color.png $out/share/pixmaps/jetbrains-toolbox.png
+              install -Dm0644 ${src}/bin/jetbrains-toolbox.desktop -t $out/share/applications
+              install -Dm0644 ${src}/bin/toolbox-tray-color.png $out/share/pixmaps/jetbrains-toolbox.png
             '';
           };
       })

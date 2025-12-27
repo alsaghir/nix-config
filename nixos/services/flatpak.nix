@@ -87,6 +87,16 @@
 
   };
 
+  # This makes the Flatpak install/update run in the background
+  # so 'nh os switch' doesn't wait for downloads.
+  systemd.services.flatpak-managed-install = {
+    wantedBy = lib.mkForce [ "multi-user.target" ]; # Start during normal boot
+    before = lib.mkForce [ ]; # Remove the "block" on activation
+
+    # Ensure the service doesn't kill the switch if it takes too long
+    serviceConfig.TimeoutStartSec = "0";
+  };
+
   system.activationScripts.someScriptUsingSudo = {
     text = ''
       export PATH=${

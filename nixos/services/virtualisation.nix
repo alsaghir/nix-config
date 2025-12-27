@@ -1,10 +1,21 @@
-{ ... }:
+{ pkgs, ... }:
 {
+  # systemd.services."user@".serviceConfig.Delegate = "yes";
   virtualisation = {
-    containers.enable = true;
-    oci-containers.backend = "podman";
+    containers.enable = false;
+    containers.registries.search = [
+      "docker.io"
+      "quay.io"
+    ];
+    containers.containersConf.settings = {
+      containers = {
+        cgroup_manager = "systemd";
+      };
+    };
+
     podman = {
-      enable = true;
+      enable = false;
+      dockerSocket.enable = false;
       dockerCompat = true;
       defaultNetwork.settings.dns_enabled = true; # Required for containers under podman-compose to be able to talk to each other.
       autoPrune = {

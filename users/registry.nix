@@ -20,11 +20,6 @@
         "podman"
       ];
       
-      # Home Manager modules specific to this user
-      homeModules = [
-        ../modules/home-manager
-      ];
-      
       # User preferences (can be overridden per-host)
       preferences = {
         theme = "dark"; # "dark" or "light"
@@ -45,7 +40,6 @@
     #   homeDirectory = "/home/john";
     #   shell = "bash";
     #   extraGroups = [ "wheel" ];
-    #   homeModules = [ ../modules/home-manager/minimal.nix ];
     #   preferences.theme = "light";
     # };
   };

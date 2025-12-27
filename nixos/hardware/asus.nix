@@ -1,4 +1,4 @@
-# /modules/nixos/hardware/asus.nix
+
 { config
 , pkgs
 , lib

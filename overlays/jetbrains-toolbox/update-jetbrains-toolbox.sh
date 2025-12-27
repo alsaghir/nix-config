@@ -5,7 +5,7 @@
 set -e
 
 # The path to the overlay file, relative to this script's location.
-OVERLAY_FILE="$(dirname "$0")/jetbrains-toolbox.nix"
+OVERLAY_FILE="$(dirname "$0")/default.nix"
 
 echo "Checking for JetBrains Toolbox updates..."
 
