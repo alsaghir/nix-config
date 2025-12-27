@@ -78,6 +78,7 @@
 
   # Shell and small conveniences
   home.shellAliases = {
+    idea = "(/home/ahmed/.local/share/JetBrains/Toolbox/apps/intellij-idea/bin/idea . > /dev/null 2>&1 & disown)";
     rm = "rm -i";
     gpustat = "nvidia-smi";
     offload-gl = "__NV_PRIME_RENDER_OFFLOAD=1 __GLX_VENDOR_LIBRARY_NAME=nvidia glxinfo -B | egrep 'OpenGL (vendor|renderer)'";
