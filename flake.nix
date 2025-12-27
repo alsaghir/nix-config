@@ -29,7 +29,7 @@
     { self, nixpkgs, ... }@inputs:
     let
       # Import the helper function from lib
-      lib = import ./lib;
+      lib = import ./lib { inherit (nixpkgs) lib; };
 
       # The system architecture for your machines.
       system = "x86_64-linux";
@@ -49,7 +49,7 @@
 
       # Using the helper function makes this section clean and scalable.
       nixosConfigurations = {
-        laptop = lib.mkNixosSystem {
+        asus-laptop = lib.mkNixosSystem {
 
           inherit (inputs) nixpkgs;
           inherit system pkgsUnstable self;
@@ -69,10 +69,12 @@
           ];
         };
 
-        # Example for a future server:
-        # server = lib.mkNixosSystem {
-        #   inherit nixpkgs system pkgsUnstable;
-        #   modules = [ ./hosts/server ];
+        # Example for future hosts:
+        # desktop = lib.mkNixosSystem {
+        #   inherit (inputs) nixpkgs;
+        #   inherit system pkgsUnstable self;
+        #   overlays = customOverlays;
+        #   modules = [ ./hosts/desktop ];
         # };
       };
     };

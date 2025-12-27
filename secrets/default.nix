@@ -1,42 +1,58 @@
 {
   config,
+  pkgs,
+  lib,
   ...
 }:
 let
-  primaryUser = builtins.head (builtins.attrNames config.home-manager.users);
   sopsFile = ./asus-laptop-ssh-keys.yaml;
+
+  # Import user registry to get paths
+  registry = import ../users/registry.nix;
+  hostname = config.networking.hostName;
+  primaryUsername = registry.hosts.${hostname};
+  userConfig = registry.users.${primaryUsername};
+
+  # Get SSH key secret name for this host
+  sshKeySecret = userConfig.sshKeys.${hostname};
 in
 {
-  sops.secrets.ssh_private_key = {
-    inherit sopsFile;
-    key = "ssh_private_key";
-    path = "/home/${primaryUser}/.ssh/id_ed25519";
-    owner = primaryUser;
-    mode = "0600";
-  };
 
-  sops.secrets.breadfast_ssh_private_key = {
-    sopsFile = sopsFile;
-    key = "breadfast_ssh_private_key";
-    path = "/home/${primaryUser}/.ssh/breadfast_id_rsa";
-    owner = primaryUser;
-    mode = "0600";
-  };
+  sops = {
+    defaultSopsFile = sopsFile;
+    
+    # age.keyFile is inherited from roles/common.nix
+    # DO NOT set it here - /home is not mounted during early boot!
 
-  sops.secrets.ssh_public_key = {
-    sopsFile = sopsFile;
-    key = "ssh_public_key";
-    path = "/home/${primaryUser}/.ssh/id_ed25519.pub";
-    owner = primaryUser;
-    mode = "0644";
-  };
+    # Personal SSH keys
+    secrets.ssh_private_key = {
+      key = "ssh_private_key";
+      path = "${userConfig.homeDirectory}/.ssh/id_ed25519";
+      owner = userConfig.username;
+      mode = "0600";
+    };
 
-  sops.secrets.breadfast_ssh_public_key = {
-    sopsFile = sopsFile;
-    key = "breadfast_ssh_public_key";
-    path = "/home/${primaryUser}/.ssh/breadfast_id_rsa.pub";
-    owner = primaryUser;
-    mode = "0644";
+    secrets.ssh_public_key = {
+      key = "ssh_public_key";
+      path = "${userConfig.homeDirectory}/.ssh/id_ed25519.pub";
+      owner = userConfig.username;
+      mode = "0644";
+    };
+
+    # Breadfast SSH keys
+    secrets.breadfast_ssh_private_key = {
+      key = "breadfast_ssh_private_key";
+      path = "${userConfig.homeDirectory}/.ssh/breadfast_id_rsa";
+      owner = userConfig.username;
+      mode = "0600";
+    };
+
+    secrets.breadfast_ssh_public_key = {
+      key = "breadfast_ssh_public_key";
+      path = "${userConfig.homeDirectory}/.ssh/breadfast_id_rsa.pub";
+      owner = userConfig.username;
+      mode = "0644";
+    };
   };
 
 }
