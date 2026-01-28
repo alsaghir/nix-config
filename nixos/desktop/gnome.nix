@@ -8,48 +8,6 @@
 let
 
   theme = if config.myTheme.preferDark then "adwaita-dark" else "adwaita";
-  gtkTheme = if config.myTheme.preferDark then "Adwaita-dark" else "Adwaita";
-  gtkThemeEnv = if config.myTheme.preferDark then "Adwaita:dark" else "Adwaita";
-
-  # System-level override of Nemo's desktop entry (same filename: nemo.desktop)
-  nemoDesktopOverride = pkgs.runCommand "nemo-desktop-override" { meta.priority = 1; } ''
-    set -euo pipefail
-    mkdir -p "$out/share/applications"
-    cp ${pkgs.nemo-with-extensions}/share/applications/nemo.desktop "$out/share/applications/nemo.desktop"
-    chmod u+w "$out/share/applications/nemo.desktop"
-
-    # Patch Exec to enforce GTK_THEME and adjust fields to make search find "Nemo"
-    sed -i \
-      -e 's|^Exec=.*|Exec=env GTK_THEME=${gtkThemeEnv} ${pkgs.nemo-with-extensions}/bin/nemo %U|' \
-      -e 's|^Categories=.*|Categories=System;Utility;FileManager;GTK;|' \
-      -e 's|^MimeType=.*|MimeType=inode/directory;application/x-gnome-saved-search;inode/file;x-scheme-handler/file;|' \
-      -e 's|^Name=.*|Name=Nemo|' \
-      "$out/share/applications/nemo.desktop"
-
-    # Ensure DBusActivatable=false (remove any existing, then append)
-    sed -i '/^DBusActivatable=/d' "$out/share/applications/nemo.desktop"
-    printf '\nDBusActivatable=false\n' >> "$out/share/applications/nemo.desktop"
-
-    # Ensure Keywords include Nemo for GNOME search
-    if ! grep -q '^Keywords=' "$out/share/applications/nemo.desktop"; then
-      printf 'Keywords=Nemo;File;Files;File Manager;Explorer;\n' >> "$out/share/applications/nemo.desktop"
-    else
-      sed -i 's/^Keywords=.*/Keywords=Nemo;File;Files;File Manager;Explorer;/' "$out/share/applications/nemo.desktop"
-    fi
-  '';
-
-  # OPTIONAL: also override the D-Bus service so GTK_THEME applies when apps open folders via FileManager1
-  nemoDbusServiceOverride = pkgs.runCommand "nemo-dbus-service-override" { meta.priority = 1; } ''
-    set -euo pipefail
-    mkdir -p "$out/share/dbus-1/services"
-    for f in ${pkgs.nemo-with-extensions}/share/dbus-1/services/*.service; do
-      bn="$(basename "$f")"
-      cp "$f" "$out/share/dbus-1/services/$bn"
-      chmod u+w "$out/share/dbus-1/services/$bn"
-      # Prefix Exec with env GTK_THEME=... while preserving the original command/args
-      sed -i 's|^Exec=|Exec=env GTK_THEME=${gtkThemeEnv} |' "$out/share/dbus-1/services/$bn"
-    done
-  '';
 
 in
 
@@ -124,12 +82,9 @@ in
       kdePackages.qtstyleplugin-kvantum
       libsForQt5.qt5.qtgraphicaleffects
       nautilus
-      nemo-with-extensions
       refine
       wl-clipboard
       gnome-themes-extra
-      nemoDesktopOverride
-      nemoDbusServiceOverride
     ]
     ++ (with pkgs.gnomeExtensions; [
       appindicator
@@ -152,7 +107,6 @@ in
       workspace-indicator
       wallpaper-slideshow
       paperwm
-      tiling-shell
     ]);
 
   xdg.portal = {
@@ -240,7 +194,6 @@ in
             disabled-extensions = [
               "windowsNavigator@gnome-shell-extensions.gcampax.github.com"
               "status-icons@gnome-shell-extensions.gcampax.github.com"
-              "tilingshell@ferrarodomenico.com"
               "apps-menu@gnome-shell-extensions.gcampax.github.com"
               "auto-move-windows@gnome-shell-extensions.gcampax.github.com"
               "BingWallpaper@sonichy"
@@ -259,17 +212,9 @@ in
     QT_STYLE_OVERRIDE = theme;
   };
 
-  environment.etc."xdg/mimeapps.list".text = ''
-    [Default Applications]
-    inode/directory=nemo.desktop
-    application/x-gnome-saved-search=nemo.desktop
-    inode/file=nemo.desktop
-    application/x-gnome-saved-search=nemo.desktop
-    x-scheme-handler/file=nemo.desktop
-  '';
-
   environment.etc."gtk-3.0/settings.ini".text = ''
     [Settings]
     gtk-application-prefer-dark-theme=${if config.myTheme.preferDark then "1" else "0"}
   '';
+
 }

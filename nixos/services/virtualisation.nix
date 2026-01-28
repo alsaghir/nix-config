@@ -2,7 +2,7 @@
 {
   # systemd.services."user@".serviceConfig.Delegate = "yes";
   virtualisation = {
-    containers.enable = false;
+    containers.enable = true;
     containers.registries.search = [
       "docker.io"
       "quay.io"
@@ -14,7 +14,7 @@
     };
 
     podman = {
-      enable = false;
+      enable = true;
       dockerSocket.enable = false;
       dockerCompat = true;
       defaultNetwork.settings.dns_enabled = true; # Required for containers under podman-compose to be able to talk to each other.

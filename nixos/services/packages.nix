@@ -44,6 +44,7 @@ let
     pkgsUnstable.docker-compose
     pkgsUnstable.podman-compose
     pkgsUnstable.vscode
+    pkgsUnstable.antigravity
   ];
 in
 {
