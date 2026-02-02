@@ -10,7 +10,9 @@ in
   programs.nix-ld.enable = true;
 
   # Use only the AppImage multiPkgs list
-  programs.nix-ld.libraries = ai.multiPkgs pkgs;
+  programs.nix-ld.libraries = (ai.multiPkgs pkgs) ++ [
+    pkgs.libsecret
+  ];
 
   # If you ALSO want targetPkgs in there (usually not necessary):
   # programs.nix-ld.libraries = (ai.multiPkgs pkgs) ++ (ai.targetPkgs pkgs);
