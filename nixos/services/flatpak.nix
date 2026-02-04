@@ -80,6 +80,10 @@
         Environment = {
           # Wrong cursor in flatpaks fix
           XCURSOR_PATH = "/run/host/user-share/icons:/run/host/share/icons";
+          QT_SCALE_FACTOR = "1.3";
+          QT_QPA_PLATFORMTHEME = "gnome";
+          QT_FONT_DPI = "120"; # 96 DPI is default, 120 DPI is 125% scaling then 144 and so on
+
         };
       };
     };

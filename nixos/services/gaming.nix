@@ -1,7 +1,7 @@
 { config, pkgs, ... }:
 {
   # Steam + Gamemode (Gamescope optional)
-  programs.steam.enable = false;
+  programs.steam.enable = true;
   programs.gamemode.enable = false;
   # programs.gamescope.enable = true; # enable if you use Gamescope sessions
 
