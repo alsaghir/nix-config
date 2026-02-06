@@ -124,8 +124,6 @@ in
 
   qt = {
     enable = true;
-    platformTheme = "gnome";
-    style = theme;
   };
 
   networking.networkmanager.settings = {
@@ -209,7 +207,6 @@ in
   environment.sessionVariables = {
     MOZ_ENABLE_WAYLAND = "1";
     NIXOS_OZONE_WL = "1";
-    QT_STYLE_OVERRIDE = theme;
   };
 
   environment.etc."gtk-3.0/settings.ini".text = ''
