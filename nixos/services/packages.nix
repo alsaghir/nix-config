@@ -45,6 +45,7 @@ let
     pkgsUnstable.podman-compose
     pkgsUnstable.vscode
     pkgsUnstable.antigravity
+    pkgsUnstable.mission-center
   ];
 in
 {

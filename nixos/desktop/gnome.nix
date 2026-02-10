@@ -89,22 +89,10 @@ in
     ++ (with pkgs.gnomeExtensions; [
       appindicator
       battery-health-charging
-      bluetooth-quick-connect
-      blur-my-shell
       caffeine
       clipboard-indicator
-      ddterm
-      gnome-40-ui-improvements
-      gpu-supergfxctl-switch
       gsconnect
-      light-style
-      native-window-placement
-      places-status-indicator
-      removable-drive-menu
-      system-monitor
-      transparent-window-moving
-      user-themes
-      workspace-indicator
+      gpu-supergfxctl-switch
       wallpaper-slideshow
       paperwm
     ]);
@@ -140,7 +128,10 @@ in
   # Repeat configuration
   services.xserver.autoRepeatDelay = 220; # ms before repeating
   services.xserver.autoRepeatInterval = 25; # ms between repeats (~30/sec)
-  services.xserver.videoDrivers = [ "nvidia" "amdgpu" ];
+  services.xserver.videoDrivers = [
+    "nvidia"
+    "amdgpu"
+  ];
   services.libinput.enable = true;
   programs.firefox.enable = true;
 
@@ -152,10 +143,6 @@ in
           "org/gnome/desktop/interface" = {
             font-hinting = "none";
             color-scheme = if config.myTheme.preferDark then "prefer-dark" else "default";
-          };
-
-          "org/gnome/shell/extensions/blur-my-shell/panel" = {
-            blur = false;
           };
 
           "org/gnome/shell/extensions/paperwm" = {
@@ -171,32 +158,14 @@ in
               "azwallpaper@azwallpaper.gitlab.com"
               "appindicatorsupport@rgcjonas.gmail.com"
               "Battery-Health-Charging@maniacx.github.com"
-              "bluetooth-quick-connect@bjarosze.gmail.com"
-              "blur-my-shell@aunetx"
               "caffeine@patapon.info"
               "clipboard-indicator@tudmotu.com"
-              "ddterm@amezin.github.com"
-              "drive-menu@gnome-shell-extensions.gcampax.github.com"
-              "gnome-ui-tune@itstime.tech"
-              "gpu-switcher-supergfxctl@chikobara.github.io"
               "gsconnect@andyholmes.github.com"
-              "light-style@gnome-shell-extensions.gcampax.github.com"
-              "native-window-placement@gnome-shell-extensions.gcampax.github.com"
-              "places-menu@gnome-shell-extensions.gcampax.github.com"
-              "system-monitor@gnome-shell-extensions.gcampax.github.com"
-              "transparent-window-moving@noobsai.github.com"
-              "user-theme@gnome-shell-extensions.gcampax.github.com"
-              "workspace-indicator@gnome-shell-extensions.gcampax.github.com"
+              "gpu-switcher-supergfxctl@chikobara.github.io"
               "paperwm@paperwm.github.com"
             ];
-            disabled-extensions = [
-              "windowsNavigator@gnome-shell-extensions.gcampax.github.com"
-              "status-icons@gnome-shell-extensions.gcampax.github.com"
-              "apps-menu@gnome-shell-extensions.gcampax.github.com"
-              "auto-move-windows@gnome-shell-extensions.gcampax.github.com"
-              "BingWallpaper@sonichy"
-              "window-list@gnome-shell-extensions.gcampax.github.com"
-            ];
+            #disabled-extensions = [
+            #];
           };
         };
       }
@@ -207,6 +176,7 @@ in
   environment.sessionVariables = {
     MOZ_ENABLE_WAYLAND = "1";
     NIXOS_OZONE_WL = "1";
+    WLR_NO_HARDWARE_CURSORS = "1";
   };
 
   environment.etc."gtk-3.0/settings.ini".text = ''

@@ -28,7 +28,6 @@
       "com.slack.Slack"
       "im.nheko.Nheko"
       "info.smplayer.SMPlayer"
-      "io.missioncenter.MissionCenter"
       "org.gnome.Evolution"
       "org.gnome.Fractal"
       "org.kde.kate"
