@@ -22,6 +22,7 @@
     packages = [
       "com.bitwarden.desktop"
       "com.discordapp.Discord"
+      "com.getpostman.Postman"
       "com.github.IsmaelMartinez.teams_for_linux"
       "com.github.tchx84.Flatseal"
       "com.microsoft.Edge"
@@ -35,6 +36,7 @@
       "org.kde.konsole"
       "org.kde.neochat"
       "org.videolan.VLC"
+      "org.libreoffice.LibreOffice"
 
       # You can mix forms:
       # { appId = "com.brave.Browser"; origin = "flathub"; }

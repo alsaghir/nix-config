@@ -60,6 +60,7 @@ in
     {
       device = "/swap/swapfiles/swapfile";
       priority = 50;
+      size = 32 * 1024;
     }
   ];
   
