@@ -49,5 +49,6 @@ let
 in
 {
   environment.systemPackages = basePackages ++ unstablePackages;
+  programs.firefox.enable = true;
 
 }

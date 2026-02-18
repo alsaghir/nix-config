@@ -14,6 +14,7 @@ in
 {
   services.displayManager.gdm.enable = true;
   services.desktopManager.gnome.enable = true;
+  services.gnome.gnome-keyring.enable = true;
   # Explicitly disable logind idle handling to let GNOME manage it.
   services.logind.settings.Login = {
     IdleAction = "ignore";
@@ -133,7 +134,6 @@ in
     "amdgpu"
   ];
   services.libinput.enable = true;
-  programs.firefox.enable = true;
 
   programs.dconf = {
     enable = true;

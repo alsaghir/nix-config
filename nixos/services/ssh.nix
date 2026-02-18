@@ -4,9 +4,6 @@
   # Ensure OpenSSH client is available
   environment.systemPackages = [ pkgs.openssh ];
 
-  # Use GNOME Keyring as ssh-agent (recommended on GNOME; avoids custom user services)
-  services.gnome.gnome-keyring.enable = true;
-
   # System-wide SSH client config
   environment.etc."ssh/ssh_config".text = ''
     Host github
