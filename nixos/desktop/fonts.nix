@@ -6,6 +6,9 @@
     packages = with pkgs; [
       nerd-fonts.hack
       hack-font
+      adwaita-fonts
+      inter
+      inter-nerdfont
     ];
   };
 }

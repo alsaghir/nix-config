@@ -143,6 +143,7 @@ in
           "org/gnome/desktop/interface" = {
             font-hinting = "none";
             color-scheme = if config.myTheme.preferDark then "prefer-dark" else "default";
+            cursor-theme = "Adwaita";         
           };
 
           "org/gnome/shell/extensions/paperwm" = {
