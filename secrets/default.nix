@@ -13,8 +13,6 @@ let
   primaryUsername = registry.hosts.${hostname};
   userConfig = registry.users.${primaryUsername};
 
-  # Get SSH key secret name for this host
-  sshKeySecret = userConfig.sshKeys.${hostname};
 in
 {
 
@@ -35,6 +33,20 @@ in
     secrets.ssh_public_key = {
       key = "ssh_public_key";
       path = "${userConfig.homeDirectory}/.ssh/id_ed25519.pub";
+      owner = userConfig.username;
+      mode = "0644";
+    };
+
+    secrets.rsa_ssh_private_key = {
+      key = "rsa_ssh_private_key";
+      path = "${userConfig.homeDirectory}/.ssh/id_rsa";
+      owner = userConfig.username;
+      mode = "0600";
+    };
+
+    secrets.rsa_ssh_public_key = {
+      key = "rsa_ssh_public_key";
+      path = "${userConfig.homeDirectory}/.ssh/id_rsa.pub";
       owner = userConfig.username;
       mode = "0644";
     };

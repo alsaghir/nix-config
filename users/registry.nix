@@ -25,12 +25,6 @@
         theme = "dark"; # "dark" or "light"
       };
       
-      # SSH key secrets per host (SOPS key names)
-      sshKeys = {
-        asus-laptop = "ssh/laptop_id_ed25519";
-        # Future hosts:
-        # desktop = "ssh/desktop_id_ed25519";
-      };
     };
     
     # Future users can be added here:

@@ -14,6 +14,14 @@
       IdentitiesOnly yes
       PreferredAuthentications publickey
 
+    Host ssh.dev.azure.com
+      HostName ssh.dev.azure.com
+      User git
+      IdentityFile ~/.ssh/id_rsa
+      AddKeysToAgent no
+      IdentitiesOnly yes
+      PreferredAuthentications publickey
+
     Host bfgithub
       HostName github.com
       User git
