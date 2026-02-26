@@ -143,7 +143,31 @@ in
           "org/gnome/desktop/interface" = {
             font-hinting = "none";
             color-scheme = if config.myTheme.preferDark then "prefer-dark" else "default";
-            cursor-theme = "Adwaita";         
+            cursor-theme = "Adwaita";
+            locate-pointer = true;
+            clock-format = "12h";
+          };
+
+          "org/gtk/settings/file-chooser" = {
+            clock-format = "12h";
+          };
+
+          "org/gnome/settings-daemon/plugins/power" = {
+            sleep-inactive-ac-timeout = lib.gvariant.mkUint32 1800;
+            sleep-inactive-battery-timeout = lib.gvariant.mkUint32 1200;
+          };
+
+          "org/gnome/desktop/session" = {
+            idle-delay = lib.gvariant.mkUint32 900;
+          };
+
+          "org/gnome/desktop/screensaver" = {
+            lock-delay = lib.gvariant.mkUint32 300;
+            restart-enabled = true;
+          };
+
+          "org/gnome/shell/extensions/Battery-Health-Charging" = {
+            charging-mode = "max";
           };
 
           "org/gnome/shell/extensions/paperwm" = {
@@ -152,6 +176,10 @@ in
 
           "system/locale" = {
             region = config.i18n.defaultLocale or "en_GB.UTF-8";
+          };
+
+          "org/gnome/desktop/wm/preferences" = {
+            button-layout = "appmenu:minimize,maximize,close";
           };
 
           "org/gnome/shell" = {
