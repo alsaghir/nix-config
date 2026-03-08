@@ -22,8 +22,8 @@ final: prev: {
 
       let
         pname = "jetbrains-toolbox";
-        version = "3.3.0.74186";
-        sha256 = "sha256-tG830C6ZPqX11R+0YSVTtBSktvWq3r1mwE/pSwtGhME=";
+        version = "3.3.1.75249";
+        sha256 = "sha256-X8haw3w4yMdcRgh1kL+muobFfxhgW7pHXnLe7HV0WWo=";
 
         meta = {
           description = "JetBrains Toolbox";
