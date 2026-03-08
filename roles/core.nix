@@ -7,6 +7,8 @@
   boot.tmp.useTmpfs = true;
 
   nix.settings = {
+    eval-cache = true;
+    narinfo-cache-negative-ttl = 0;
     experimental-features = [
       "nix-command"
       "flakes"
