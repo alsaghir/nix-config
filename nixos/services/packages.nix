@@ -11,7 +11,6 @@ let
     unzip
     just
     vim
-    remmina
 
     eza
     lsd
@@ -35,14 +34,13 @@ let
     nix-index
     nil
 
-    podman-tui
-    kubectl
     biglybt
   ];
 
   unstablePackages = [
-    pkgsUnstable.docker-compose
-    pkgsUnstable.podman-compose
+    pkgsUnstable.k9s
+    pkgsUnstable.kubectl
+    pkgsUnstable.remmina
     pkgsUnstable.vscode
     pkgsUnstable.antigravity
     pkgsUnstable.mission-center
