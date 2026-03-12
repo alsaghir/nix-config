@@ -1,4 +1,4 @@
-{ pkgs, lib, pkgsUnstable ? null, ... }:
+{ pkgs, lib, ... }:
 
 let
   basePackages = with pkgs; [
@@ -35,19 +35,17 @@ let
     nil
 
     biglybt
+    k9s
+    kubectl
+    remmina
+    vscode
+    antigravity
+    mission-center
   ];
 
-  unstablePackages = [
-    pkgsUnstable.k9s
-    pkgsUnstable.kubectl
-    pkgsUnstable.remmina
-    pkgsUnstable.vscode
-    pkgsUnstable.antigravity
-    pkgsUnstable.mission-center
-  ];
 in
 {
-  environment.systemPackages = basePackages ++ unstablePackages;
+  environment.systemPackages = basePackages;
   programs.firefox.enable = true;
 
 }

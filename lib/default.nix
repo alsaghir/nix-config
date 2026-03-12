@@ -14,7 +14,6 @@ in
       nixpkgs,
       system,
       modules,
-      pkgsUnstable,
       self,
       inputs,
       overlays ? [ ],
@@ -34,8 +33,7 @@ in
     nixpkgs.lib.nixosSystem {
       inherit system pkgs;
       modules = modules;
-      # This makes pkgsUnstable available to all modules.
-      specialArgs = { inherit pkgsUnstable self inputs; };
+      specialArgs = { inherit self inputs; };
 
     };
 

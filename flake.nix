@@ -3,8 +3,7 @@
 
   inputs = {
 
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
-    nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
     nix-flatpak = {
       url = "github:gmodena/nix-flatpak/?ref=latest";
@@ -31,14 +30,6 @@
       # Import the overlay once
       customOverlays = import ./overlays;
 
-      # Create a pkgs instance for stable packages
-      # `import` turns that into the exported function defined by nixpkgs (the big package set generator)
-      pkgsUnstable = import inputs.nixpkgs-unstable {
-        # loads `default.nix` from that source tree. In `nixpkgs`, `default.nix` is a function that expects an attribute set.
-        inherit system; # syntactic sugar for system = system;
-        config.allowUnfree = true;
-        nvidia.acceptLicense = true;
-      };
     in
     {
 
@@ -47,7 +38,7 @@
         asus-laptop = lib.mkNixosSystem {
 
           inherit (inputs) nixpkgs;
-          inherit system pkgsUnstable self inputs;
+          inherit system self inputs;
 
           overlays = customOverlays;
 
