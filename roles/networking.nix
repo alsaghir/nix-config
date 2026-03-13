@@ -1,4 +1,9 @@
-{ config, pkgs, lib, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 {
   networking.networkmanager.enable = true;
   networking.nameservers = [
@@ -7,13 +12,15 @@
   ];
   services.resolved = {
     enable = true;
-    dnssec = "true";
-    domains = [ "~." ];
-    fallbackDns = [
-      "8.8.8.8"
-      "8.8.4.4"
-    ];
-    dnsovertls = "false";
+    settings.Resolve = {
+      DNSOverTLS = "false";
+      DNSSEC = "true";
+      Domains = [ "~." ];
+      FallbackDNS = [
+        "8.8.8.8"
+        "8.8.4.4"
+      ];
+    };
   };
   # Enables DHCP on each ethernet and wireless interface. In case of scripted networking
   # (the default) this is the recommended approach. When using systemd-networkd it's

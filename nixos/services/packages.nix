@@ -24,7 +24,7 @@ let
 
     gemini-cli
 
-    nixfmt-rfc-style
+    nixfmt
     statix
     deadnix
     nix-output-monitor

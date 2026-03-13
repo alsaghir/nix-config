@@ -15,7 +15,6 @@
   services.supergfxd.enable = true;
   services.asusd = {
     enable = true;
-    enableUserService = true;
   };
   # This service forces the desired profile after boot
   systemd.services.set-asus-profile = {
@@ -23,13 +22,16 @@
     after = [
       "supergfxd.service"
       "asusd.service"
+      "dbus.service"
     ];
     requires = [ "asusd.service" ];
     wantedBy = [ "multi-user.target" ];
     serviceConfig = {
       Type = "oneshot";
+      RemainAfterExit = true; 
+      ExecStartPre = "${pkgs.coreutils}/bin/sleep 2";
       User = "root";
-      ExecStart = "${pkgs.lib.makeBinPath [ pkgs.asusctl ]}/asusctl profile --profile-set Balanced";
+      ExecStart = "${lib.makeBinPath [ pkgs.asusctl ]}/asusctl profile set Balanced";
     };
   };
 
