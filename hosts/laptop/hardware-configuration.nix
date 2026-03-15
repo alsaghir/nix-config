@@ -26,7 +26,7 @@
     "asus-wmi"
     "asus-nb-wmi"
   ];
-  boot.blacklistedKernelModules = [ "nouveau" "nova_core" "nova" ];
+  boot.blacklistedKernelModules = [ "nouveau" "nova_core" "nova" "hid-uclogic" "wacom" ];
   boot.extraModulePackages = [
     config.boot.kernelPackages.asus-ec-sensors
   ];

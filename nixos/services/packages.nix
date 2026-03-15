@@ -11,6 +11,7 @@ let
     unzip
     just
     vim
+    libinput
 
     eza
     lsd
