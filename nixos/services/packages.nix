@@ -12,7 +12,6 @@ let
     just
     vim
     libinput
-    krita
 
     eza
     lsd

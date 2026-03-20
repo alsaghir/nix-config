@@ -34,9 +34,10 @@
       "org.kde.kate"
       "org.kde.kcalc"
       "org.kde.konsole"
+      "org.kde.krita"
       "org.kde.neochat"
-      "org.videolan.VLC"
       "org.libreoffice.LibreOffice"
+      "org.videolan.VLC"
 
       # You can mix forms:
       # { appId = "com.brave.Browser"; origin = "flathub"; }
@@ -44,7 +45,7 @@
 
     # Optional: enable periodic auto updates (they occur at system activation time).
     update = {
-      onActivation = false;
+      onActivation = true;
       auto = {
         enable = true;
         onCalendar = "weekly"; # systemd OnCalendar expression
