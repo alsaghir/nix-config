@@ -10,5 +10,13 @@
       inter
       inter-nerdfont
     ];
+    fontconfig.defaultFonts = {
+      serif = [ "Noto Serif" ];
+      sansSerif = [ "Inter" ];
+      monospace = [
+        "Hack Nerd Font"
+        "Hack"
+      ];
+    };
   };
 }
