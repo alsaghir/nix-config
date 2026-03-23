@@ -42,11 +42,31 @@ let
     vscode
     antigravity
     mission-center
+
+    adwaita-fonts
+    adwaita-icon-theme
+    microsoft-edge
+    smplayer
+    bitwarden-desktop
+    krita
+    vlc
+    vesktop
+    slack
+    libreoffice
+    onlyoffice-desktopeditors
+    kdePackages.konsole
+    kdePackages.kcalc
   ];
 
 in
 {
   environment.systemPackages = basePackages;
   programs.firefox.enable = true;
+  programs.evolution = {
+    enable = true;
+    plugins = with pkgs; [
+      evolution-ews
+    ];
+  };
 
 }

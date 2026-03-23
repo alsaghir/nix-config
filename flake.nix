@@ -1,5 +1,5 @@
 {
-  description = "Zephyrus G15 – NixOS + Home Manager";
+  description = "Zephyrus G15 – NixOS";
 
   inputs = {
 
@@ -30,6 +30,14 @@
       # Import the overlay once
       customOverlays = import ./overlays;
 
+      supportedSystems = [
+        "x86_64-linux"
+        "aarch64-linux"
+        "x86_64-darwin"
+        "aarch64-darwin"
+      ];
+      forAllSystems = nixpkgs.lib.genAttrs supportedSystems;
+
     in
     {
 
@@ -50,6 +58,16 @@
             inputs.sops-nix.nixosModules.sops
           ];
         };
+
+        devShells = forAllSystems (
+          system:
+          import ./devshells {
+            pkgs = import nixpkgs {
+              inherit system;
+              config.allowUnfree = true;
+            };
+          }
+        );
 
         # Example for future hosts:
         # desktop = lib.mkNixosSystem {

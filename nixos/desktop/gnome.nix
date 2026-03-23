@@ -61,8 +61,6 @@ in
   environment.systemPackages =
     with pkgs;
     [
-      adwaita-fonts
-      adwaita-icon-theme
       baobab
       dconf-editor
       ffmpeg-headless
@@ -82,6 +80,16 @@ in
       imagemagick
       kdePackages.qtstyleplugin-kvantum
       libsForQt5.qt5.qtgraphicaleffects
+      adwaita-qt
+      adwaita-qt6
+      qadwaitadecorations
+      qadwaitadecorations-qt6
+      qgnomeplatform
+      qgnomeplatform-qt6
+      kdePackages.breeze
+      kdePackages.breeze-gtk
+      kdePackages.qt6ct
+      libsForQt5.qt5ct
       nautilus
       refine
       wl-clipboard
@@ -111,9 +119,7 @@ in
     ];
   };
 
-  qt = {
-    enable = true;
-  };
+  qt.enable = true;
 
   networking.networkmanager.settings = {
     connectivity = {
@@ -146,6 +152,7 @@ in
             cursor-theme = "Adwaita";
             locate-pointer = true;
             clock-format = "12h";
+            gtk-theme = theme;
           };
 
           "org/gtk/settings/file-chooser" = {
@@ -206,9 +213,16 @@ in
     MOZ_ENABLE_WAYLAND = "1";
     NIXOS_OZONE_WL = "1";
     WLR_NO_HARDWARE_CURSORS = "1";
+    QT_SCALE_FACTOR = "1.3";
+    QT_FONT_DPI = "120";
   };
 
   environment.etc."gtk-3.0/settings.ini".text = ''
+    [Settings]
+    gtk-application-prefer-dark-theme=${if config.myTheme.preferDark then "1" else "0"}
+  '';
+
+  environment.etc."gtk-4.0/settings.ini".text = ''
     [Settings]
     gtk-application-prefer-dark-theme=${if config.myTheme.preferDark then "1" else "0"}
   '';

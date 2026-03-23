@@ -35,11 +35,15 @@ in
 
   # KDE/Plasma packages and utilities
   environment.systemPackages = with pkgs; [
+    # Scripts
+    # kdePackages.krohnkite
+    kdePackages.karousel
+
+
     # Core KDE utilities
     kdePackages.dolphin
     kdePackages.dolphin-plugins
     kdePackages.ark
-    kdePackages.kcalc
     kdePackages.kcolorchooser
     kdePackages.filelight
     kdePackages.spectacle
@@ -47,10 +51,8 @@ in
     kdePackages.kwallet
     kdePackages.kwalletmanager
     kdePackages.plasma-systemmonitor
-    kdePackages.karousel
     kdePackages.kmail
     kdePackages.kmail-account-wizard
-    kdePackages.konsole
 
     # System settings and theming
     kdePackages.kde-gtk-config
