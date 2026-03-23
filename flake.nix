@@ -59,16 +59,6 @@
           ];
         };
 
-        devShells = forAllSystems (
-          system:
-          import ./devshells {
-            pkgs = import nixpkgs {
-              inherit system;
-              config.allowUnfree = true;
-            };
-          }
-        );
-
         # Example for future hosts:
         # desktop = lib.mkNixosSystem {
         #   inherit (inputs) nixpkgs;
@@ -77,5 +67,15 @@
         #   modules = [ ./hosts/desktop ];
         # };
       };
+
+      devShells = forAllSystems (
+        system:
+        import ./devshells {
+          pkgs = import nixpkgs {
+            inherit system;
+            config.allowUnfree = true;
+          };
+        }
+      );
     };
 }
