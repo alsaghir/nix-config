@@ -45,6 +45,7 @@ final: prev: rec {
         --prefix PATH : $out/jre/bin
         --set JAVA_HOME $out/jre
         --set BIGLYBT_ICON $out/share/biglybt/biglybt.svg
+        --set GTK_THEME "Adwaita"
       )
 
       VMOPTS="$(cat <<EOV
