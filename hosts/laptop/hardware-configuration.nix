@@ -41,6 +41,7 @@
     "quiet" # Further reduce kernel log verbosity
     "mitigations=auto" # Enable CPU vulnerability mitigations
     "pcie_aspm=on" # Enable PCIe Active State Power Management
+    "nvidia.NVreg_EnableS0ixPowerManagement=1"
   ];
 
   # Btrfs mounts with recommended options

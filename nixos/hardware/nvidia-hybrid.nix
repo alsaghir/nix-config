@@ -67,7 +67,7 @@ let
         ];
         serviceConfig = {
           Type = "oneshot";
-          ExecStart = ''${pkgs.procps}/bin/pkill -f -STOP ${pkgs.gnome-shell}/bin/gnome-shell'';
+          ExecStart = "${pkgs.procps}/bin/pkill -f -STOP ${pkgs.gnome-shell}/bin/gnome-shell";
         };
       };
 
@@ -84,7 +84,7 @@ let
         ];
         serviceConfig = {
           Type = "oneshot";
-          ExecStart = ''${pkgs.procps}/bin/pkill -f -CONT ${pkgs.gnome-shell}/bin/gnome-shell'';
+          ExecStart = "${pkgs.procps}/bin/pkill -f -CONT ${pkgs.gnome-shell}/bin/gnome-shell";
         };
       };
     };
@@ -92,6 +92,10 @@ let
 
 in
 {
+  boot.extraModprobeConfig = ''
+    options nvidia NVreg_EnableS0ixPowerManagement=1
+  '';
+
   # Modern graphics option
   hardware.graphics.enable = true;
   hardware.graphics.enable32Bit = true; # 32‑bit GL/Vulkan for Steam/Wine
@@ -130,4 +134,6 @@ in
     '')
   ];
 
-} // nvidiaSuspendServices // gnomeSuspendServices
+}
+// nvidiaSuspendServices
+// gnomeSuspendServices

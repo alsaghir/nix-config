@@ -26,14 +26,13 @@ in
   services.gnome.core-apps.enable = true;
   services.gnome.core-developer-tools.enable = false;
   services.gnome.games.enable = false;
+  
   environment.gnome.excludePackages = with pkgs; [
     atomix
     cheese
     epiphany
     evince
-    geary
     gedit
-    gnome-terminal
     hitori
     iagno
     tali
@@ -41,15 +40,9 @@ in
     gnome-tour
     cheese
     gnome-maps
-    gnome-contacts
-    gnome-calendar
     gnome-photos
-    gnome-clocks
     gnome-music
-    gnome-weather
     gnome-user-docs
-    gnome-calculator
-    gnome-console
     simple-scan
     decibels
   ];
@@ -67,7 +60,6 @@ in
       ffmpegthumbnailer
       file-roller
       gnome-desktop
-      gnome-extension-manager
       gnome-tweaks
       gst_all_1.gst-libav
       gst_all_1.gst-plugins-bad
@@ -94,6 +86,7 @@ in
       refine
       wl-clipboard
       gnome-themes-extra
+      rewaita
     ]
     ++ (with pkgs.gnomeExtensions; [
       appindicator
@@ -139,6 +132,7 @@ in
     "nvidia"
     "amdgpu"
   ];
+  services.xserver.excludePackages = [ pkgs.xterm ];
   services.libinput.enable = true;
 
   programs.dconf = {

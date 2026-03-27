@@ -1,6 +1,43 @@
 { pkgs, lib, ... }:
 
 let
+
+  mkQtScaledApp =
+    {
+      pkg,
+      scale ? "1",
+      fontDpi ? "96",
+    }:
+    pkgs.symlinkJoin {
+      name = "${lib.getName pkg}-qt-scale-${builtins.replaceStrings [ "." ] [ "_" ] scale}";
+      paths = [ pkg ];
+      nativeBuildInputs = [ pkgs.makeWrapper ];
+      postBuild = ''
+        if [ -d "$out/bin" ]; then
+          for f in $out/bin/*; do
+            [ -f "$f" ] && [ -x "$f" ] || continue
+            wrapProgram "$f" --set QT_SCALE_FACTOR ${scale} --set QT_FONT_DPI ${fontDpi}
+          done
+        fi
+
+        if [ -d "$out/share/applications" ]; then
+        for desktop in "$out/share/applications"/*.desktop; do
+          [ -f "$desktop" ] || continue
+          # Dereference the symlink so we can edit it
+          cp --remove-destination "$(readlink -f "$desktop")" "$desktop"
+          # Repoint Exec= from the original pkg store path to our wrapped $out/bin
+          substituteInPlace "$desktop" --replace-warn "${pkg}/bin/" "$out/bin/"
+        done
+      fi
+      '';
+    };
+
+  onlyofficeQtScale1 = mkQtScaledApp {
+    pkg = pkgs.onlyoffice-desktopeditors;
+    scale = "1";
+    fontDpi = "96";
+  };
+
   basePackages = with pkgs; [
     jetbrains-toolbox
     bash
@@ -53,9 +90,9 @@ let
     vesktop
     slack
     libreoffice
-    onlyoffice-desktopeditors
-    kdePackages.konsole
-    kdePackages.kcalc
+    onlyofficeQtScale1
+    ptyxis
+    ghostty
   ];
 
 in
