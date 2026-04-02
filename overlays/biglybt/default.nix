@@ -46,6 +46,7 @@ final: prev: rec {
         --set JAVA_HOME $out/jre
         --set BIGLYBT_ICON $out/share/biglybt/biglybt.svg
         --set GTK_THEME "Adwaita"
+        --set XDG_CONFIG_HOME "$out/share/biglybt/.config-biglybt"
       )
 
       VMOPTS="$(cat <<EOV

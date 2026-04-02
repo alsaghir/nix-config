@@ -9,6 +9,13 @@ let
 
   theme = if config.myTheme.preferDark then "adwaita-dark" else "adwaita";
 
+  registry = import ../../users/registry.nix;
+  hostname = config.networking.hostName;
+  primaryUsername = registry.hosts.${hostname};
+  userConfig = registry.users.${primaryUsername};
+
+  userMonitorsFile = "${userConfig.homeDirectory}/.config/monitors.xml";
+  gdmConfigDir = "/var/lib/gdm/.config";
 in
 
 {
@@ -26,7 +33,7 @@ in
   services.gnome.core-apps.enable = true;
   services.gnome.core-developer-tools.enable = false;
   services.gnome.games.enable = false;
-  
+
   environment.gnome.excludePackages = with pkgs; [
     atomix
     cheese
@@ -207,8 +214,8 @@ in
     MOZ_ENABLE_WAYLAND = "1";
     NIXOS_OZONE_WL = "1";
     WLR_NO_HARDWARE_CURSORS = "1";
-    QT_SCALE_FACTOR = "1.3";
-    QT_FONT_DPI = "120";
+    # QT_SCALE_FACTOR = "1";
+    # QT_FONT_DPI = "96";
   };
 
   environment.etc."gtk-3.0/settings.ini".text = ''

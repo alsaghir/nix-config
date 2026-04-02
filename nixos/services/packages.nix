@@ -2,6 +2,8 @@
 
 let
 
+  # A helper function to create a symlinked package with QT_SCALE_FACTOR
+  # and QT_FONT_DPI set in the wrapper scripts.
   mkQtScaledApp =
     {
       pkg,
@@ -93,6 +95,8 @@ let
     onlyofficeQtScale1
     ptyxis
     ghostty
+    kdePackages.konsole
+    gradia
   ];
 
 in
