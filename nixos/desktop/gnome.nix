@@ -104,6 +104,7 @@ in
       gpu-supergfxctl-switch
       wallpaper-slideshow
       paperwm
+      tophat
     ]);
 
   xdg.portal = {
@@ -200,6 +201,7 @@ in
               "gsconnect@andyholmes.github.com"
               "gpu-switcher-supergfxctl@chikobara.github.io"
               "paperwm@paperwm.github.com"
+              "tophat@fflewddur.github.io"
             ];
             #disabled-extensions = [
             #];
