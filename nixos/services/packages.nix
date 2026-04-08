@@ -3,24 +3,16 @@
 let
 
   basePackages = with pkgs; [
-    bash
     usbutils
     mesa-demos
     vulkan-tools
-    fastfetch
     unzip
     just
-    vim
+    
     libinput
     openssh
 
-    eza
-    lsd
-    fd
-    ripgrep
-    fzf
     safe-rm
-    jq
 
     ncdu
     dust
@@ -28,11 +20,9 @@ let
     nixfmt
     statix
     deadnix
-    nix-output-monitor
     nvd
     nix-diff
     nix-tree
-    nix-index
     nil
 
   ];

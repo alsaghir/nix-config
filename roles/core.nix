@@ -50,15 +50,6 @@
   # Enable zsh system-wide (required if any user’s shell = zsh)
   programs.zsh.enable = true;
 
-  # Clean older generations
-  programs.nh = {
-    enable = true;
-    clean = {
-      enable = true;
-      extraArgs = "--keep 5";
-    };
-  };
-
   # Base tools common to all machines (keep minimal and generic)
   environment.systemPackages = with pkgs; [
     pciutils # lspci et al. for hardware inspection; helpful everywhere

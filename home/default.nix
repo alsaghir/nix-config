@@ -45,20 +45,35 @@ in
     ./ssh.nix
   ];
 
+  programs.bash.enable = true;
   programs.direnv.enable = true;
   programs.direnv.enableZshIntegration = true;
   programs.direnv.nix-direnv.enable = true;
-
+  programs.eza.enable = true;
+  programs.eza.enableZshIntegration = true;
+  programs.fastfetch.enable = true;
+  programs.fd.enable = true;
+  programs.firefox.enable = true;
+  programs.fzf.enable = true;
+  programs.fzf.enableZshIntegration = true;
+  programs.ghostty.enable = true;
+  programs.git.enable = true;
+  programs.jq.enable = true;
+  programs.k9s.enable = true;
+  programs.lsd.enable = true;
+  programs.lsd.enableZshIntegration = true;
+  programs.nix-index.enable = true;
+  programs.nix-index.enableZshIntegration = true;
+  programs.nix-your-shell.nix-output-monitor.enable = true;
+  programs.ptyxis.enable = true;
+  programs.ripgrep-all.enable = true;
+  programs.ripgrep.enable = true;
   programs.starship.enable = true;
   programs.starship.enableZshIntegration = true;
-  programs.zoxide.enable = true;
-  programs.git.enable = true;
-  programs.k9s.enable = true;
-  programs.vscode.enable = true;
   programs.vesktop.enable = true;
-  programs.ptyxis.enable = true;
-  programs.ghostty.enable = true;
-  programs.firefox.enable = true;
+  programs.vim.enable = true;
+  programs.vscode.enable = true;
+  programs.zoxide.enable = true;
 
   services.remmina.enable = true;
 
@@ -122,6 +137,14 @@ in
         zshConfigLastToRun
       ];
 
+  };
+
+   programs.nh = {
+    enable = true;
+    clean = {
+      enable = true;
+      extraArgs = "--keep 5";
+    };
   };
 
   home.packages = with pkgs; [
