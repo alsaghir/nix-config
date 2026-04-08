@@ -17,9 +17,9 @@ in
       self,
       inputs,
       overlays ? [ ],
+      hostname,
     }:
     let
-      # Single import of nixpkgs for this system, with overlays applied
       pkgs = import nixpkgs {
         inherit system;
         overlays = overlays;
@@ -33,29 +33,96 @@ in
     nixpkgs.lib.nixosSystem {
       inherit system pkgs;
       modules = modules;
-      specialArgs = { inherit self inputs; };
+      specialArgs = { inherit self inputs hostname; };
 
     };
 
-  # Get user config by username
-  # Usage: getUserConfig "ahmed"
+  mkHomeConfig =
+    {
+      nixpkgs,
+      home-manager,
+      system,
+      username,
+      hostname,
+      modules,
+      self,
+      inputs,
+      overlays ? [ ],
+    }:
+    let
+      pkgs = import nixpkgs {
+        inherit system;
+        overlays = overlays;
+        config = {
+          allowUnfree = true;
+        };
+      };
+      userConfig = registry.users.${username};
+      hostConfig = registry.hosts.${hostname};
+    in
+    home-manager.lib.homeManagerConfiguration {
+      inherit pkgs;
+      modules = modules;
+      extraSpecialArgs = {
+        inherit
+          self
+          inputs
+          userConfig
+          hostConfig
+          ;
+      };
+    };
+
+  mkAllHomeConfigurations =
+    {
+      nixpkgs,
+      home-manager,
+      self,
+      inputs,
+      overlays ? [ ],
+    }:
+    builtins.listToAttrs (
+      builtins.concatMap (
+        hostname:
+        let
+          hostCfg = registry.hosts.${hostname};
+          system = hostCfg.system;
+          userNames = builtins.attrNames hostCfg.userModules;
+        in
+        builtins.map (username: {
+          name = "${username}@${hostname}";
+          value = home-manager.lib.homeManagerConfiguration {
+            pkgs = import nixpkgs {
+              inherit system;
+              overlays = overlays;
+              config = {
+                allowUnfree = true;
+              };
+            };
+            modules = [
+              ../users/${username}.nix
+            ]
+            ++ hostCfg.userModules.${username};
+            extraSpecialArgs = {
+              inherit self inputs;
+              userConfig = registry.users.${username};
+              hostConfig = hostCfg // {
+                inherit hostname;
+              };
+            };
+          };
+        }) userNames
+      ) (builtins.attrNames registry.hosts)
+    );
+
   getUserConfig = username: registry.users.${username};
-
-  # Get primary user for a host
-  # Usage: getPrimaryUser "laptop" -> "ahmed"
-  getPrimaryUser = hostname: registry.hosts.${hostname};
-
-  # Get full user config for a host's primary user
-  # Usage: getPrimaryUserConfig "laptop" -> { username = "ahmed"; ... }
+  getPrimaryUser = hostname: registry.hosts.${hostname}.primaryUser;
+  getHostUsers = hostname: builtins.attrNames registry.hosts.${hostname}.userModules;
   getPrimaryUserConfig =
     hostname:
     let
-      username = registry.hosts.${hostname};
+      username = registry.hosts.${hostname}.primaryUser;
     in
     registry.users.${username};
 
-  # Get all users for a host (currently just returns primary user)
-  # Future: could return [ primaryUser ] ++ additionalUsers
-  # Usage: getHostUsers "laptop" -> [ "ahmed" ]
-  getHostUsers = hostname: [ (registry.hosts.${hostname}) ];
 }

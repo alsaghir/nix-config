@@ -7,14 +7,11 @@
   pkgs,
   lib,
   self,
+  hostname,
   ...
 }:
 let
-  # Import user registry helpers
   userLib = import ../../lib { inherit lib; };
-
-  # Get primary user configuration for this host
-  hostname = "asus-laptop"; # This host's identifier
   primaryUsername = userLib.getPrimaryUser hostname;
   userConfig = userLib.getPrimaryUserConfig hostname;
 in

@@ -1,5 +1,5 @@
 {
-  description = "Zephyrus G15 – NixOS";
+  description = "Zephyrus G15 - NixOS";
 
   inputs = {
 
@@ -14,6 +14,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    home-manager = {
+      url = "github:nix-community/home-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
   };
 
   # nixpkgs-stable defined in inputs and here it represents the root of the nixpkgs
@@ -21,15 +26,8 @@
   outputs =
     { self, nixpkgs, ... }@inputs:
     let
-      # Import the helper function from lib
       lib = import ./lib { inherit (nixpkgs) lib; };
-
-      # The system architecture for your machines.
-      system = "x86_64-linux";
-
-      # Import the overlay once
       customOverlays = import ./overlays;
-
       supportedSystems = [
         "x86_64-linux"
         "aarch64-linux"
@@ -41,31 +39,26 @@
     in
     {
 
-      # Using the helper function makes this section clean and scalable.
       nixosConfigurations = {
         asus-laptop = lib.mkNixosSystem {
-
           inherit (inputs) nixpkgs;
-          inherit system self inputs;
-
+          inherit self inputs;
+          hostname = "asus-laptop";
+          system = "x86_64-linux";
           overlays = customOverlays;
-
           modules = [
-            # This is the main entry point for your laptop configuration.
             ./hosts/laptop/default.nix
-
             inputs.nix-flatpak.nixosModules.nix-flatpak
             inputs.sops-nix.nixosModules.sops
           ];
         };
 
-        # Example for future hosts:
-        # desktop = lib.mkNixosSystem {
-        #   inherit (inputs) nixpkgs;
-        #   inherit system pkgsUnstable self;
-        #   overlays = customOverlays;
-        #   modules = [ ./hosts/desktop ];
-        # };
+      };
+
+      homeConfigurations = lib.mkAllHomeConfigurations {
+        inherit (inputs) nixpkgs home-manager;
+        inherit self inputs;
+        overlays = customOverlays;
       };
 
       devShells = forAllSystems (

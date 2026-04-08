@@ -6,10 +6,10 @@
 }:
 
 let
-  registry = import ./registry.nix;
+  userLib = import ../lib { inherit lib; };
   hostname = config.networking.hostName;
-  primaryUsername = registry.hosts.${hostname};
-  userConfig = registry.users.${primaryUsername};
+  primaryUsername = userLib.getPrimaryUser hostname;
+  userConfig = userLib.getPrimaryUserConfig hostname;
 in
 
 {

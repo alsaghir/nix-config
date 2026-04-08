@@ -2,46 +2,7 @@
 
 let
 
-  # A helper function to create a symlinked package with QT_SCALE_FACTOR
-  # and QT_FONT_DPI set in the wrapper scripts.
-  mkQtScaledApp =
-    {
-      pkg,
-      scale ? "1",
-      fontDpi ? "96",
-    }:
-    pkgs.symlinkJoin {
-      name = "${lib.getName pkg}-qt-scale-${builtins.replaceStrings [ "." ] [ "_" ] scale}";
-      paths = [ pkg ];
-      nativeBuildInputs = [ pkgs.makeWrapper ];
-      postBuild = ''
-        if [ -d "$out/bin" ]; then
-          for f in $out/bin/*; do
-            [ -f "$f" ] && [ -x "$f" ] || continue
-            wrapProgram "$f" --set QT_SCALE_FACTOR ${scale} --set QT_FONT_DPI ${fontDpi}
-          done
-        fi
-
-        if [ -d "$out/share/applications" ]; then
-        for desktop in "$out/share/applications"/*.desktop; do
-          [ -f "$desktop" ] || continue
-          # Dereference the symlink so we can edit it
-          cp --remove-destination "$(readlink -f "$desktop")" "$desktop"
-          # Repoint Exec= from the original pkg store path to our wrapped $out/bin
-          substituteInPlace "$desktop" --replace-warn "${pkg}/bin/" "$out/bin/"
-        done
-      fi
-      '';
-    };
-
-  onlyofficeQtScale1 = mkQtScaledApp {
-    pkg = pkgs.onlyoffice-desktopeditors;
-    scale = "1";
-    fontDpi = "96";
-  };
-
   basePackages = with pkgs; [
-    jetbrains-toolbox
     bash
     usbutils
     mesa-demos
@@ -51,18 +12,18 @@ let
     just
     vim
     libinput
+    openssh
 
     eza
     lsd
+    fd
+    ripgrep
+    fzf
+    safe-rm
+    jq
 
     ncdu
     dust
-
-    bat
-    ripgrep
-    fd
-
-    gemini-cli
 
     nixfmt
     statix
@@ -74,35 +35,11 @@ let
     nix-index
     nil
 
-    biglybt
-    k9s
-    kubectl
-    remmina
-    vscode
-    antigravity
-    mission-center
-
-    adwaita-fonts
-    adwaita-icon-theme
-    microsoft-edge
-    smplayer
-    bitwarden-desktop
-    krita
-    vlc
-    vesktop
-    slack
-    libreoffice
-    onlyofficeQtScale1
-    ptyxis
-    ghostty
-    kdePackages.konsole
-    gradia
   ];
 
 in
 {
   environment.systemPackages = basePackages;
-  programs.firefox.enable = true;
   programs.evolution = {
     enable = true;
     plugins = with pkgs; [

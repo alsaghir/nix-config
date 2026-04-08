@@ -1,32 +1,37 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 let
-  registry = import ./registry.nix;
+  userLib = import ../lib { inherit lib; };
   hostname = config.networking.hostName;
-  primaryUsername = registry.hosts.${hostname};
-  userConfig = registry.users.${primaryUsername};
-  
+  primaryUsername = userLib.getPrimaryUser hostname;
+  userConfig = userLib.getPrimaryUserConfig hostname;
+
   # Get the host-specific justfile content if it exists
   hostJustfile = config.justfile.host or "";
-  
+
   # Create the global justfile content
   globalJustfileContent = ''
     # Global justfile for ${userConfig.username}
     # This file is managed by NixOS configuration
-    
+
     default:
       @just --list
 
     [no-cd]
     idea:
       ${userConfig.homeDirectory}/.local/share/JetBrains/Toolbox/apps/intellij-idea/bin/idea . > /dev/null 2>&1 & disown
-    
+
     idea-path path:
       ${userConfig.homeDirectory}/.local/share/JetBrains/Toolbox/apps/intellij-idea/bin/idea "{{path}}" > /dev/null 2>&1 & disown
-    
+
     ${hostJustfile}
   '';
-  
+
   # Write the justfile to a file in the Nix store
   justfileFile = pkgs.writeText "justfile" globalJustfileContent;
 in

@@ -2,23 +2,23 @@
   config,
   pkgs,
   lib,
+  hostName,
   ...
 }:
 let
   sopsFile = ./asus-laptop-ssh-keys.yaml;
 
-  # Import user registry to get paths
-  registry = import ../users/registry.nix;
+  userLib = import ../lib { inherit lib; };
   hostname = config.networking.hostName;
-  primaryUsername = registry.hosts.${hostname};
-  userConfig = registry.users.${primaryUsername};
+  primaryUsername = userLib.getPrimaryUser hostname;
+  userConfig = userLib.getPrimaryUserConfig hostname;
 
 in
 {
 
   sops = {
     defaultSopsFile = sopsFile;
-    
+
     # age.keyFile is inherited from roles/common.nix
     # DO NOT set it here - /home is not mounted during early boot!
 

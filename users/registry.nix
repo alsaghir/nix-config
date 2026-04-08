@@ -7,9 +7,7 @@
       username = "ahmed";
       fullName = "Ahmed";
       homeDirectory = "/home/ahmed";
-      shell = "zsh"; # Preferred shell (can be overridden per-host)
-      
-      # System groups this user belongs to
+      shell = "zsh";
       extraGroups = [
         "networkmanager"
         "wheel"
@@ -19,31 +17,35 @@
         "input"
         "podman"
       ];
-      
-      # User preferences (can be overridden per-host)
+
       preferences = {
         theme = "dark"; # "dark" or "light"
       };
-      
+
     };
-    
-    # Future users can be added here:
-    # john = {
-    #   username = "john";
-    #   fullName = "John Doe";
-    #   homeDirectory = "/home/john";
-    #   shell = "bash";
-    #   extraGroups = [ "wheel" ];
-    #   preferences.theme = "light";
-    # };
+
   };
-  
+
   # Per-host primary user assignments
   # This determines which user is the "main" user on each host
   hosts = {
-    asus-laptop = "ahmed";
-    # Future hosts:
-    # desktop = "ahmed";
-    # server = "john";
+    asus-laptop = {
+      system = "x86_64-linux";
+      primaryUser = "ahmed";
+      # per user@host pluggable HM modules on top of users/<name>/home.nix
+      userModules = {
+        ahmed = [
+          # host-specific additions for ahmed on this machine
+          # e.g. ../../home/profiles/gaming.nix
+        ];
+      };
+    };
+    # desktop = {
+    #   system      = "x86_64-linux";
+    #   primaryUser = "john";
+    #   userModules = {
+    #     john = [];
+    #   };
+    # };
   };
 }

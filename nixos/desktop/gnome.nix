@@ -2,6 +2,7 @@
   config,
   pkgs,
   lib,
+  hostname,
   ...
 }:
 
@@ -9,19 +10,20 @@ let
 
   theme = if config.myTheme.preferDark then "adwaita-dark" else "adwaita";
 
-  registry = import ../../users/registry.nix;
-  hostname = config.networking.hostName;
-  primaryUsername = registry.hosts.${hostname};
-  userConfig = registry.users.${primaryUsername};
+  userLib = import ../../lib { inherit lib; };
+  primaryUsername = userLib.getPrimaryUser hostname;
+  userConfig = userLib.getPrimaryUserConfig hostname;
 
   userMonitorsFile = "${userConfig.homeDirectory}/.config/monitors.xml";
   gdmConfigDir = "/var/lib/gdm/.config";
+
 in
 
 {
   services.displayManager.gdm.enable = true;
   services.desktopManager.gnome.enable = true;
   services.gnome.gnome-keyring.enable = true;
+  programs.dconf.enable = true;
   # Explicitly disable logind idle handling to let GNOME manage it.
   services.logind.settings.Login = {
     IdleAction = "ignore";
@@ -143,74 +145,6 @@ in
   services.xserver.excludePackages = [ pkgs.xterm ];
   services.libinput.enable = true;
 
-  programs.dconf = {
-    enable = true;
-    profiles.user.databases = [
-      {
-        settings = {
-          "org/gnome/desktop/interface" = {
-            font-hinting = "none";
-            color-scheme = if config.myTheme.preferDark then "prefer-dark" else "default";
-            cursor-theme = "Adwaita";
-            locate-pointer = true;
-            clock-format = "12h";
-            gtk-theme = theme;
-          };
-
-          "org/gtk/settings/file-chooser" = {
-            clock-format = "12h";
-          };
-
-          "org/gnome/settings-daemon/plugins/power" = {
-            sleep-inactive-ac-timeout = lib.gvariant.mkUint32 1800;
-            sleep-inactive-battery-timeout = lib.gvariant.mkUint32 1200;
-          };
-
-          "org/gnome/desktop/session" = {
-            idle-delay = lib.gvariant.mkUint32 900;
-          };
-
-          "org/gnome/desktop/screensaver" = {
-            lock-delay = lib.gvariant.mkUint32 300;
-            restart-enabled = true;
-          };
-
-          "org/gnome/shell/extensions/Battery-Health-Charging" = {
-            charging-mode = "max";
-          };
-
-          "org/gnome/shell/extensions/paperwm" = {
-            disable-topbar-styling = true;
-          };
-
-          "system/locale" = {
-            region = config.i18n.defaultLocale or "en_GB.UTF-8";
-          };
-
-          "org/gnome/desktop/wm/preferences" = {
-            button-layout = "appmenu:minimize,maximize,close";
-          };
-
-          "org/gnome/shell" = {
-            enabled-extensions = [
-              "azwallpaper@azwallpaper.gitlab.com"
-              "appindicatorsupport@rgcjonas.gmail.com"
-              "Battery-Health-Charging@maniacx.github.com"
-              "caffeine@patapon.info"
-              "clipboard-indicator@tudmotu.com"
-              "gsconnect@andyholmes.github.com"
-              "gpu-switcher-supergfxctl@chikobara.github.io"
-              "paperwm@paperwm.github.com"
-              "tophat@fflewddur.github.io"
-            ];
-            #disabled-extensions = [
-            #];
-          };
-        };
-      }
-    ];
-  };
-
   # Generic desktop session environment vars (Wayland + Electron + Firefox)
   environment.sessionVariables = {
     MOZ_ENABLE_WAYLAND = "1";
@@ -219,15 +153,5 @@ in
     # QT_SCALE_FACTOR = "1";
     # QT_FONT_DPI = "96";
   };
-
-  environment.etc."gtk-3.0/settings.ini".text = ''
-    [Settings]
-    gtk-application-prefer-dark-theme=${if config.myTheme.preferDark then "1" else "0"}
-  '';
-
-  environment.etc."gtk-4.0/settings.ini".text = ''
-    [Settings]
-    gtk-application-prefer-dark-theme=${if config.myTheme.preferDark then "1" else "0"}
-  '';
 
 }

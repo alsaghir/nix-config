@@ -18,7 +18,6 @@ in
     ./packages.nix
     ./pipewire.nix
     ./printing.nix
-    ./ssh.nix
     ./virtualisation.nix
   ];
 

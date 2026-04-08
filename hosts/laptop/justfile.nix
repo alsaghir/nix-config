@@ -2,12 +2,11 @@
   config,
   lib,
   pkgs,
+  hostname,
   ...
 }:
 
-let
-  hostname = "asus-laptop";
-in
+
 {
   justfile.host = ''
     # Host-specific recipes for ${hostname}
