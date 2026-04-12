@@ -55,7 +55,6 @@ let
       libPath = pkgs.lib.makeLibraryPath (
         with pkgs;
         [
-          nodejs
           libglvnd
           libGLU
           mesa
@@ -96,9 +95,6 @@ let
         ln -sfT "${chromium}" .idea/sdk/chromium-home
         ln -sfT "${jdk}" .idea/sdk/jdk-home
         ln -sfT "${gradle}" .idea/sdk/gradle-home
-        ln -sf ${pkgs.nodejs}/bin/node .idea/sdk/bin/node
-        ln -sf ${pkgs.nodejs}/bin/npm  .idea/sdk/bin/npm
-        ln -sf ${pkgs.nodejs}/bin/npx  .idea/sdk/bin/npx
         ln -sf "${jdk}/bin/java"      .idea/sdk/bin/java
         ln -sf "${gradle}/bin/gradle" .idea/sdk/bin/gradle
         ln -sf "${chromium}/bin/chromium" .idea/sdk/bin/chromium
