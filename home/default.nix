@@ -37,6 +37,37 @@ let
     fontDpi = "96";
   };
 
+
+
+
+  mkLibreOfficeCleanGtk = pkg:
+  pkgs.symlinkJoin {
+    name = "${lib.getName pkg}-clean-gtk";
+    paths = [ pkg ];
+    nativeBuildInputs = [ pkgs.makeWrapper ];
+    postBuild = ''
+      if [ -d "$out/bin" ]; then
+        for f in $out/bin/*; do
+          [ -f "$f" ] && [ -x "$f" ] || continue
+          wrapProgram "$f" \
+            --set SAL_USE_VCLPLUGIN gtk3 \
+            --set GTK_THEME Adwaita:light \
+            --set GTK2_RC_FILES /dev/null \
+            --set XDG_CONFIG_HOME "$HOME/.config/libreoffice-clean"
+        done
+      fi
+
+      if [ -d "$out/share/applications" ]; then
+        for desktop in "$out/share/applications"/*.desktop; do
+          [ -f "$desktop" ] || continue
+          cp --remove-destination "$(readlink -f "$desktop")" "$desktop"
+          substituteInPlace "$desktop" \
+            --replace-warn "${pkg}/bin/" "$out/bin/"
+        done
+      fi
+    '';
+  };
+
 in
 
 {
@@ -167,7 +198,7 @@ in
     vlc
     
     slack
-    libreoffice
+    (mkLibreOfficeCleanGtk pkgs.libreoffice)
     
     kdePackages.konsole
     gradia

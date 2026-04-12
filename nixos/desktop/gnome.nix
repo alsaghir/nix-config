@@ -6,19 +6,6 @@
   ...
 }:
 
-let
-
-  theme = if config.myTheme.preferDark then "adwaita-dark" else "adwaita";
-
-  userLib = import ../../lib { inherit lib; };
-  primaryUsername = userLib.getPrimaryUser hostname;
-  userConfig = userLib.getPrimaryUserConfig hostname;
-
-  userMonitorsFile = "${userConfig.homeDirectory}/.config/monitors.xml";
-  gdmConfigDir = "/var/lib/gdm/.config";
-
-in
-
 {
   services.displayManager.gdm.enable = true;
   services.desktopManager.gnome.enable = true;

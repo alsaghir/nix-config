@@ -37,42 +37,6 @@ in
 
     };
 
-  mkHomeConfig =
-    {
-      nixpkgs,
-      home-manager,
-      system,
-      username,
-      hostname,
-      modules,
-      self,
-      inputs,
-      overlays ? [ ],
-    }:
-    let
-      pkgs = import nixpkgs {
-        inherit system;
-        overlays = overlays;
-        config = {
-          allowUnfree = true;
-        };
-      };
-      userConfig = registry.users.${username};
-      hostConfig = registry.hosts.${hostname};
-    in
-    home-manager.lib.homeManagerConfiguration {
-      inherit pkgs;
-      modules = modules;
-      extraSpecialArgs = {
-        inherit
-          self
-          inputs
-          userConfig
-          hostConfig
-          ;
-      };
-    };
-
   mkAllHomeConfigurations =
     {
       nixpkgs,
