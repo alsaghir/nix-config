@@ -81,6 +81,7 @@ let
         jdk
         gradle
         chromium
+        pkgs.firebase-tools
       ]
       ++ basics;
 
@@ -101,6 +102,7 @@ let
         ln -sf "${jdk}/bin/java"      .idea/sdk/bin/java
         ln -sf "${gradle}/bin/gradle" .idea/sdk/bin/gradle
         ln -sf "${chromium}/bin/chromium" .idea/sdk/bin/chromium
+        ln -sf "${pkgs.firebase-tools}/bin/firebase" .idea/sdk/bin/firebase
 
         echo "✅ Kotlin Multiplatform shell ready"
         echo "   Java:   $(java --version 2>&1 | head -n1)"
