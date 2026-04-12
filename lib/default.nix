@@ -64,7 +64,8 @@ in
               };
             };
             modules = [
-              ../users/${username}.nix
+              ../users/${username}
+              ../users/${username}/${hostname}
             ]
             ++ hostCfg.userModules.${username};
             extraSpecialArgs = {

@@ -49,7 +49,6 @@
           modules = [
             ./hosts/laptop/default.nix
             inputs.nix-flatpak.nixosModules.nix-flatpak
-            inputs.sops-nix.nixosModules.sops
           ];
         };
 

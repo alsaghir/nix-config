@@ -1,7 +1,7 @@
 { userConfig, inputs, pkgs, ... }:
 {
   imports = [
-    ../home
+    ../../home
   ];
 
   home.username      = userConfig.username;

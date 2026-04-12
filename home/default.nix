@@ -1,4 +1,4 @@
-{ pkgs, lib, ... }:
+{ pkgs, lib, inputs, ... }:
 
 let
   mkQtScaledApp =
@@ -72,6 +72,8 @@ in
 
 {
   imports = [
+    inputs.sops-nix.homeManagerModules.sops
+
     ./gnome.nix
     ./ssh.nix
   ];

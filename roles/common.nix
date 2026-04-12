@@ -14,5 +14,4 @@
     ./networking.nix
   ];
 
-  sops.age.keyFile = lib.mkDefault "/var/lib/sops-nix/age/keys.txt";
 }

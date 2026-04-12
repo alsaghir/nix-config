@@ -3,7 +3,7 @@ keys:
   - &asus_laptop age1uq0vpazn6mjyusj3nvw0xrgkecq8gxdxll9wdemgv97yp7du8ajqel5fly
 
 creation_rules:
-  - path_regex: secrets/.*\.yaml$
+  - path_regex: users/.*\.yaml$
     key_groups:
       - age:
           - *asus_laptop

@@ -19,9 +19,6 @@ in
   imports = [
     ../../roles/common.nix # or default.nix
 
-    # Secrets
-    ../../secrets
-
     # Host-specific hardware scan
     ./hardware-configuration.nix
 
@@ -58,11 +55,6 @@ in
       priority = 50;
       size = 32 * 1024;
     }
-  ];
-  
-  systemd.tmpfiles.rules = [
-    # Ensure ~/.ssh exists early with correct perms/ownership
-    "d ${userConfig.homeDirectory}/.ssh 0700 ${primaryUsername} users -"
   ];
 
   myTheme.preferDark = userConfig.preferences.theme == "dark";
