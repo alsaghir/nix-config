@@ -85,7 +85,8 @@ let
       ++ basics;
 
       shellHook = ''
-        export LD_LIBRARY_PATH="${libPath}:$LD_LIBRARY_PATH"
+        export LD_LIBRARY_PATH="${libPath}''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+
         export JAVA_HOME="${jdk}"
         export GRADLE_OPTS="-Dorg.gradle.java.home=${jdk}"
         export CHROME_BIN="${chromium}/bin/chromium"

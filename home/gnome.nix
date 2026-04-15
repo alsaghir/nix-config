@@ -2,9 +2,11 @@
   config,
   lib,
   userConfig,
+  pkgs,
   ...
 }:
 {
+  services.gnome-keyring.enable = true;
   gtk = {
     enable = true;
     theme = {
@@ -73,4 +75,21 @@
       ];
     };
   };
+
+  xdg.portal = {
+    enable = true;
+    extraPortals = with pkgs; [
+      xdg-desktop-portal-gnome # GNOME-native portal (file chooser, etc.)
+      xdg-desktop-portal-gtk # GTK fallback, covers org.gtk.Settings.FileChooser
+    ];
+    # Explicit portal routing — prevents ambiguity when multiple portals are present
+    config.common.default = [
+      "gnome"
+      "gtk"
+      "*"
+    ];
+  };
+
+  qt.enable = true;
+
 }

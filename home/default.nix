@@ -1,4 +1,9 @@
-{ pkgs, lib, inputs, ... }:
+{
+  pkgs,
+  lib,
+  inputs,
+  ...
+}:
 
 let
   mkQtScaledApp =
@@ -37,36 +42,70 @@ let
     fontDpi = "96";
   };
 
+  mkLibreOfficeCleanGtk =
+    pkg:
+    pkgs.symlinkJoin {
+      name = "${lib.getName pkg}-clean-gtk";
+      paths = [ pkg ];
+      nativeBuildInputs = [ pkgs.makeWrapper ];
+      postBuild = ''
+        if [ -d "$out/bin" ]; then
+          for f in $out/bin/*; do
+            [ -f "$f" ] && [ -x "$f" ] || continue
+            wrapProgram "$f" \
+              --set SAL_USE_VCLPLUGIN gtk3 \
+              --set GTK_THEME Adwaita:light \
+              --set GTK2_RC_FILES /dev/null \
+              --set XDG_CONFIG_HOME "$HOME/.config/libreoffice-clean"
+          done
+        fi
 
+        if [ -d "$out/share/applications" ]; then
+          for desktop in "$out/share/applications"/*.desktop; do
+            [ -f "$desktop" ] || continue
+            cp --remove-destination "$(readlink -f "$desktop")" "$desktop"
+            substituteInPlace "$desktop" \
+              --replace-warn "${pkg}/bin/" "$out/bin/"
+          done
+        fi
+      '';
+    };
 
+  mkGSettingsApp =
+    {
+      pkg,
+      schemaPackages ? [
+        pkgs.gsettings-desktop-schemas
+        pkgs.gtk3
+      ],
+    }:
+    let
+      schemaPaths = map (p: "${p}/share/gsettings-schemas/${p.name}") schemaPackages;
+      schemaPathsJoined = lib.concatStringsSep ":" schemaPaths;
+    in
+    pkgs.symlinkJoin {
+      name = "${lib.getName pkg}-gsettings";
+      paths = [ pkg ];
+      nativeBuildInputs = [ pkgs.makeWrapper ];
+      postBuild = ''
+        if [ -d "$out/bin" ]; then
+          for f in $out/bin/*; do
+            [ -f "$f" ] && [ -x "$f" ] || continue
+            wrapProgram "$f" \
+              --prefix XDG_DATA_DIRS : "${schemaPathsJoined}"
+          done
+        fi
 
-  mkLibreOfficeCleanGtk = pkg:
-  pkgs.symlinkJoin {
-    name = "${lib.getName pkg}-clean-gtk";
-    paths = [ pkg ];
-    nativeBuildInputs = [ pkgs.makeWrapper ];
-    postBuild = ''
-      if [ -d "$out/bin" ]; then
-        for f in $out/bin/*; do
-          [ -f "$f" ] && [ -x "$f" ] || continue
-          wrapProgram "$f" \
-            --set SAL_USE_VCLPLUGIN gtk3 \
-            --set GTK_THEME Adwaita:light \
-            --set GTK2_RC_FILES /dev/null \
-            --set XDG_CONFIG_HOME "$HOME/.config/libreoffice-clean"
-        done
-      fi
-
-      if [ -d "$out/share/applications" ]; then
-        for desktop in "$out/share/applications"/*.desktop; do
-          [ -f "$desktop" ] || continue
-          cp --remove-destination "$(readlink -f "$desktop")" "$desktop"
-          substituteInPlace "$desktop" \
-            --replace-warn "${pkg}/bin/" "$out/bin/"
-        done
-      fi
-    '';
-  };
+        if [ -d "$out/share/applications" ]; then
+          for desktop in "$out/share/applications"/*.desktop; do
+            [ -f "$desktop" ] || continue
+            cp --remove-destination "$(readlink -f "$desktop")" "$desktop"
+            substituteInPlace "$desktop" \
+              --replace-warn "${pkg}/bin/" "$out/bin/"
+          done
+        fi
+      '';
+    };
 
 in
 
@@ -107,6 +146,7 @@ in
   programs.vim.enable = true;
   programs.vscode.enable = true;
   programs.zoxide.enable = true;
+  gtk.enable = true;
 
   services.remmina.enable = true;
 
@@ -172,7 +212,7 @@ in
 
   };
 
-   programs.nh = {
+  programs.nh = {
     enable = true;
     clean = {
       enable = true;
@@ -185,9 +225,9 @@ in
 
     gemini-cli
     biglybt
-  
+
     kubectl
-    
+
     antigravity
     mission-center
 
@@ -196,12 +236,12 @@ in
     microsoft-edge
     smplayer
     bitwarden-desktop
-    krita
+    (mkGSettingsApp { pkg = krita; })
     vlc
-    
+
     slack
     (mkLibreOfficeCleanGtk pkgs.libreoffice)
-    
+
     kdePackages.konsole
     gradia
   ];

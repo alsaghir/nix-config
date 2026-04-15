@@ -9,7 +9,6 @@
 {
   services.displayManager.gdm.enable = true;
   services.desktopManager.gnome.enable = true;
-  services.gnome.gnome-keyring.enable = true;
   programs.dconf.enable = true;
   # Explicitly disable logind idle handling to let GNOME manage it.
   services.logind.settings.Login = {
@@ -22,6 +21,7 @@
   services.gnome.core-apps.enable = true;
   services.gnome.core-developer-tools.enable = false;
   services.gnome.games.enable = false;
+  services.dbus.packages = [ pkgs.dconf ];
 
   environment.gnome.excludePackages = with pkgs; [
     atomix
@@ -96,20 +96,6 @@
       tophat
     ]);
 
-  xdg.portal = {
-    enable = true;
-    extraPortals = [
-      pkgs.xdg-desktop-portal-gnome
-      pkgs.xdg-desktop-portal-gtk
-    ];
-    config.common.default = [
-      "gnome"
-      "gtk"
-      "*"
-    ];
-  };
-
-  qt.enable = true;
 
   networking.networkmanager.settings = {
     connectivity = {
