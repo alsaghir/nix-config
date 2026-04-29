@@ -19,6 +19,8 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    nixos-wsl.url = "github:nix-community/NixOS-WSL/main";
+
   };
 
   # nixpkgs-stable defined in inputs and here it represents the root of the nixpkgs
@@ -49,6 +51,18 @@
           modules = [
             ./hosts/laptop/default.nix
             inputs.nix-flatpak.nixosModules.nix-flatpak
+          ];
+        };
+
+        wsl-lenovo-laptop = lib.mkNixosSystem {
+          inherit (inputs) nixpkgs;
+          inherit self inputs;
+          hostname = "wsl-lenovo-laptop";
+          system = "x86_64-linux";
+          overlays = customOverlays;
+          modules = [
+            ./hosts/wsl/default.nix
+            inputs.nixos-wsl.nixosModules.default
           ];
         };
 

@@ -9,6 +9,7 @@
 }:
 {
   imports = [
+    ./boot.nix
     ./core.nix
     ./locale.nix
     ./networking.nix

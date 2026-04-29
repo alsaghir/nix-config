@@ -24,6 +24,17 @@
 
     };
 
+    nixos = {
+    username = "nixos";
+    fullName = "NixOS";
+    homeDirectory = "/home/nixos";
+    shell = "zsh";
+    extraGroups = [
+      "wheel"
+      "networkmanager"
+    ];
+  };
+
   };
 
   # Per-host primary user assignments
@@ -40,6 +51,14 @@
         ];
       };
     };
+
+    wsl-lenovo-laptop = {
+    system = "x86_64-linux";
+    primaryUser = "nixos";
+    userModules = {
+      nixos = [ ];
+    };
+  };
     # desktop = {
     #   system      = "x86_64-linux";
     #   primaryUser = "john";
