@@ -42,7 +42,7 @@ let
     fontDpi = "96";
   };
 
-  mkLibreOfficeCleanGtk =
+  mkCleanGtk =
     pkg:
     pkgs.symlinkJoin {
       name = "${lib.getName pkg}-clean-gtk";
@@ -56,7 +56,7 @@ let
               --set SAL_USE_VCLPLUGIN gtk3 \
               --set GTK_THEME Adwaita:light \
               --set GTK2_RC_FILES /dev/null \
-              --set XDG_CONFIG_HOME "$HOME/.config/libreoffice-clean"
+              --set XDG_CONFIG_HOME "$HOME/.config/${lib.getName pkg}-clean"
           done
         fi
 
@@ -137,6 +137,9 @@ in
 
   home.packages = with pkgs; [
     jetbrains-toolbox
+    mailspring
+    (mkGSettingsApp { pkg = nomacs; })
+    kdePackages.gwenview
 
    
     biglybt
@@ -154,7 +157,7 @@ in
     vlc
 
     slack
-    (mkLibreOfficeCleanGtk pkgs.libreoffice)
+    (mkCleanGtk pkgs.libreoffice)
 
     kdePackages.konsole
     gradia
