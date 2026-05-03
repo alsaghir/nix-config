@@ -10,16 +10,9 @@ let
 
 in
 {
-  imports = [
-    ./cli.nix
-    ./flatpak.nix
-    ./gaming.nix
-    ./nix-ld.nix
-    ./packages.nix
-    ./pipewire.nix
-    ./printing.nix
-    ./virtualisation.nix
-  ];
+
+  # remove nix-channel related tools & configs, we use flakes instead.
+  nix.channel.enable = false;
 
   # Pin registry entries to your flake inputs to avoid network fetches during eval
   nix.registry = lib.mapAttrs (_: v: { flake = v; }) flakeInputs;

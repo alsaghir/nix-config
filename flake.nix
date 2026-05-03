@@ -21,6 +21,8 @@
 
     nixos-wsl.url = "github:nix-community/NixOS-WSL/main";
 
+    nix-jetbrains-plugins.url = "github:nix-community/nix-jetbrains-plugins";
+
   };
 
   # nixpkgs-stable defined in inputs and here it represents the root of the nixpkgs
@@ -28,7 +30,7 @@
   outputs =
     { self, nixpkgs, ... }@inputs:
     let
-      lib = import ./lib { inherit (nixpkgs) lib; };
+      lib = import ./lib { inherit (nixpkgs) lib;};
       customOverlays = import ./overlays;
       supportedSystems = [
         "x86_64-linux"

@@ -17,7 +17,10 @@ let
 in
 {
   imports = [
-    ../../roles/common.nix # or default.nix
+    ../../roles/boot.nix
+    ../../roles/core.nix
+    ../../roles/locale.nix
+    ../../roles/networking.nix
 
     # Host-specific hardware scan
     ./hardware-configuration.nix
@@ -25,14 +28,22 @@ in
     # System profiles
     ../../nixos/desktop
     ../../nixos/hardware
-    ../../nixos/services
+
+    ../../nixos/services/cli.nix
+    ../../nixos/services/flatpak.nix
+    ../../nixos/services/gaming.nix
+    ../../nixos/services/nix-ld.nix
+    ../../nixos/services/gui-packages.nix
+    ../../nixos/services/pipewire.nix
+    ../../nixos/services/printing.nix
+    ../../nixos/services/virtualisation.nix
 
     # Hardware profiles
     # ../../profiles/kernels.nix
 
     # User definitions
     ../../users/user.nix
-    
+
     # Host-specific justfile
     ./justfile.nix
   ];

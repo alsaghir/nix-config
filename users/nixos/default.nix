@@ -4,6 +4,7 @@
      ../../home/cli.nix
   ];
 
+  xdg.enable = true;
   home.username      = userConfig.username;
   home.homeDirectory = userConfig.homeDirectory;
   home.stateVersion  = "25.11";

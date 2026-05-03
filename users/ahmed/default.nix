@@ -1,7 +1,11 @@
 { userConfig, inputs, pkgs, ... }:
 {
   imports = [
-    ../../home
+    inputs.sops-nix.homeManagerModules.sops
+    ../../home/cli.nix
+    ../../home/gnome.nix
+    ../../home/gui-packages.nix
+    ../../home/ssh.nix  
   ];
 
   home.username      = userConfig.username;

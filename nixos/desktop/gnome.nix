@@ -96,7 +96,6 @@
       tophat
     ]);
 
-
   networking.networkmanager.settings = {
     connectivity = {
       # Set to 0 to disable the check and remove the question mark

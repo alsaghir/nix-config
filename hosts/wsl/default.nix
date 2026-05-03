@@ -20,6 +20,7 @@ in
 
   system.configurationRevision = self.rev or self.dirtyRev or null;
 
+  xdg.enable = true;
   wsl.enable = true;
   wsl.defaultUser = primaryUsername;
   wsl.useWindowsDriver = true;
