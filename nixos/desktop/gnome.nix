@@ -43,9 +43,6 @@
     decibels
   ];
 
-  # for trash support in file managers
-  services.gvfs.enable = true;
-
   # Helpful GNOME tooling
   environment.systemPackages =
     with pkgs;
@@ -104,18 +101,7 @@
     };
   };
 
-  # Enable the X11 windowing system.
-  # You can disable this if you're only using the Wayland session.
-  services.xserver.enable = true;
-  # Repeat configuration
-  services.xserver.autoRepeatDelay = 220; # ms before repeating
-  services.xserver.autoRepeatInterval = 25; # ms between repeats (~30/sec)
-  services.xserver.videoDrivers = [
-    "nvidia"
-    "amdgpu"
-  ];
-  services.xserver.excludePackages = [ pkgs.xterm ];
-  services.libinput.enable = true;
+
 
   # Generic desktop session environment vars (Wayland + Electron + Firefox)
   environment.sessionVariables = {
@@ -124,6 +110,13 @@
     WLR_NO_HARDWARE_CURSORS = "1";
     # QT_SCALE_FACTOR = "1";
     # QT_FONT_DPI = "96";
+  };
+
+  programs.evolution = {
+    enable = true;
+    plugins = with pkgs; [
+      evolution-ews
+    ];
   };
 
 }

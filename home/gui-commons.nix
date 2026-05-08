@@ -48,6 +48,9 @@ let
 in
 
 {
+  programs.konsole.enable = true;
+  programs.mpv.enable = true;
+
   programs.firefox.enable = true;
   programs.firefox.configPath = "${config.xdg.configHome}/mozilla/firefox";
 
@@ -82,6 +85,8 @@ in
     adwaita-icon-theme
     microsoft-edge
     smplayer
+    vlc
+    haruna
     bitwarden-desktop
     (userLib.mkGSettingsApp {
       inherit pkgs;
@@ -95,7 +100,6 @@ in
       pkg = pkgs.libreoffice;
     })
 
-    kdePackages.konsole
     gradia
 
     #(inputs.nix-jetbrains-plugins.lib.buildIdeWithPlugins pkgs jetbrains.idea ideaPlugins)

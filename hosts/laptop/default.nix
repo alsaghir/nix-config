@@ -30,10 +30,9 @@ in
     ../../nixos/hardware
 
     ../../nixos/services/cli.nix
-    ../../nixos/services/flatpak.nix
     ../../nixos/services/gaming.nix
     ../../nixos/services/nix-ld.nix
-    ../../nixos/services/gui-packages.nix
+    ../../nixos/services/gui-commons.nix
     ../../nixos/services/pipewire.nix
     ../../nixos/services/printing.nix
     ../../nixos/services/virtualisation.nix

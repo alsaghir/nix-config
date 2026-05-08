@@ -31,9 +31,8 @@
       # { appId = "com.brave.Browser"; origin = "flathub"; }
     ];
 
-    # Optional: enable periodic auto updates (they occur at system activation time).
     update = {
-      onActivation = true;
+      onActivation = false;
       auto = {
         enable = true;
         onCalendar = "weekly"; # systemd OnCalendar expression
@@ -85,25 +84,16 @@
 
   # This makes the Flatpak install/update run in the background
   # so 'nh os switch' doesn't wait for downloads.
-  systemd.services.flatpak-managed-install = {
-    wantedBy = lib.mkForce [ "multi-user.target" ]; # Start during normal boot
-    before = lib.mkForce [ ]; # Remove the "block" on activation
-
-    # Ensure the service doesn't kill the switch if it takes too long
-    serviceConfig.TimeoutStartSec = "0";
-  };
-
-  system.activationScripts.someScriptUsingSudo = {
-    text = ''
-      export PATH=${
-        lib.makeBinPath [
-          pkgs.unzip
-        ]
-      }:$PATH
-
-      echo "Running some script using Sudo ..." >&2
-    '';
-    deps = [ ]; # deps are usually inferred, leaving it empty is fine
+  systemd.user.services.flatpak-managed-install = {
+    Install = {
+      WantedBy = lib.mkForce [ "default.target" ];
+    };
+    Unit = {
+      Before = lib.mkForce [ ];
+    };
+    Service = {
+      TimeoutStartSec = "0";
+    };
   };
 
 }

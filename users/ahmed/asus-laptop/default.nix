@@ -2,6 +2,7 @@
   config,
   pkgs,
   lib,
+  inputs,
   ...
 }:
 let
@@ -9,6 +10,11 @@ let
 
 in
 {
+
+  imports = [
+    inputs.plasma-manager.homeModules.plasma-manager
+    inputs.nix-flatpak.homeManagerModules.nix-flatpak
+  ];
 
   home.activation.ensureSshPermissions = lib.hm.dag.entryBefore [ "sops-nix" ] ''
     $DRY_RUN_CMD mkdir -p $VERBOSE_ARG "${config.home.homeDirectory}/.ssh"

@@ -23,6 +23,12 @@
 
     nix-jetbrains-plugins.url = "github:nix-community/nix-jetbrains-plugins";
 
+    plasma-manager = {
+      url = "github:nix-community/plasma-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.home-manager.follows = "home-manager";
+    };
+
   };
 
   # nixpkgs-stable defined in inputs and here it represents the root of the nixpkgs
@@ -52,7 +58,6 @@
           overlays = customOverlays;
           modules = [
             ./hosts/laptop/default.nix
-            inputs.nix-flatpak.nixosModules.nix-flatpak
           ];
         };
 
