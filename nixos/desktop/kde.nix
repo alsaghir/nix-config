@@ -5,9 +5,6 @@
   ...
 }:
 
-let
-  theme = if config.myTheme.preferDark then "breeze-dark" else "breeze";
-in
 {
   services.displayManager.plasma-login-manager.enable = true;
   services.desktopManager.plasma6.enable = true;

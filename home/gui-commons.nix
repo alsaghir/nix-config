@@ -34,6 +34,20 @@ let
 
   ideaPluginsResolved = inputs.nix-jetbrains-plugins.lib.pluginsForIdeWith {
     extraOverrides = {
+      "com.github.copilot" =
+        plugin:
+        plugin.overrideAttrs (old: {
+          buildInputs = (old.buildInputs or [ ]) ++ [
+            pkgs.libsecret
+            pkgs.glib
+            pkgs.libx11
+            pkgs.libxtst
+            pkgs.libjpeg8
+            pkgs.libpng
+            pkgs.pipewire
+            pkgs.libei
+          ];
+        });
       "com.intellij.nativeDebug" =
         plugin:
         plugin.overrideAttrs (old: {
@@ -76,6 +90,7 @@ in
       pkg = nomacs;
     })
     kdePackages.gwenview
+    ente-auth
 
     biglybt
 

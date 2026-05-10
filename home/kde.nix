@@ -70,6 +70,7 @@ in
 
     # Qt theming
     kdePackages.qtstyleplugin-kvantum
+    klassy
 
     # Media codecs
     ffmpeg-headless
