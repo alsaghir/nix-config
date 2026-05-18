@@ -34,56 +34,82 @@ final: prev: rec {
       # BiglyBT windows usually identify as "BiglyBT Extreme Mod" or "org-gudy-azureus2-ui-swt-Main"
       sed -i '/StartupWMClass/d' $out/share/biglybt/biglybt.desktop
       echo "StartupWMClass=BiglyBT Extreme Mod" >> $out/share/biglybt/biglybt.desktop
-      
+
       # Set the correct JDK path in the wrapper script
       substituteInPlace $out/share/biglybt/.biglybt-wrapped \
         --replace-fail 'JAVA_PROGRAM_DIR=""' 'JAVA_PROGRAM_DIR="'"$out/jre/bin/"'"'
+
+      # Wrap xdg-open so child apps (Dolphin) don't inherit BiglyBT's XDG_CONFIG_HOME
+      mkdir -p $out/share/biglybt/bin
+      cat > $out/share/biglybt/bin/xdg-open <<-'EOF'
+      #!/usr/bin/env sh
+        unset XDG_CONFIG_HOME
+        exec ${prev.xdg-utils}/bin/xdg-open "$@"
+      EOF
+      chmod +x $out/share/biglybt/bin/xdg-open
+
+      # Wrap dolphin so it uses normal KDE config when launched by BiglyBT
+      cat > $out/share/biglybt/bin/dolphin <<-'EOF'
+        #!/usr/bin/env sh
+        unset XDG_CONFIG_HOME
+        exec ${prev.kdePackages.dolphin}/bin/dolphin "$@"
+      EOF
+      chmod +x $out/share/biglybt/bin/dolphin
+
+      # Some apps call kde-open5 instead of xdg-open
+      cat > $out/share/biglybt/bin/kde-open5 <<-'EOF'
+        #!/usr/bin/env sh
+        unset XDG_CONFIG_HOME
+        exec ${prev.kdePackages.kio}/bin/kde-open5 "$@"
+      EOF
+      chmod +x $out/share/biglybt/bin/kde-open5
     '';
 
     preFixup = ''
       gappsWrapperArgs+=(
+        --prefix PATH : $out/share/biglybt/bin
         --prefix PATH : $out/jre/bin
         --set JAVA_HOME $out/jre
         --set BIGLYBT_ICON $out/share/biglybt/biglybt.svg
         --set GTK_THEME "Adwaita"
-        --set XDG_CONFIG_HOME "$out/share/biglybt/.config-biglybt"
+        --set XDG_CONFIG_HOME "$HOME/.config/biglybt"
       )
 
       VMOPTS="$(cat <<EOV
---patch-module=java.base=$out/share/biglybt/ghostfucker_utils.jar
---add-exports=java.base/sun.net.www.protocol=ALL-UNNAMED
---add-exports=java.base/sun.net.www.protocol.http=ALL-UNNAMED
---add-exports=java.base/sun.net.www.protocol.https=ALL-UNNAMED
---add-opens=java.base/java.net=ALL-UNNAMED
--Dorg.glassfish.jaxb.runtime.v2.bytecode.ClassTailor.noOptimize=true
---add-opens=java.base/java.io=ALL-UNNAMED
---add-opens=java.base/java.lang.reflect=ALL-UNNAMED
---add-opens=java.base/java.lang=ALL-UNNAMED
---add-opens=java.base/java.util.concurrent=ALL-UNNAMED
---add-opens=java.base/java.util=ALL-UNNAMED
---add-opens=java.base/sun.nio.ch=ALL-UNNAMED
--Djava.security.properties="/app/biglybt/java-security-override.properties"
--Dsecurity.overridePropertiesFile=true
--Dsun.java2d.opengl=false
--Dsun.java2d.xrender=false
--Dsun.java2d.d3d=false
--Dsun.java2d.dpiaware=true
--Djava.awt.focusWindowByDefault=false
--Dawt.toolkit.name=WLToolkit
--Djava.awt.headless=false
--Dawt.useSystemAAFontSettings=on
--Dgdk.backend=wayland
--DGDK_BACKEND=wayland
--Dsun.awt.disablegrab=true
--Dsun.java2d.pmoffscreen=false
--Dsun.awt.noerasebackground=true
--Dswing.aatext=true
---enable-native-access=ALL-UNNAMED
--Dcom.biglybt.ui.swt.enableGTK3=true
--Djdk.gtk.version=3
--D_JAVA_AWT_WM_NONREPARENTING=1
-EOV
-)"
+      --patch-module=java.base=$out/share/biglybt/ghostfucker_utils.jar
+      --add-exports=java.base/sun.net.www.protocol=ALL-UNNAMED
+      --add-exports=java.base/sun.net.www.protocol.http=ALL-UNNAMED
+      --add-exports=java.base/sun.net.www.protocol.https=ALL-UNNAMED
+      --add-opens=java.base/java.net=ALL-UNNAMED
+      -Dorg.glassfish.jaxb.runtime.v2.bytecode.ClassTailor.noOptimize=true
+      --add-opens=java.base/java.io=ALL-UNNAMED
+      --add-opens=java.base/java.lang.reflect=ALL-UNNAMED
+      --add-opens=java.base/java.lang=ALL-UNNAMED
+      --add-opens=java.base/java.util.concurrent=ALL-UNNAMED
+      --add-opens=java.base/java.util=ALL-UNNAMED
+      --add-opens=java.base/sun.nio.ch=ALL-UNNAMED
+      -Djava.security.properties="/app/biglybt/java-security-override.properties"
+      -Dsecurity.overridePropertiesFile=true
+      -Dsun.java2d.opengl=false
+      -Dsun.java2d.xrender=false
+      -Dsun.java2d.d3d=false
+      -Dsun.java2d.dpiaware=true
+      -Djava.awt.focusWindowByDefault=false
+      -Dawt.toolkit.name=WLToolkit
+      -Djava.awt.headless=false
+      -Dawt.useSystemAAFontSettings=on
+      -Dgdk.backend=wayland
+      -DGDK_BACKEND=wayland
+      -Dsun.awt.disablegrab=true
+      -Dsun.java2d.pmoffscreen=false
+      -Dsun.awt.noerasebackground=true
+      -Dswing.aatext=true
+      --enable-native-access=ALL-UNNAMED
+      -Dcom.biglybt.ui.swt.enableGTK3=true
+      -Djdk.gtk.version=3
+      -D_JAVA_AWT_WM_NONREPARENTING=1
+      EOV
+      )"
       VMOPTS="''${VMOPTS//$'\n'/ }"
 
       # Inject VM options and Wayland-related env into the wrapped launcher
@@ -93,7 +119,7 @@ EOV
         --set _JAVA_AWT_WM_NONREPARENTING 1
         --set JDK_GTK_VERSION 3
       )
-      '';
+    '';
 
     meta = oldAttrs.meta // {
       description = "BiglyBT BitTorrent Client with extreme mod and JDK 25";

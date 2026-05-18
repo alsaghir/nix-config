@@ -47,7 +47,6 @@ in
   services.kdeconnect.enable = true;
 
   home.packages = with pkgs; [
-    kdePackages.karousel
     kdePackages.dynamic-workspaces
     kdePackages.krohnkite
 
@@ -63,6 +62,7 @@ in
     kdePackages.plasma-systemmonitor
     kdePackages.kmail
     kdePackages.kmail-account-wizard
+    kdePackages.plasma-browser-integration
 
     # System settings and theming
     kdePackages.kde-gtk-config

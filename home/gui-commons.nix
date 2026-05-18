@@ -67,6 +67,15 @@ in
 
   programs.firefox.enable = true;
   programs.firefox.configPath = "${config.xdg.configHome}/mozilla/firefox";
+  programs.firefox.package = pkgs.firefox.override {
+    cfg = {
+      enablePlasmaBrowserIntegration = true;
+    };
+  };
+  programs.firefox.nativeMessagingHosts = [
+    pkgs.firefoxpwa
+    pkgs.kdePackages.plasma-browser-integration
+  ];
 
   programs.ghostty.enable = true;
   programs.k9s.enable = true;
