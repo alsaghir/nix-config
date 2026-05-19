@@ -5,14 +5,14 @@
 
     enableDefaultConfig = false;
 
-    matchBlocks = {
+    settings = {
       "github" = {
         hostname                = "github.com";
         user                    = "git";
         identityFile            = "~/.ssh/id_ed25519";
         identitiesOnly          = true;
         addKeysToAgent          = "yes";
-        extraOptions.PreferredAuthentications = "publickey";
+        PreferredAuthentications = "publickey";
       };
 
       "ssh.dev.azure.com" = {
@@ -21,7 +21,7 @@
         identityFile            = "~/.ssh/id_rsa";
         addKeysToAgent          = "no";
         identitiesOnly          = true;
-        extraOptions.PreferredAuthentications = "publickey";
+        PreferredAuthentications = "publickey";
       };
 
       "bfgithub" = {
@@ -30,10 +30,8 @@
         identityFile            = "~/.ssh/breadfast_id_rsa";
         addKeysToAgent          = "no";
         identitiesOnly          = true;
-        extraOptions = {
-          PreferredAuthentications = "publickey";
-          IdentityAgent            = "none";
-        };
+        PreferredAuthentications = "publickey";
+        IdentityAgent            = "none";
       };
 
       # catch-all — must be last
