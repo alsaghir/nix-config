@@ -67,14 +67,9 @@ in
 
   programs.firefox.enable = true;
   programs.firefox.configPath = "${config.xdg.configHome}/mozilla/firefox";
-  programs.firefox.package = pkgs.firefox.override {
-    cfg = {
-      enablePlasmaBrowserIntegration = true;
-    };
-  };
+  
   programs.firefox.nativeMessagingHosts = [
     pkgs.firefoxpwa
-    pkgs.kdePackages.plasma-browser-integration
   ];
 
   programs.ghostty.enable = true;
@@ -87,6 +82,18 @@ in
 
   services.remmina.enable = true;
 
+  xdg.configFile."autostart/vesktop.desktop" = {
+    force = true;
+    text = ''
+      [Desktop Entry]
+      Name=Vesktop
+      Exec=vesktop %U
+      Icon=vesktop
+      Type=Application
+      X-KDE-autostart-phase=2
+    '';
+  };
+
   programs.onlyoffice = {
     enable = true;
     package = onlyofficeQtScale1;
@@ -98,7 +105,6 @@ in
       inherit pkgs;
       pkg = nomacs;
     })
-    kdePackages.gwenview
     ente-auth
 
     biglybt

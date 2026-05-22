@@ -6,6 +6,19 @@
   ...
 }:
 
+let
+  fromGitHub =
+    ref: repo:
+    pkgs.vimUtils.buildVimPlugin {
+      pname = "${lib.strings.sanitizeDerivationName repo}";
+      version = ref;
+      src = builtins.fetchGit {
+        url = "https://github.com/${repo}.git";
+        ref = ref;
+      };
+    };
+in
+
 {
 
   programs.bash.enable = true;
@@ -96,13 +109,44 @@
     };
   };
 
+  /* programs.neovim = {
+    enable = true;
+    defaultEditor = true;
+    viAlias = true;
+    vimAlias = true;
+    vimdiffAlias = true;
+    plugins = with pkgs.vimPlugins; [
+      nvim-lspconfig
+      plenary-nvim
+      gruvbox-material
+      mini-nvim
+      pkgs.vimPlugins.nvim-treesitter.withPlugins
+      (
+        treesitter-plugins: with treesitter-plugins; [
+          bash
+          lua
+          nix
+        ]
+      )
+      (fromGitHub "HEAD" "elihunter173/dirbuf.nvim")
+    ];
+    extraConfig = ''
+      set number relativenumber
+    '';
+    extraLuaConfig = ''
+      vim.o.termguicolors  = true
+      vim.cmd('colorscheme gruvbox-material')
+      vim.g.gruvbox_material_background = 'hard'
+    '';
+  }; */
+
   home.packages = with pkgs; [
     usbutils
     mesa-demos
     vulkan-tools
     unzip
     just
-    
+
     libinput
     openssh
 

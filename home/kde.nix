@@ -32,7 +32,15 @@ in
   };
 
   programs.plasma.configFile."plasma-org.kde.plasma.desktop-appletsrc" = {
-    
+
+  };
+
+  programs.plasma.configFile.kdeglobals = {
+    WM = {
+      frame = "61,174,233";
+      inactiveFrame = "239,240,241";
+    };
+
   };
 
   programs.plasma.shortcuts = {
@@ -45,6 +53,17 @@ in
   };
 
   services.kdeconnect.enable = true;
+
+  programs.firefox.package = pkgs.firefox.override {
+    cfg = {
+      enablePlasmaBrowserIntegration = true;
+    };
+  };
+
+  programs.firefox.nativeMessagingHosts = [
+    pkgs.firefoxpwa
+    pkgs.kdePackages.plasma-browser-integration
+  ];
 
   home.packages = with pkgs; [
     kdePackages.dynamic-workspaces
@@ -71,6 +90,8 @@ in
     # Qt theming
     kdePackages.qtstyleplugin-kvantum
     klassy
+
+    kdePackages.gwenview
 
     # Media codecs
     ffmpeg-headless

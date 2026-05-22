@@ -67,8 +67,6 @@ in
     }
   ];
 
-  myTheme.preferDark = userConfig.preferences.theme == "dark";
-
   # Host-specific settings
   networking.hostName = hostname;
   system.stateVersion = "25.05";
