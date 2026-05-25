@@ -5,6 +5,8 @@
     enableDefaultPackages = true;
     packages = with pkgs; [
       nerd-fonts.hack
+      nerd-fonts.symbols-only
+      noto-fonts-color-emoji
       hack-font
       adwaita-fonts
       inter
@@ -12,9 +14,14 @@
     ];
     fontconfig.defaultFonts = {
       serif = [ "Noto Serif" ];
-      sansSerif = [ "Inter" ];
+      sansSerif = [
+        "Inter"
+        "Symbols Nerd Font"
+        "Symbols Nerd Font Mono"
+      ];
       monospace = [
         "Hack Nerd Font"
+        "Symbols Nerd Font"
         "Hack"
       ];
     };

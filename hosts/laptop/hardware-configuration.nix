@@ -18,13 +18,14 @@
     "sd_mod"
     "sdhci_pci"
   ];
-  boot.initrd.kernelModules = [ ];
+  boot.initrd.kernelModules = [ "amdgpu" ];
   boot.kernelModules = [
     "kvm-amd"
     "i2c-dev"
     "i2c-piix4"
     "asus-wmi"
     "asus-nb-wmi"
+    "nvidia_drm"
   ];
   boot.blacklistedKernelModules = [ "nouveau" "nova_core" "nova" "hid-uclogic" "wacom" ];
   boot.extraModulePackages = [

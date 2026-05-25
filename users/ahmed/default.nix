@@ -8,7 +8,7 @@
   imports = [
     inputs.sops-nix.homeManagerModules.sops
     ../../home/cli.nix
-    ../../home/kde.nix
+    ../../home/gnome.nix
     ../../home/gui-commons.nix
     ../../home/ssh.nix
     ../../home/flatpak.nix

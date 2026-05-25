@@ -11,19 +11,22 @@ let
 in
 {
   programs.plasma.enable = true;
+  programs.konsole.enable = true;
+
   programs.plasma.configFile.kwinrc = {
     Plugins.desktopchangeosdEnabled = true;
     Plugins.dynamic_workspacesEnabled = true;
-    Plugins.krohnkiteEnabled = true;
+    #Plugins.krohnkiteEnabled = false;
+    #Plugins.karouselEnabled = false;
     Desktops.Rows = 1;
 
-    Script-krohnkite = {
-      screenGapBetween = 6;
-      screenGapBottom = 6;
-      screenGapLeft = 6;
-      screenGapRight = 6;
-      screenGapTop = 6;
-    };
+    # Script-krohnkite = {
+    #   screenGapBetween = 6;
+    #   screenGapBottom = 6;
+    #   screenGapLeft = 6;
+    #   screenGapRight = 6;
+    #   screenGapTop = 6;
+    # };
 
     Windows = {
       FocusPolicy = "FocusFollowsMouse";
@@ -67,7 +70,8 @@ in
 
   home.packages = with pkgs; [
     kdePackages.dynamic-workspaces
-    kdePackages.krohnkite
+    #kdePackages.krohnkite
+    #kdePackages.karousel
 
     kdePackages.dolphin
     kdePackages.dolphin-plugins

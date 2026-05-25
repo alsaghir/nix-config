@@ -29,6 +29,21 @@
       inputs.home-manager.follows = "home-manager";
     };
 
+    dms = {
+      url = "github:AvengeMedia/DankMaterialShell/stable";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    niri = {
+      url = "github:sodiboo/niri-flake";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    dms-plugin-registry = {
+      url = "github:AvengeMedia/dms-plugin-registry";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
   };
 
   # nixpkgs-stable defined in inputs and here it represents the root of the nixpkgs
@@ -36,8 +51,8 @@
   outputs =
     { self, nixpkgs, ... }@inputs:
     let
-      lib = import ./lib { inherit (nixpkgs) lib;};
-      customOverlays = import ./overlays;
+      lib = import ./lib { inherit (nixpkgs) lib; };
+      customOverlays = (import ./overlays) ++ [ inputs.niri.overlays.niri ];
       supportedSystems = [
         "x86_64-linux"
         "aarch64-linux"

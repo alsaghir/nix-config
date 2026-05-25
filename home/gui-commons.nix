@@ -62,7 +62,6 @@ let
 in
 
 {
-  programs.konsole.enable = true;
   programs.mpv.enable = true;
 
   programs.firefox.enable = true;
@@ -123,6 +122,8 @@ in
       pkg = krita;
     })
     vlc
+
+    xwayland-satellite
 
     slack
     (userLib.mkCleanGtk {

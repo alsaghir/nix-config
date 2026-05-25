@@ -92,6 +92,8 @@ let
 
 in
 {
+  services.xserver.videoDrivers = [ "nvidia" ];
+
   boot.extraModprobeConfig = ''
     options nvidia NVreg_EnableS0ixPowerManagement=1
   '';
