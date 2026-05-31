@@ -62,6 +62,7 @@
     };
 
     "org/gnome/shell" = {
+      always-show-log-out = true;
       enabled-extensions = [
         "azwallpaper@azwallpaper.gitlab.com"
         "appindicatorsupport@rgcjonas.gmail.com"

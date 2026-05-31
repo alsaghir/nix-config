@@ -18,6 +18,7 @@ let
     fontDpi = "96";
   };
 
+  # https://github.com/nix-community/nix-jetbrains-plugins
   ideaPlugins = [
     "com.fapiko.jetbrains.plugins.better_direnv"
     "com.github.copilot"
@@ -76,6 +77,8 @@ in
   programs.ptyxis.enable = true;
   programs.vesktop.enable = true;
   programs.vscode.enable = true;
+  programs.lapce.enable = true;
+
   programs.zoxide.enable = true;
   gtk.enable = true;
 
@@ -120,8 +123,8 @@ in
     (userLib.mkGSettingsApp {
       inherit pkgs;
       pkg = krita;
+      primaryDesktopFile = "org.kde.krita.desktop";
     })
-    vlc
 
     xwayland-satellite
 
@@ -132,9 +135,13 @@ in
     })
 
     gradia
+    _7zz-rar
+    unrar
 
+    kdePackages.kate
+    jetbrains-toolbox
     #(inputs.nix-jetbrains-plugins.lib.buildIdeWithPlugins pkgs jetbrains.idea ideaPlugins)
-    ideaWithPlugins
+    #ideaWithPlugins
   ];
 
 }

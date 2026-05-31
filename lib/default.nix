@@ -121,10 +121,10 @@ in
         fi
       '';
     };
-  
+
   # Function to create a wrapper around a package that sets a clean GTK environment.
   mkCleanGtk =
-    {pkgs, pkg }:
+    { pkgs, pkg }:
     pkgs.symlinkJoin {
       name = "${lib.getName pkg}-clean-gtk";
       paths = [ pkg ];
@@ -152,7 +152,6 @@ in
       '';
     };
 
-  
   # Function to create a wrapper around a package that sets the GSettings schema path.
   mkGSettingsApp =
     {
@@ -162,6 +161,7 @@ in
         pkgs.gsettings-desktop-schemas
         pkgs.gtk3
       ],
+      primaryDesktopFile ? null,
     }:
     let
       schemaPaths = map (p: "${p}/share/gsettings-schemas/${p.name}") schemaPackages;
@@ -181,15 +181,47 @@ in
         fi
 
         if [ -d "$out/share/applications" ]; then
-          for desktop in "$out/share/applications"/*.desktop; do
-            [ -f "$desktop" ] || continue
-            cp --remove-destination "$(readlink -f "$desktop")" "$desktop"
-            substituteInPlace "$desktop" \
+          ${lib.optionalString (primaryDesktopFile != null) ''
+            # Collect all MimeType values from non-primary desktop files
+            allMimeTypes=""
+            for desktop in "$out/share/applications"/*.desktop; do
+              [ -f "$desktop" ] || continue
+              name=$(basename "$desktop")
+              [ "$name" = "${primaryDesktopFile}" ] && continue
+              mime=$(grep "^MimeType=" "$desktop" | sed 's/^MimeType=//')
+              allMimeTypes="$allMimeTypes$mime"
+            done
+
+            # Merge into primary desktop file
+            primary="$out/share/applications/${primaryDesktopFile}"
+            cp --remove-destination "$(readlink -f "$primary")" "$primary"
+            substituteInPlace "$primary" \
               --replace-warn "${pkg}/bin/" "$out/bin/"
-          done
+            if grep -q "^MimeType=" "$primary"; then
+              sed -i "s|^MimeType=.*|MimeType=$allMimeTypes|" "$primary"
+            else
+              echo "MimeType=$allMimeTypes" >> "$primary"
+            fi
+
+            # Delete the now-redundant extras
+            for desktop in "$out/share/applications"/*.desktop; do
+              [ -f "$desktop" ] || continue
+              name=$(basename "$desktop")
+              [ "$name" = "${primaryDesktopFile}" ] && continue
+              rm "$desktop"
+            done
+          ''}
+
+          ${lib.optionalString (primaryDesktopFile == null) ''
+            for desktop in "$out/share/applications"/*.desktop; do
+              [ -f "$desktop" ] || continue
+              cp --remove-destination "$(readlink -f "$desktop")" "$desktop"
+              substituteInPlace "$desktop" \
+                --replace-warn "${pkg}/bin/" "$out/bin/"
+            done
+          ''}
         fi
       '';
     };
-
 
 }

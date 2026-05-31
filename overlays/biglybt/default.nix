@@ -10,7 +10,7 @@ final: prev: rec {
   });
 
   biglybt = prev.biglybt.overrideAttrs (oldAttrs: rec {
-    version = "4.0.0.0";
+    version = "4.1.0.0";
 
     src = prev.fetchurl {
       url = "https://github.com/BiglySoftware/BiglyBT/releases/download/v${version}/GitHub_BiglyBT_unix.tar.gz";
@@ -98,16 +98,18 @@ final: prev: rec {
       -Dawt.toolkit.name=WLToolkit
       -Djava.awt.headless=false
       -Dawt.useSystemAAFontSettings=on
-      -Dgdk.backend=wayland
-      -DGDK_BACKEND=wayland
+      -Dgdk.backend=x11
+      -DGDK_BACKEND=x11
       -Dsun.awt.disablegrab=true
+      -Dsun.java2d.noddraw=true
+      -Dswing.bufferPerWindow=false
       -Dsun.java2d.pmoffscreen=false
       -Dsun.awt.noerasebackground=true
       -Dswing.aatext=true
       --enable-native-access=ALL-UNNAMED
       -Dcom.biglybt.ui.swt.enableGTK3=true
       -Djdk.gtk.version=3
-      -D_JAVA_AWT_WM_NONREPARENTING=1
+      -D_JAVA_AWT_WM_NONREPARENTING=0
       EOV
       )"
       VMOPTS="''${VMOPTS//$'\n'/ }"
@@ -116,7 +118,7 @@ final: prev: rec {
       gappsWrapperArgs+=(
         --set JAVA_TOOL_OPTIONS "''${VMOPTS}"
         --set GDK_BACKEND wayland
-        --set _JAVA_AWT_WM_NONREPARENTING 1
+        --set _JAVA_AWT_WM_NONREPARENTING 0
         --set JDK_GTK_VERSION 3
       )
     '';

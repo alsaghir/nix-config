@@ -49,7 +49,7 @@ let
   kotlinShell =
     let
       jdk = pkgs.jetbrains.jdk;
-      gradle = pkgs.gradle;
+      gradle = pkgs.gradle_9;
       chromium = pkgs.chromium;
 
       libPath = pkgs.lib.makeLibraryPath (
@@ -127,7 +127,7 @@ let
   javaShell =
     let
       jdk = pkgs.jetbrains.jdk;
-      gradle = pkgs.gradle;
+      gradle = pkgs.gradle_9;
       maven = pkgs.maven;
 
       libPath = pkgs.lib.makeLibraryPath (
