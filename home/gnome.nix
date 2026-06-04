@@ -93,4 +93,54 @@
 
   qt.enable = true;
 
+  # Helpful GNOME tooling
+  home.packages =
+    with pkgs;
+    [
+      baobab
+      dconf-editor
+      ffmpeg-headless
+      ffmpegthumbnailer
+      file-roller
+      gnome-desktop
+      gnome-tweaks
+      gst_all_1.gst-libav
+      gst_all_1.gst-plugins-bad
+      gst_all_1.gst-plugins-base
+      gst_all_1.gst-plugins-good
+      gst_all_1.gst-plugins-ugly
+      gst_all_1.gst-vaapi
+      gst_all_1.gstreamer
+
+      imagemagick
+      kdePackages.qtstyleplugin-kvantum
+      libsForQt5.qt5.qtgraphicaleffects
+      adwaita-qt
+      adwaita-qt6
+      qadwaitadecorations
+      qadwaitadecorations-qt6
+      qgnomeplatform
+      qgnomeplatform-qt6
+      kdePackages.breeze
+      kdePackages.breeze-gtk
+      kdePackages.qt6ct
+      libsForQt5.qt5ct
+      nautilus
+      refine
+      wl-clipboard
+      gnome-themes-extra
+      rewaita
+    ]
+    ++ (with pkgs.gnomeExtensions; [
+      appindicator
+      battery-health-charging
+      caffeine
+      clipboard-indicator
+      gsconnect
+      gpu-supergfxctl-switch
+      wallpaper-slideshow
+      paperwm
+      tophat
+    ]);
+
 }
