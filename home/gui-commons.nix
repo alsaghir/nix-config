@@ -78,6 +78,10 @@ in
   programs.vesktop.enable = true;
   programs.vscode.enable = true;
   programs.lapce.enable = true;
+  programs.chromium = {
+    enable = true;
+    package = pkgs.brave;
+  };
 
   programs.zoxide.enable = true;
   gtk.enable = true;

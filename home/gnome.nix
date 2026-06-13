@@ -114,7 +114,7 @@
 
       imagemagick
       kdePackages.qtstyleplugin-kvantum
-      libsForQt5.qt5.qtgraphicaleffects
+      qt5.qtgraphicaleffects
       adwaita-qt
       adwaita-qt6
       qadwaitadecorations
