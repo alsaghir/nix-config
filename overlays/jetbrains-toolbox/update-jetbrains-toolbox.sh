@@ -51,7 +51,7 @@ echo "   New hash:    $HASH_SRI"
 
 # Use 'sed' to replace the version and sha256 lines in the overlay file.
 sed -i "s/version = \".*\"/version = \"$LATEST_BUILD\"/" "$OVERLAY_FILE"
-sed -i "s|sha256 = \".*\"|sha256 = \"$HASH_SRI\"|" "$OVERLAY_FILE"
+sed -i "s|hash = \".*\"|hash = \"$HASH_SRI\"|" "$OVERLAY_FILE"
 
 echo "✅ Successfully updated '$OVERLAY_FILE'."
 echo "   Run 'git diff' to review the changes, then apply with 'nixos-rebuild switch --flake .#laptop'."

@@ -11,10 +11,10 @@
 final: prev: {
   jetbrains-toolbox =
     let
-      version = "3.4.3.81140";
+      version = "3.5.0.84344";
       src = final.fetchzip {
         url = "https://download-cdn.jetbrains.com/toolbox/jetbrains-toolbox-${version}.tar.gz";
-        hash = "sha256-cDquMMb2gcRv6juEo2Ty4KgoKG5zBYtq+0mppnq4vyU=";
+        hash = "sha256-u+ATMiioJAmr8wTde4g1hB/DZqPnLZoPNJp6Oiq6m5o=";
       };
 
       meta = prev.jetbrains-toolbox.meta // {
