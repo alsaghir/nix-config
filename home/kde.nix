@@ -171,7 +171,7 @@ in
           WindowOutlineCustomColorActive = "61,174,233";
           WindowOutlineCustomColorInactive = "239,240,241";
           WindowOutlineStyleActive = "WindowOutlineAccentColor"; # or "WindowOutlineCustomColor"
-          WindowOutlineThickness = 2.0;
+          WindowOutlineThickness = 4.0;
         };
       };
 
