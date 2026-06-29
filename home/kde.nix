@@ -118,6 +118,10 @@ in
         Plugins.dynamic_workspacesEnabled = true;
         Plugins.krohnkiteEnabled = true;
 
+        "Effect-slide" = {
+          SlideBackground = false;
+        };
+
         Script-krohnkite = {
           monocleMaximize = false;
 
@@ -150,7 +154,7 @@ in
 
       kdeglobals = {
         KDE = {
-          AnimationDurationFactor = 0.75;
+          AnimationDurationFactor = 0.5;
         };
         General = {
           accentColorFromWallpaper = true;
