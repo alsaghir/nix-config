@@ -58,27 +58,14 @@
           scale = 1.5;
         };
       };
+
+      environment = {
+        QT_QPA_PLATFORMTHEME = "qt6ct";
+        QT_QPA_PLATFORMTHEME_QT6 = "qt6ct";
+        QT_WAYLAND_DECORATION = "adwaita";
+       };
+
     };
   };
 
-  # Required for DMS components
-  home.packages = with pkgs; [
-    fuzzel
-    waybar
-    thunar
-  ];
-
-  xdg.portal = {
-    enable = true;
-    xdgOpenUsePortal = true;
-    extraPortals = [
-      pkgs.xdg-desktop-portal-gtk
-      pkgs.xdg-desktop-portal-gnome
-    ];
-    configPackages = [ pkgs.xdg-desktop-portal-gtk ];
-    config.common.default = [
-      "gtk"
-      "*"
-    ];
-  };
 }

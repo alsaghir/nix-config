@@ -2,14 +2,8 @@
 {
   programs.niri.enable = true;
   programs.niri.package = pkgs.niri-unstable;
-
+  programs.niri.useNautilus = false;
   security.rtkit.enable = true;
-
-  xdg.portal = {
-    enable = true;
-    extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
-    config.common.default = [ "gtk" ];
-  };
 
   services.pipewire = {
     enable = true;

@@ -18,48 +18,6 @@ let
     fontDpi = "96";
   };
 
-  # https://github.com/nix-community/nix-jetbrains-plugins
-  ideaPlugins = [
-    "com.fapiko.jetbrains.plugins.better_direnv"
-    "com.github.copilot"
-    "String Manipulation"
-    "HighlightBracketPair"
-
-    # KMP
-    "com.intellij.nativeDebug"
-    "androidx.compose.plugins.idea"
-    "com.android.tools.design"
-    "org.jetbrains.android"
-    "com.jetbrains.kmm"
-  ];
-
-  ideaPluginsResolved = inputs.nix-jetbrains-plugins.lib.pluginsForIdeWith {
-    extraOverrides = {
-      "com.github.copilot" =
-        plugin:
-        plugin.overrideAttrs (old: {
-          buildInputs = (old.buildInputs or [ ]) ++ [
-            pkgs.libsecret
-            pkgs.glib
-            pkgs.libx11
-            pkgs.libxtst
-            pkgs.libjpeg8
-            pkgs.libpng
-            pkgs.pipewire
-            pkgs.libei
-          ];
-        });
-      "com.intellij.nativeDebug" =
-        plugin:
-        plugin.overrideAttrs (old: {
-          buildInputs = (old.buildInputs or [ ]) ++ [ pkgs.llvmPackages.lldb ];
-        });
-    };
-  } pkgs pkgs.jetbrains.idea ideaPlugins;
-
-  ideaWithPlugins = pkgs.jetbrains.plugins.addPlugins pkgs.jetbrains.idea (
-    lib.attrValues ideaPluginsResolved
-  );
 in
 
 {
@@ -67,7 +25,7 @@ in
 
   programs.firefox.enable = true;
   programs.firefox.configPath = "${config.xdg.configHome}/mozilla/firefox";
-  
+
   programs.firefox.nativeMessagingHosts = [
     pkgs.firefoxpwa
   ];
@@ -77,7 +35,6 @@ in
   programs.ptyxis.enable = true;
   programs.vesktop.enable = true;
   programs.vscode.enable = true;
-  programs.lapce.enable = true;
   programs.chromium = {
     enable = true;
     package = pkgs.brave;
@@ -106,7 +63,7 @@ in
   };
 
   home.packages = with pkgs; [
-    mailspring
+    # mailspring
     (userLib.mkGSettingsApp {
       inherit pkgs;
       pkg = nomacs;
@@ -123,7 +80,7 @@ in
     smplayer
     vlc
     haruna
-    bitwarden-desktop
+    # bitwarden-desktop
     (userLib.mkGSettingsApp {
       inherit pkgs;
       pkg = krita;
@@ -144,8 +101,7 @@ in
 
     kdePackages.kate
     jetbrains-toolbox
-    #(inputs.nix-jetbrains-plugins.lib.buildIdeWithPlugins pkgs jetbrains.idea ideaPlugins)
-    #ideaWithPlugins
+
   ];
 
 }

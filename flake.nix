@@ -19,30 +19,30 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    nixos-wsl.url = "github:nix-community/NixOS-WSL/main";
-
-    nix-jetbrains-plugins.url = "github:nix-community/nix-jetbrains-plugins";
-
     plasma-manager = {
       url = "github:nix-community/plasma-manager";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.home-manager.follows = "home-manager";
     };
 
-    dms = {
-      url = "github:AvengeMedia/DankMaterialShell/stable";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    /*
+      nixos-wsl.url = "github:nix-community/NixOS-WSL/main";
 
-    niri = {
-      url = "github:sodiboo/niri-flake";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+       dms = {
+        url = "github:AvengeMedia/DankMaterialShell/stable";
+        inputs.nixpkgs.follows = "nixpkgs";
+      };
 
-    dms-plugin-registry = {
-      url = "github:AvengeMedia/dms-plugin-registry";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+      niri = {
+        url = "github:sodiboo/niri-flake";
+        inputs.nixpkgs.follows = "nixpkgs";
+      };
+
+      dms-plugin-registry = {
+        url = "github:AvengeMedia/dms-plugin-registry";
+        inputs.nixpkgs.follows = "nixpkgs";
+      };
+    */
 
   };
 
@@ -52,7 +52,7 @@
     { self, nixpkgs, ... }@inputs:
     let
       lib = import ./lib { inherit (nixpkgs) lib; };
-      customOverlays = (import ./overlays) ++ [ inputs.niri.overlays.niri ];
+      customOverlays = (import ./overlays); # ++ [ inputs.niri.overlays.niri ];
       supportedSystems = [
         "x86_64-linux"
         "aarch64-linux"

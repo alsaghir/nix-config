@@ -8,6 +8,7 @@
   lib,
   self,
   hostname,
+  inputs,
   ...
 }:
 let
@@ -45,12 +46,14 @@ in
 
     # Host-specific justfile
     ./justfile.nix
+
+    # inputs.dms.nixosModules.greeter
   ];
 
   system.configurationRevision = self.rev or self.dirtyRev or null;
 
   # Laptop-only kernel choice (keep servers/VMs on default kernel)
-  boot.kernelPackages = pkgs.linuxPackages_zen;
+  # boot.kernelPackages = pkgs.linuxPackages_zen;linuxPackages_latest
 
   # Laptop memory tuning: fast compressed RAM swap; keep a small swapfile fallback
   zramSwap = {
