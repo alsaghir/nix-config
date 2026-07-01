@@ -109,6 +109,54 @@ in
           "Meta+F"
           "Maximize Window"
         ];
+        "MoveMouseToCenter" = [
+          "Meta+F6"
+          "Move Mouse to Centre"
+        ];
+        "MoveMouseToFocus" = [
+          "Meta+F5"
+          "Move Mouse to Focus"
+        ];
+        "Window to Next Screen" = [
+          "Meta+Shift+Right"
+          "Move Window to Next Screen"
+        ];
+        "Window to Previous Screen" = [
+          "Meta+Shift+Left"
+          "Move Window to Previous Screen"
+        ];
+        "Window One Desktop Down" = [
+          "Meta+Ctrl+Shift+Down"
+          "Window One Desktop Down"
+        ];
+        "Window One Desktop Up" = [
+          "Meta+Ctrl+Shift+Up"
+          "Window One Desktop Up"
+        ];
+        "Window One Desktop to the Left" = [
+          "Meta+Ctrl+Shift+Left"
+          "Window One Desktop to the Left"
+        ];
+        "Window One Desktop to the Right" = [
+          "Meta+Ctrl+Shift+Right"
+          "Window One Desktop to the Right"
+        ];
+        "Switch to Next Screen" = [
+          "Meta+]"
+          "Switch to Next Screen"
+        ];
+        "Switch to Previous Screen" = [
+          "Meta+["
+          "Switch to Previous Screen"
+        ];
+
+        "KrohnkiteFocusNext" = "Meta+Ctrl+L";
+        "KrohnkiteFocusPrev" = "Meta+Ctrl+H";
+        "KrohnkiteNextLayout" = "Meta+\\";
+        "KrohnkitePreviousLayout" = "Meta+|";
+        "KrohnkiteToggleFloat" = "Meta+Alt+Esc";
+        "KrohnkiteShiftLeft" = "Meta+Shift+H";
+        "KrohnkiteShiftRight" = "Meta+Shift+L";
       };
     };
 
