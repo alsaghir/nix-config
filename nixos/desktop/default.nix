@@ -1,7 +1,7 @@
 { lib, ... }:
 {
   imports = [
-    ./kde.nix
+    ./gnome.nix
     ./fonts.nix
   ];
 

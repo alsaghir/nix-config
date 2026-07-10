@@ -12,7 +12,7 @@ in
 {
 
   imports = [
-    inputs.plasma-manager.homeModules.plasma-manager
+    #inputs.plasma-manager.homeModules.plasma-manager
     #inputs.dms.homeModules.dank-material-shell
     #inputs.dms.homeModules.niri
     #inputs.niri.homeModules.niri

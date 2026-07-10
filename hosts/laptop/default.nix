@@ -53,7 +53,7 @@ in
   system.configurationRevision = self.rev or self.dirtyRev or null;
 
   # Laptop-only kernel choice (keep servers/VMs on default kernel)
-  # boot.kernelPackages = pkgs.linuxPackages_zen;linuxPackages_latest
+  boot.kernelPackages = pkgs.linuxPackages_zen;
 
   # Laptop memory tuning: fast compressed RAM swap; keep a small swapfile fallback
   zramSwap = {
