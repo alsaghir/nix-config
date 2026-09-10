@@ -41,7 +41,60 @@ in
   programs.ripgrep.enable = true;
   programs.starship.enable = true;
   programs.starship.enableZshIntegration = true;
-  programs.vim.enable = true;
+  programs.vim.enable = false;
+  programs.vim.defaultEditor = true;
+
+  programs.antigravity-cli.enable = true;
+  programs.aichat = {
+    enable = true;
+    settings = {
+      model = "gemini:gemini-2.5-flash";
+      stream = true;
+      save = true;
+      highlight = true;
+      keybindings = "vi";
+
+      clients = [
+        {
+          type = "gemini";
+          api_base = "https://generativelanguage.googleapis.com/v1beta";
+        }
+        {
+          type = "openai-compatible";
+          name = "deepseek";
+          api_base = "https://api.deepseek.com";
+        }
+        {
+          type = "openai-compatible";
+          name = "groq";
+          api_base = "https://api.groq.com/openai/v1";
+        }
+        {
+          type = "openai-compatible";
+          name = "openrouter";
+          api_base = "https://openrouter.ai/api/v1";
+        }
+        {
+          type = "openai";
+          api_base = "https://api.openai.com/v1";
+        }
+        {
+          type = "openai-compatible";
+          name = "mistral";
+          api_base = "https://api.mistral.ai/v1";
+        }
+      ];
+    };
+  };
+  programs.aider-chat = {
+    enable = true;
+    settings = {
+      model = "deepseek/deepseek-chat";
+      git = true;
+      auto-commits = true;
+      dark-mode = true;
+    };
+  };
 
   programs.zsh = {
     enable = true;
@@ -89,6 +142,13 @@ in
             eval "$(just --completions zsh)"
           fi
 
+          # AI Keys
+          if [ -r "$AI_ENV_FILE" ]; then
+            set -a
+            source "$AI_ENV_FILE"
+            set +a
+          fi
+
           echo "Last to run init"
         '';
       in
@@ -103,42 +163,154 @@ in
 
   programs.nh = {
     enable = true;
+    #package = inputs.nh.packages.${pkgs.stdenv.hostPlatform.system}.default;
     clean = {
       enable = true;
       extraArgs = "--keep 5";
     };
   };
 
-  /* programs.neovim = {
+  programs.lazyvim = {
     enable = true;
-    defaultEditor = true;
-    viAlias = true;
-    vimAlias = true;
-    vimdiffAlias = true;
-    plugins = with pkgs.vimPlugins; [
-      nvim-lspconfig
-      plenary-nvim
-      gruvbox-material
-      mini-nvim
-      pkgs.vimPlugins.nvim-treesitter.withPlugins
-      (
-        treesitter-plugins: with treesitter-plugins; [
-          bash
-          lua
-          nix
-        ]
-      )
-      (fromGitHub "HEAD" "elihunter173/dirbuf.nvim")
+    installCoreDependencies = false;
+    
+    extras = {
+      ai."copilot-native".enable = true;
+      lang.nix = {
+        enable = true;
+        installDependencies = false;
+      };
+
+      lang.rust = {
+        enable = true;
+        installDependencies = false; # keep sourcing rust-analyzer/codelldb from your devshell
+        installRuntimeDependencies = false; # keep sourcing cargo/rustc from your devshell
+      };
+
+      dap.core = {
+        enable = true;
+        installDependencies = false; # keep sourcing codelldb from your devshell, same pattern as rust
+      };
+
+      lang.json = {
+        enable = true;
+        installDependencies = false;
+      };
+      lang.markdown = {
+        enable = true;
+        installDependencies = false;
+      };
+
+    };
+
+    # Additional packages (optional)
+    extraPackages = with pkgs; [
+      nixd # Nix LSP
+      alejandra # Nix formatter
+      lua-language-server
+      stylua
+      marksman
+      vscode-langservers-extracted
+      prettier
+
+      # Tools LazyVim/plugins expect on PATH
+      ripgrep
+      lazygit
+      git
+      gcc
+      mermaid-cli
+      wget
+      curl
     ];
-    extraConfig = ''
-      set number relativenumber
-    '';
-    extraLuaConfig = ''
-      vim.o.termguicolors  = true
-      vim.cmd('colorscheme gruvbox-material')
-      vim.g.gruvbox_material_background = 'hard'
-    '';
-  }; */
+
+    # Only needed for languages not covered by LazyVim extras
+    treesitterParsers = with pkgs.vimPlugins.nvim-treesitter-parsers; [
+      wgsl # WebGPU Shading Language
+      templ # Go templ files
+      go
+    ];
+
+    config = {
+      autocmds = ''
+        vim.api.nvim_create_autocmd({ "InsertEnter" }, { command = "set norelativenumber" })
+        vim.api.nvim_create_autocmd({ "InsertLeave" }, { command = "set relativenumber" })
+
+        vim.api.nvim_create_autocmd("FileType", {
+          pattern = "nix",
+          callback = function(args)
+            vim.lsp.inlay_hint.enable(false, { bufnr = args.buf })
+          end,
+        })
+      '';
+    };
+
+    plugins = {
+      disable-luarocks = ''
+        return {
+          {
+            "folke/lazy.nvim",
+            opts = {
+              rocks = {
+                enabled = false,
+                hererocks = false,
+              },
+            },
+          },
+        }
+      '';
+
+      treesitter-no-autoinstall = ''
+        return {
+          {
+            "nvim-treesitter/nvim-treesitter",
+            opts = {
+              auto_install = false,
+              ensure_installed = {}, -- rely entirely on Nix-provided parsers
+            },
+          },
+        }
+      '';
+
+      lspconfig = ''
+        return {
+          {
+            "neovim/nvim-lspconfig",
+            opts = {
+              servers = {
+                rust_analyzer = { enabled = false }, -- rustaceanvim handles this
+                nixd = {},
+              },
+            },
+          },
+        }
+      '';
+
+      rust-dap = ''
+        return {
+          {
+            "mrcjkb/rustaceanvim",
+            opts = function(_, opts)
+              local codelldb_symlink = vim.fn.exepath("codelldb")
+              if codelldb_symlink ~= "" then
+                local codelldb_real = vim.uv.fs_realpath(codelldb_symlink) or codelldb_symlink
+                local liblldb_path = codelldb_real:gsub("adapter/codelldb$", "lldb/lib/liblldb.so")
+                local cfg = require("rustaceanvim.config")
+                opts.dap = opts.dap or {}
+                opts.dap.adapter = cfg.get_codelldb_adapter(codelldb_real, liblldb_path)
+              else
+                vim.notify("codelldb not found on PATH — Rust debugging disabled", vim.log.levels.WARN)
+              end
+              return opts
+            end,
+          },
+        }
+      '';
+    };
+  };
+
+  # xdg.configFile."nvim" = {
+  #   source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/nix-config/config/nvim";
+  # };
 
   home.packages = with pkgs; [
     usbutils
@@ -161,9 +333,7 @@ in
     nvd
     nix-diff
     nix-tree
-    nil
 
-    gemini-cli
     kubectl
     adwaita-fonts
   ];

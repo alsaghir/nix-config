@@ -35,6 +35,7 @@
       addresses = true;
     };
   };
+  networking.dhcpcd.extraConfig = "nohook resolv.conf";
 
   # networking.interfaces.enp3s0.useDHCP = lib.mkDefault true;
   # networking.interfaces.wlp4s0.useDHCP = lib.mkDefault true;

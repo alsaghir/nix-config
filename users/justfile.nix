@@ -29,6 +29,9 @@ let
     idea-path path:
       ${userConfig.homeDirectory}/.local/share/JetBrains/Toolbox/apps/intellij-idea/bin/idea "{{path}}" > /dev/null 2>&1 & disown
 
+    rustrover:
+      ${userConfig.homeDirectory}/.local/share/JetBrains/Toolbox/apps/rustrover/bin/rustrover . > /dev/null 2>&1 & disown
+
     ${hostJustfile}
   '';
 

@@ -7,61 +7,57 @@
 }:
 
 let
-monitorsConfig = pkgs.writeText "gdm_monitors.xml" ''
-
-<monitors version="2">
-  <configuration>
-    <layoutmode>logical</layoutmode>
-    <logicalmonitor>
-      <x>2560</x>
-      <y>0</y>
-      <scale>1</scale>
-      <monitor>
-        <monitorspec>
-          <connector>HDMI-1</connector>
-          <vendor>AOC</vendor>
-          <product>Q27G4</product>
-          <serial>18DQ5HA063266</serial>
-        </monitorspec>
-        <mode>
-          <width>2560</width>
-          <height>1440</height>
-          <rate>60.000</rate>
-        </mode>
-      </monitor>
-    </logicalmonitor>
-    <logicalmonitor>
-      <x>0</x>
-      <y>0</y>
-      <scale>1</scale>
-      <primary>yes</primary>
-      <monitor>
-        <monitorspec>
-          <connector>DP-1</connector>
-          <vendor>AOC</vendor>
-          <product>Q27G4Z</product>
-          <serial>2RRR9HA014571</serial>
-        </monitorspec>
-        <mode>
-          <width>2560</width>
-          <height>1440</height>
-          <rate>120.000</rate>
-        </mode>
-      </monitor>
-    </logicalmonitor>
-    <disabled>
-      <monitorspec>
-        <connector>eDP-1</connector>
-        <vendor>CMN</vendor>
-        <product>0x152a</product>
-        <serial>0x00000000</serial>
-      </monitorspec>
-    </disabled>
-  </configuration>
-</monitors>
-
-'';
-  in
+  gdmMonitorsConfig = pkgs.writeText "gdm_monitors.xml" ''
+    <monitors version="2">
+      <configuration>
+        <layoutmode>logical</layoutmode>
+        <logicalmonitor>
+          <x>0</x>
+          <y>0</y>
+          <scale>1</scale>
+          <primary>yes</primary>
+          <monitor>
+            <monitorspec>
+              <connector>DP-1</connector>
+              <vendor>AOC</vendor>
+              <product>Q27G4Z</product>
+              <serial>2RRR9HA014571</serial>
+            </monitorspec>
+            <mode><width>2560</width><height>1440</height><rate>120.000</rate></mode>
+          </monitor>
+        </logicalmonitor>
+        <logicalmonitor>
+          <x>2560</x>
+          <y>0</y>
+          <scale>1</scale>
+          <monitor>
+            <monitorspec>
+              <connector>HDMI-1</connector>
+              <vendor>AOC</vendor>
+              <product>Q27G4</product>
+              <serial>18DQ5HA063266</serial>
+            </monitorspec>
+            <mode><width>2560</width><height>1440</height><rate>60.000</rate></mode>
+          </monitor>
+        </logicalmonitor>
+        <logicalmonitor>
+          <x>0</x>
+          <y>1440</y>
+          <scale>1</scale>
+          <monitor>
+            <monitorspec>
+              <connector>eDP-1</connector>
+              <vendor>CMN</vendor>
+              <product>0x152a</product>
+              <serial>0x00000000</serial>
+            </monitorspec>
+            <mode><width>2560</width><height>1440</height><rate>60.000</rate></mode>
+          </monitor>
+        </logicalmonitor>
+      </configuration>
+    </monitors>
+  '';
+in
 
 {
   services.displayManager.gdm.enable = true;
@@ -93,7 +89,6 @@ monitorsConfig = pkgs.writeText "gdm_monitors.xml" ''
     gnome-tour
     cheese
     gnome-maps
-    gnome-photos
     gnome-music
     gnome-user-docs
     simple-scan
@@ -107,8 +102,6 @@ monitorsConfig = pkgs.writeText "gdm_monitors.xml" ''
       interval = 0;
     };
   };
-
-
 
   # Generic desktop session environment vars (Wayland + Electron + Firefox)
   environment.sessionVariables = {
@@ -127,7 +120,8 @@ monitorsConfig = pkgs.writeText "gdm_monitors.xml" ''
   };
 
   systemd.tmpfiles.rules = [
-    "L+ /run/gdm/.config/monitors.xml - - - - ${monitorsConfig}"
+    "d /var/lib/gdm/seat0 0711 gdm gdm -"
+    "d /var/lib/gdm/seat0/config 0711 gdm gdm -"
+    "L+ /var/lib/gdm/seat0/config/monitors.xml - - - - ${gdmMonitorsConfig}"
   ];
-
 }

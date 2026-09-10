@@ -6,65 +6,18 @@
   ...
 }:
 let
-  sopsFile = ./asus-laptop-ssh-keys.yaml;
 
   userLib = import ../lib { inherit lib; };
   hostname = config.networking.hostName;
   primaryUsername = userLib.getPrimaryUser hostname;
   userConfig = userLib.getPrimaryUserConfig hostname;
 
+  sshKeysSopsFile = ../users/${userConfig.username}/${hostname}/ssh-keys.yaml;
+  aiApiKeysSopsFile = ../users/${userConfig.username}/ai-keys.yaml;
+
 in
 {
 
-  sops = {
-    defaultSopsFile = sopsFile;
-
-    # age.keyFile is inherited from roles/common.nix
-    # DO NOT set it here - /home is not mounted during early boot!
-
-    # Personal SSH keys
-    secrets.ssh_private_key = {
-      key = "ssh_private_key";
-      path = "${userConfig.homeDirectory}/.ssh/id_ed25519";
-      owner = userConfig.username;
-      mode = "0600";
-    };
-
-    secrets.ssh_public_key = {
-      key = "ssh_public_key";
-      path = "${userConfig.homeDirectory}/.ssh/id_ed25519.pub";
-      owner = userConfig.username;
-      mode = "0644";
-    };
-
-    secrets.rsa_ssh_private_key = {
-      key = "rsa_ssh_private_key";
-      path = "${userConfig.homeDirectory}/.ssh/id_rsa";
-      owner = userConfig.username;
-      mode = "0600";
-    };
-
-    secrets.rsa_ssh_public_key = {
-      key = "rsa_ssh_public_key";
-      path = "${userConfig.homeDirectory}/.ssh/id_rsa.pub";
-      owner = userConfig.username;
-      mode = "0644";
-    };
-
-    # Breadfast SSH keys
-    secrets.breadfast_ssh_private_key = {
-      key = "breadfast_ssh_private_key";
-      path = "${userConfig.homeDirectory}/.ssh/breadfast_id_rsa";
-      owner = userConfig.username;
-      mode = "0600";
-    };
-
-    secrets.breadfast_ssh_public_key = {
-      key = "breadfast_ssh_public_key";
-      path = "${userConfig.homeDirectory}/.ssh/breadfast_id_rsa.pub";
-      owner = userConfig.username;
-      mode = "0644";
-    };
-  };
+  
 
 }

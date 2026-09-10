@@ -28,6 +28,7 @@
       cursor-theme = "Adwaita";
       locate-pointer = true;
       clock-format = "12h";
+      show-battery-percentage = true;
       gtk-theme = if userConfig.preferences.theme == "dark" then "adwaita-dark" else "adwaita";
     };
 
@@ -38,10 +39,11 @@
     "org/gnome/settings-daemon/plugins/power" = {
       sleep-inactive-ac-timeout = lib.gvariant.mkUint32 1800;
       sleep-inactive-battery-timeout = lib.gvariant.mkUint32 1200;
+      sleep-inactive-ac-type = "nothing"; # nothing suspend
     };
 
     "org/gnome/desktop/session" = {
-      idle-delay = lib.gvariant.mkUint32 900;
+      idle-delay = lib.gvariant.mkUint32 0; # 0 for disabling, 900 for 15 minutes
     };
 
     "org/gnome/desktop/screensaver" = {
@@ -55,6 +57,14 @@
 
     "org/gnome/shell/extensions/paperwm" = {
       disable-topbar-styling = true;
+      winprops = [
+        (builtins.toJSON {
+          wm_class = "jetbrains-toolbox";
+          title = "";
+          scratch_layer = false;
+          preferredWidth = "101%";
+        })
+      ];
     };
 
     "org/gnome/desktop/wm/preferences" = {
@@ -109,7 +119,6 @@
       gst_all_1.gst-plugins-base
       gst_all_1.gst-plugins-good
       gst_all_1.gst-plugins-ugly
-      gst_all_1.gst-vaapi
       gst_all_1.gstreamer
 
       imagemagick

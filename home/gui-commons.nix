@@ -62,6 +62,15 @@ in
     package = onlyofficeQtScale1;
   };
 
+  programs.zed-editor = {
+    enable = true;
+    userSettings = {
+      auto_update = false;
+      vim_mode = false;
+    };
+
+  };
+
   home.packages = with pkgs; [
     # mailspring
     (userLib.mkGSettingsApp {
@@ -72,7 +81,7 @@ in
 
     biglybt
 
-    antigravity
+    antigravity-ide
     mission-center
 
     adwaita-icon-theme

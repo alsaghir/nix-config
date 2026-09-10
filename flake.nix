@@ -19,6 +19,8 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    lazyvim.url = "github:pfassina/lazyvim-nix";
+
     /*
     plasma-manager = {
       url = "github:nix-community/plasma-manager";
@@ -27,7 +29,7 @@
     };
 
       nixos-wsl.url = "github:nix-community/NixOS-WSL/main";
-  
+
        dms = {
         url = "github:AvengeMedia/DankMaterialShell/stable";
         inputs.nixpkgs.follows = "nixpkgs";

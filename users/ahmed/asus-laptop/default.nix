@@ -6,7 +6,7 @@
   ...
 }:
 let
-  sopsFile = ./ssh-keys.yaml;
+  sshKeysSopsFile = ./ssh-keys.yaml;
 
 in
 {
@@ -25,47 +25,61 @@ in
   '';
 
   sops = {
-    defaultSopsFile = sopsFile;
     # or ${config.home.homeDirectory}/.config/sops/age/keys.txt
-    age.keyFile = "${config.xdg.configHome}/sops/age/keys.txt";
+    age.keyFile = "${config.home.homeDirectory}/.config/sops/age/keys.txt";
 
     # Personal SSH keys
-    secrets.ssh_private_key = {
-      key = "ssh_private_key";
-      path = "${config.home.homeDirectory}/.ssh/id_ed25519";
-      mode = "0600";
+    secrets = {
+      ssh_private_key = {
+        key = "ssh_private_key";
+        path = "${config.home.homeDirectory}/.ssh/id_ed25519";
+        mode = "0600";
+        sopsFile = sshKeysSopsFile;
+
+      };
+
+      ssh_public_key = {
+        key = "ssh_public_key";
+        path = "${config.home.homeDirectory}/.ssh/id_ed25519.pub";
+        mode = "0644";
+        sopsFile = sshKeysSopsFile;
+
+      };
+
+      rsa_ssh_private_key = {
+        key = "rsa_ssh_private_key";
+        path = "${config.home.homeDirectory}/.ssh/id_rsa";
+        mode = "0600";
+        sopsFile = sshKeysSopsFile;
+
+      };
+
+      rsa_ssh_public_key = {
+        key = "rsa_ssh_public_key";
+        path = "${config.home.homeDirectory}/.ssh/id_rsa.pub";
+        mode = "0644";
+        sopsFile = sshKeysSopsFile;
+
+      };
+
+      # Breadfast SSH keys
+      breadfast_ssh_private_key = {
+        key = "breadfast_ssh_private_key";
+        path = "${config.home.homeDirectory}/.ssh/breadfast_id_rsa";
+        mode = "0600";
+        sopsFile = sshKeysSopsFile;
+
+      };
+
+      breadfast_ssh_public_key = {
+        key = "breadfast_ssh_public_key";
+        path = "${config.home.homeDirectory}/.ssh/breadfast_id_rsa.pub";
+        mode = "0644";
+        sopsFile = sshKeysSopsFile;
+
+      };
     };
 
-    secrets.ssh_public_key = {
-      key = "ssh_public_key";
-      path = "${config.home.homeDirectory}/.ssh/id_ed25519.pub";
-      mode = "0644";
-    };
-
-    secrets.rsa_ssh_private_key = {
-      key = "rsa_ssh_private_key";
-      path = "${config.home.homeDirectory}/.ssh/id_rsa";
-      mode = "0600";
-    };
-
-    secrets.rsa_ssh_public_key = {
-      key = "rsa_ssh_public_key";
-      path = "${config.home.homeDirectory}/.ssh/id_rsa.pub";
-      mode = "0644";
-    };
-
-    # Breadfast SSH keys
-    secrets.breadfast_ssh_private_key = {
-      key = "breadfast_ssh_private_key";
-      path = "${config.home.homeDirectory}/.ssh/breadfast_id_rsa";
-      mode = "0600";
-    };
-
-    secrets.breadfast_ssh_public_key = {
-      key = "breadfast_ssh_public_key";
-      path = "${config.home.homeDirectory}/.ssh/breadfast_id_rsa.pub";
-      mode = "0644";
-    };
   };
 
 }

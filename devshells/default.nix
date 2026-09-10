@@ -70,6 +70,12 @@ let
           freetype
           zlib
           stdenv.cc.cc.lib
+          glib
+          dbus
+          dconf
+          gtk3
+          libportal
+          dbus.lib
         ]
       );
     in
@@ -186,6 +192,56 @@ let
       '';
     };
 
+  # ============== RUST SHELL ==============
+  rustShell = pkgs.mkShell {
+    name = "rust-devshell";
+
+    packages =
+      with pkgs;
+      [
+        cargo
+        rustc
+        rustfmt
+        clippy
+        rust-analyzer
+        pkg-config
+        openssl
+        cargo-edit
+        cargo-watch
+        cargo-nextest
+      ]
+      ++ basics;
+
+    nativeBuildInputs = with pkgs; [ pkg-config ];
+
+    shellHook = ''
+      export RUST_SRC_PATH="${pkgs.rustPlatform.rustLibSrc}"
+      export PATH="$PWD/.sdk/bin:$PWD/target/debug:$PATH"
+
+      mkdir -p .sdk/bin
+      ln -sf "${pkgs.cargo}/bin/cargo"        .sdk/bin/cargo
+      ln -sf "${pkgs.rustc}/bin/rustc"        .sdk/bin/rustc
+      ln -sf "${pkgs.rust-analyzer}/bin/rust-analyzer" .sdk/bin/rust-analyzer
+      ln -sf "${pkgs.rustfmt}/bin/rustfmt"    .sdk/bin/rustfmt
+      ln -sf "${pkgs.vscode-extensions.vadimcn.vscode-lldb}/share/vscode/extensions/vadimcn.vscode-lldb/adapter/codelldb" .sdk/bin/codelldb
+      ln -sfT "${pkgs.rustPlatform.rustLibSrc}" .sdk/rust-src
+
+      # RustRover on NixOS can't index a read-only Nix store path (JetBrains RUST-7912),
+      # so keep a real writable copy at a fixed path, regenerated only when the
+      # pinned rustc version changes.
+      RUST_SRC_MARKER=".sdk/rust-src/.nix-version"
+      CURRENT_RUST_VERSION="${pkgs.rustc.version}"
+      if [ ! -f "$RUST_SRC_MARKER" ] || [ "$(cat "$RUST_SRC_MARKER" 2>/dev/null)" != "$CURRENT_RUST_VERSION" ]; then
+        cp -r "${pkgs.rustPlatform.rustLibSrc}" .sdk/rust-src-hard-copy
+        chmod -R u+w .sdk/rust-src-hard-copy
+        echo "$CURRENT_RUST_VERSION" > "$RUST_SRC_MARKER"
+      fi
+
+      echo "✅ Rust dev shell ready"
+      echo "   $(rustc --version)"
+      echo "   $(cargo --version)"
+    '';
+  };
 in
 {
   # Named shells
@@ -193,6 +249,7 @@ in
   kotlin = kotlinShell;
   python = pythonShell;
   java = javaShell;
+  rust = rustShell;
 
   # Default shell (pick your most common one)
   default = nodejsShell;
