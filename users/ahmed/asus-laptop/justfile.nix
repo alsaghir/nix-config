@@ -1,15 +1,17 @@
 {
-  config,
+  hostConfig,
   lib,
   pkgs,
-  hostname,
   ...
 }:
 
+let
+  hostname = hostConfig.hostname;
 
+in
 {
-  justfile.host = ''
-    # Host-specific recipes for ${hostname}
+  justfile.recipes = ''
+    # user-host specific recipes
 
     rebuild:
         nh os switch ~/nix-config --hostname ${hostname}

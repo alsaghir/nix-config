@@ -13,8 +13,7 @@ let
 in
 
 {
-  imports = [ ./justfile.nix ];
-
+  
   users.users.${userConfig.username} = {
     isNormalUser = true;
     description = userConfig.fullName;

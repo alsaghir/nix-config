@@ -204,13 +204,14 @@ in
 
     # Additional packages (optional)
     extraPackages = with pkgs; [
-      nixd # Nix LSP
-      alejandra # Nix formatter
+      nixd
+      alejandra
       lua-language-server
       stylua
       marksman
       vscode-langservers-extracted
       prettier
+      copilot-language-server
 
       # Tools LazyVim/plugins expect on PATH
       ripgrep

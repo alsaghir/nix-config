@@ -12,6 +12,7 @@ in
 {
 
   imports = [
+    ./justfile.nix
     #inputs.plasma-manager.homeModules.plasma-manager
     #inputs.dms.homeModules.dank-material-shell
     #inputs.dms.homeModules.niri

@@ -13,11 +13,13 @@ let
 in
 {
   imports = [
+    ./justfile.nix
     inputs.sops-nix.homeManagerModules.sops
     inputs.lazyvim.homeManagerModules.default
     ../../home/cli.nix
     ../../home/gnome.nix
     ../../home/gui-commons.nix
+    ../../home/justfile.nix
     ../../home/ssh.nix
     ../../home/flatpak.nix
   ];

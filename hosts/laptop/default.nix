@@ -44,9 +44,6 @@ in
     # User definitions
     ../../users/user.nix
 
-    # Host-specific justfile
-    ./justfile.nix
-
     # inputs.dms.nixosModules.greeter
   ];
 
