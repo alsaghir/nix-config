@@ -62,15 +62,6 @@ in
     package = onlyofficeQtScale1;
   };
 
-  programs.zed-editor = {
-    enable = true;
-    userSettings = {
-      auto_update = false;
-      vim_mode = false;
-    };
-
-  };
-
   home.packages = with pkgs; [
     # mailspring
     (userLib.mkGSettingsApp {
@@ -110,6 +101,8 @@ in
 
     kdePackages.kate
     jetbrains-toolbox
+    protonvpn-gui
+    github-copilot-app
 
   ];
 

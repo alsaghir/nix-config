@@ -192,56 +192,142 @@ let
       '';
     };
 
-  # ============== RUST SHELL ==============
-  rustShell = pkgs.mkShell {
-    name = "rust-devshell";
+  # ============== SHARED RUST TOOLCHAIN (rust-overlay) ==============
+  mkRustToolchain =
+    targets:
+    pkgs.rust-bin.stable.latest.default.override {
+      extensions = [
+        "rust-src"
+        "rust-analyzer"
+        "clippy"
+        "rustfmt"
+      ];
+      inherit targets;
+    };
 
-    packages =
-      with pkgs;
-      [
-        cargo
-        rustc
-        rustfmt
-        clippy
-        rust-analyzer
+  # ============== DIOXUS SHELL ==============
+  dioxusShell =
+    let
+      rustToolchain = mkRustToolchain [ "wasm32-unknown-unknown" ];
+
+      # wasm-bindgen-cli pinned to match Dioxus's expected schema version.
+      # When bumping Dioxus, check what wasm-bindgen version it wants, update
+      # `version` below, set both hashes to pkgs.lib.fakeHash, rebuild twice,
+      # copy the real hashes from the errors (fetchCrate first, then cargoVendor).
+      wasm-bindgen-cli =
+        let
+          src = pkgs.fetchCrate {
+            pname = "wasm-bindgen-cli";
+            version = "0.2.128";
+            hash = "sha256-a7lcXJnnZkYReja+iUO7NqqrWyv3toxnUgQb8s4IS5s=";
+          };
+        in
+        pkgs.buildWasmBindgenCli {
+          inherit src;
+          cargoDeps = pkgs.rustPlatform.fetchCargoVendor {
+            inherit src;
+            inherit (src) pname version;
+            hash = "sha256-R1Tas33Ursy8kqsxguAkG0ZhNed2n5uFTAhw1l2qlLY=";
+          };
+        };
+
+      libPath = pkgs.lib.makeLibraryPath (
+        with pkgs;
+        [
+          atkmm
+          webkitgtk_4_1
+          gtk3
+          cairo
+          gdk-pixbuf
+          glib
+          pango
+          atk
+          openssl
+          libsoup_3
+          xdotool
+        ]
+      );
+    in
+    pkgs.mkShell {
+      name = "dioxus-devshell";
+
+      packages =
+        with pkgs;
+        [
+          rustToolchain
+          vscode-extensions.vadimcn.vscode-lldb
+          dioxus-cli
+          wasm-bindgen-cli
+          pkg-config
+          openssl
+          cargo-edit
+          cargo-watch
+          cargo-nextest
+          binaryen
+          lld
+        ]
+        ++ basics;
+
+      nativeBuildInputs = with pkgs; [
         pkg-config
-        openssl
-        cargo-edit
-        cargo-watch
-        cargo-nextest
-      ]
-      ++ basics;
+        gcc
+        gnumake
+      ];
 
-    nativeBuildInputs = with pkgs; [ pkg-config ];
+      shellHook = ''
+        export LD_LIBRARY_PATH="${libPath}''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+        export PATH="$PWD/.sdk/bin:$PWD/target/debug:$PATH"
 
-    shellHook = ''
-      export RUST_SRC_PATH="${pkgs.rustPlatform.rustLibSrc}"
-      export PATH="$PWD/.sdk/bin:$PWD/target/debug:$PATH"
+        mkdir -p .sdk/bin
+        ln -sf "${pkgs.vscode-extensions.vadimcn.vscode-lldb}/share/vscode/extensions/vadimcn.vscode-lldb/adapter/codelldb" .sdk/bin/codelldb
 
-      mkdir -p .sdk/bin
-      ln -sf "${pkgs.cargo}/bin/cargo"        .sdk/bin/cargo
-      ln -sf "${pkgs.rustc}/bin/rustc"        .sdk/bin/rustc
-      ln -sf "${pkgs.rust-analyzer}/bin/rust-analyzer" .sdk/bin/rust-analyzer
-      ln -sf "${pkgs.rustfmt}/bin/rustfmt"    .sdk/bin/rustfmt
-      ln -sf "${pkgs.vscode-extensions.vadimcn.vscode-lldb}/share/vscode/extensions/vadimcn.vscode-lldb/adapter/codelldb" .sdk/bin/codelldb
-      ln -sfT "${pkgs.rustPlatform.rustLibSrc}" .sdk/rust-src
+        echo "✅ Dioxus dev shell ready (nix rust-overlay)"
+        echo "   $(rustc --version 2>/dev/null || true)"
+        echo "   $(cargo --version 2>/dev/null || true)"
+        echo "   dx: $(dx --version 2>/dev/null || echo 'dx missing')"
+      '';
+    };
 
-      # RustRover on NixOS can't index a read-only Nix store path (JetBrains RUST-7912),
-      # so keep a real writable copy at a fixed path, regenerated only when the
-      # pinned rustc version changes.
-      RUST_SRC_MARKER=".sdk/rust-src/.nix-version"
-      CURRENT_RUST_VERSION="${pkgs.rustc.version}"
-      if [ ! -f "$RUST_SRC_MARKER" ] || [ "$(cat "$RUST_SRC_MARKER" 2>/dev/null)" != "$CURRENT_RUST_VERSION" ]; then
-        cp -r "${pkgs.rustPlatform.rustLibSrc}" .sdk/rust-src-hard-copy
-        chmod -R u+w .sdk/rust-src-hard-copy
-        echo "$CURRENT_RUST_VERSION" > "$RUST_SRC_MARKER"
-      fi
+  # ============== RUST SHELL ==============
+  rustShell =
+    let
+      toolchainFile = ./rust-toolchain.toml;
+      rustToolchain =
+        if builtins.pathExists toolchainFile then
+          pkgs.rust-bin.fromRustupToolchainFile toolchainFile
+        else
+          mkRustToolchain [ ];
+    in
 
-      echo "✅ Rust dev shell ready"
-      echo "   $(rustc --version)"
-      echo "   $(cargo --version)"
-    '';
-  };
+    pkgs.mkShell {
+      name = "rust-devshell";
+
+      packages =
+        with pkgs;
+        [
+          rustToolchain
+          vscode-extensions.vadimcn.vscode-lldb
+          pkg-config
+          openssl
+          cargo-edit
+          cargo-watch
+          cargo-nextest
+        ]
+        ++ basics;
+
+      nativeBuildInputs = with pkgs; [ pkg-config ];
+
+      shellHook = ''
+        export PATH="$PWD/.sdk/bin:$PWD/target/debug:$PATH"
+
+        mkdir -p .sdk/bin
+        ln -sf "${pkgs.vscode-extensions.vadimcn.vscode-lldb}/share/vscode/extensions/vadimcn.vscode-lldb/adapter/codelldb" .sdk/bin/codelldb
+
+        echo "✅ Rust dev shell ready (rustup-managed)"
+        echo "   $(rustc --version 2>/dev/null || echo 'toolchain installing…')"
+        echo "   $(cargo --version 2>/dev/null || true)"
+      '';
+    };
 in
 {
   # Named shells
@@ -250,6 +336,7 @@ in
   python = pythonShell;
   java = javaShell;
   rust = rustShell;
+  dioxus = dioxusShell;
 
   # Default shell (pick your most common one)
   default = nodejsShell;

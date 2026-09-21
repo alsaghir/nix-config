@@ -21,30 +21,35 @@
 
     lazyvim.url = "github:pfassina/lazyvim-nix";
 
-    /*
-    plasma-manager = {
-      url = "github:nix-community/plasma-manager";
+    rust-overlay = {
+      url = "github:oxalica/rust-overlay";
       inputs.nixpkgs.follows = "nixpkgs";
-      inputs.home-manager.follows = "home-manager";
     };
 
-      nixos-wsl.url = "github:nix-community/NixOS-WSL/main";
-
-       dms = {
-        url = "github:AvengeMedia/DankMaterialShell/stable";
+    /*
+      plasma-manager = {
+        url = "github:nix-community/plasma-manager";
         inputs.nixpkgs.follows = "nixpkgs";
+        inputs.home-manager.follows = "home-manager";
       };
 
-      niri = {
-        url = "github:sodiboo/niri-flake";
-        inputs.nixpkgs.follows = "nixpkgs";
-      };
+        nixos-wsl.url = "github:nix-community/NixOS-WSL/main";
 
-      dms-plugin-registry = {
-        url = "github:AvengeMedia/dms-plugin-registry";
-        inputs.nixpkgs.follows = "nixpkgs";
-      };
-  */
+         dms = {
+          url = "github:AvengeMedia/DankMaterialShell/stable";
+          inputs.nixpkgs.follows = "nixpkgs";
+        };
+
+        niri = {
+          url = "github:sodiboo/niri-flake";
+          inputs.nixpkgs.follows = "nixpkgs";
+        };
+
+        dms-plugin-registry = {
+          url = "github:AvengeMedia/dms-plugin-registry";
+          inputs.nixpkgs.follows = "nixpkgs";
+        };
+    */
 
   };
 
@@ -54,7 +59,7 @@
     { self, nixpkgs, ... }@inputs:
     let
       lib = import ./lib { inherit (nixpkgs) lib; };
-      customOverlays = (import ./overlays); # ++ [ inputs.niri.overlays.niri ];
+      customOverlays = (import ./overlays) ++ [ inputs.rust-overlay.overlays.default ];
       supportedSystems = [
         "x86_64-linux"
         "aarch64-linux"
@@ -103,6 +108,7 @@
         import ./devshells {
           pkgs = import nixpkgs {
             inherit system;
+            overlays = customOverlays;
             config.allowUnfree = true;
           };
         }

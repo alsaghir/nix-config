@@ -35,6 +35,8 @@ final: prev: rec {
       sed -i '/StartupWMClass/d' $out/share/biglybt/biglybt.desktop
       echo "StartupWMClass=BiglyBT Extreme Mod" >> $out/share/biglybt/biglybt.desktop
 
+      sed -i 's|^Icon=biglybt.svg$|Icon=biglybt|' $out/share/biglybt/biglybt.desktop
+
       # Set the correct JDK path in the wrapper script
       substituteInPlace $out/share/biglybt/.biglybt-wrapped \
         --replace-fail 'JAVA_PROGRAM_DIR=""' 'JAVA_PROGRAM_DIR="'"$out/jre/bin/"'"'

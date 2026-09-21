@@ -21,7 +21,10 @@ in
 
 {
 
+  programs.antigravity-cli.enable = true;
   programs.bash.enable = true;
+  programs.claude-code.enable = true;
+  programs.codex.enable = true;
   programs.direnv.enable = true;
   programs.direnv.enableZshIntegration = true;
   programs.direnv.nix-direnv.enable = true;
@@ -32,6 +35,7 @@ in
   programs.fzf.enable = true;
   programs.fzf.enableZshIntegration = true;
   programs.git.enable = true;
+  programs.github-copilot-cli.enable = true;
   programs.jq.enable = true;
   programs.lsd.enable = false;
   programs.lsd.enableZshIntegration = false;
@@ -41,10 +45,10 @@ in
   programs.ripgrep.enable = true;
   programs.starship.enable = true;
   programs.starship.enableZshIntegration = true;
-  programs.vim.enable = false;
   programs.vim.defaultEditor = true;
+  programs.vim.enable = false;
 
-  programs.antigravity-cli.enable = true;
+  
   programs.aichat = {
     enable = true;
     settings = {
@@ -172,7 +176,7 @@ in
   programs.lazyvim = {
     enable = true;
     installCoreDependencies = false;
-    
+
     extras = {
       ai."copilot-native".enable = true;
       lang.nix = {
@@ -300,6 +304,37 @@ in
               else
                 vim.notify("codelldb not found on PATH — Rust debugging disabled", vim.log.levels.WARN)
               end
+              return opts
+            end,
+          },
+        }
+      '';
+
+      dap-ui-autoclose = ''
+        return {
+          {
+            "rcarriga/nvim-dap-ui",
+            opts = function(_, opts)
+              local dap = require("dap")
+
+              local function reset_explorer_width()
+                vim.defer_fn(function()
+                  for _, win in ipairs(vim.api.nvim_list_wins()) do
+                    local buf = vim.api.nvim_win_get_buf(win)
+                    if vim.bo[buf].filetype == "snacks_picker_list" then
+                      vim.api.nvim_win_set_width(win, 30)
+                    end
+                  end
+                end, 100)
+              end
+
+              local function on_end()
+                require("dapui").close()
+                reset_explorer_width()
+              end
+
+              dap.listeners.before.event_terminated["close_dapui"] = on_end
+              dap.listeners.before.event_exited["close_dapui"] = on_end
               return opts
             end,
           },

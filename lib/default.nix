@@ -201,11 +201,17 @@ in
             cp --remove-destination "$(readlink -f "$primary")" "$primary"
             substituteInPlace "$primary" \
               --replace-warn "${pkg}/bin/" "$out/bin/"
+            
             if grep -q "^MimeType=" "$primary"; then
               sed -i "s|^MimeType=.*|MimeType=$allMimeTypes|" "$primary"
             else
               echo "MimeType=$allMimeTypes" >> "$primary"
             fi
+
+            substituteInPlace "$primary" \
+              --replace-quiet \
+                "image/x-jpeg2000-imageimage/jpegimage/jxl" \
+                "image/x-jpeg2000-image;image/jpeg;image/jxl" || true
 
             # Delete the now-redundant extras
             for desktop in "$out/share/applications"/*.desktop; do
