@@ -20,9 +20,16 @@ in
       hostname,
     }:
     let
+      hostCfg = registry.hosts.${hostname};
       pkgs = import nixpkgs {
         inherit system;
-        overlays = overlays;
+        # Host-scoped overlays (registry `extraOverlays`) are appended to the
+        # global ones, so a fix needed by a single machine does not change the
+        # package set of the others. They are passed an { inputs } argument so
+        # they can reach flake inputs; overlays that do not need it should take
+        # `{ ... }`.
+        overlays =
+          overlays ++ (builtins.map (o: import o { inherit inputs; }) (hostCfg.extraOverlays or [ ]));
         config = {
           allowUnfree = true;
           nvidia.acceptLicense = true;
@@ -58,7 +65,11 @@ in
           value = home-manager.lib.homeManagerConfiguration {
             pkgs = import nixpkgs {
               inherit system;
-              overlays = overlays;
+              # Host-scoped overlays (registry `extraOverlays`), appended to the
+              # global ones. Same mechanism as mkNixosSystem above, so a host
+              # declares its overlays once and both builders pick them up.
+              overlays =
+                overlays ++ (builtins.map (o: import o { inherit inputs; }) (hostCfg.extraOverlays or [ ]));
               config = {
                 allowUnfree = true;
                 permittedInsecurePackages = [
@@ -201,7 +212,7 @@ in
             cp --remove-destination "$(readlink -f "$primary")" "$primary"
             substituteInPlace "$primary" \
               --replace-warn "${pkg}/bin/" "$out/bin/"
-            
+
             if grep -q "^MimeType=" "$primary"; then
               sed -i "s|^MimeType=.*|MimeType=$allMimeTypes|" "$primary"
             else

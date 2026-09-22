@@ -39,6 +39,11 @@
           # e.g. ../../home/profiles/gaming.nix
         ];
       };
+      # Overlays applied to this host only, on top of the global ones in
+      # ../overlays/default.nix. Both mkNixosSystem and mkAllHomeConfigurations
+      # consume this, so a host declares them once.
+      # e.g. extraOverlays = [ ../overlays/my-host-fix ];
+      extraOverlays = [ ];
     };
 
     # desktop = {
