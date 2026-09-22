@@ -62,23 +62,6 @@ in
         sopsFile = sshKeysSopsFile;
 
       };
-
-      # Breadfast SSH keys
-      breadfast_ssh_private_key = {
-        key = "breadfast_ssh_private_key";
-        path = "${config.home.homeDirectory}/.ssh/breadfast_id_rsa";
-        mode = "0600";
-        sopsFile = sshKeysSopsFile;
-
-      };
-
-      breadfast_ssh_public_key = {
-        key = "breadfast_ssh_public_key";
-        path = "${config.home.homeDirectory}/.ssh/breadfast_id_rsa.pub";
-        mode = "0644";
-        sopsFile = sshKeysSopsFile;
-
-      };
     };
 
   };

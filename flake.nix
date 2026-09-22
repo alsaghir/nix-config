@@ -33,8 +33,6 @@
         inputs.home-manager.follows = "home-manager";
       };
 
-        nixos-wsl.url = "github:nix-community/NixOS-WSL/main";
-
          dms = {
           url = "github:AvengeMedia/DankMaterialShell/stable";
           inputs.nixpkgs.follows = "nixpkgs";
@@ -80,18 +78,6 @@
           overlays = customOverlays;
           modules = [
             ./hosts/laptop/default.nix
-          ];
-        };
-
-        wsl-lenovo-laptop = lib.mkNixosSystem {
-          inherit (inputs) nixpkgs;
-          inherit self inputs;
-          hostname = "wsl-lenovo-laptop";
-          system = "x86_64-linux";
-          overlays = customOverlays;
-          modules = [
-            ./hosts/wsl/default.nix
-            inputs.nixos-wsl.nixosModules.default
           ];
         };
 

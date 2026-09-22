@@ -24,18 +24,8 @@
         PreferredAuthentications = "publickey";
       };
 
-      "bfgithub" = {
-        hostname                = "github.com";
-        user                    = "git";
-        identityFile            = "~/.ssh/breadfast_id_rsa";
-        addKeysToAgent          = "no";
-        identitiesOnly          = true;
-        PreferredAuthentications = "publickey";
-        IdentityAgent            = "none";
-      };
-
       # catch-all — must be last
-      "* !bfgithub !github" = {
+      "* !github" = {
         identityFile            = "~/.ssh/id_ed25519";
         addKeysToAgent          = "yes";
         identitiesOnly          = true;
