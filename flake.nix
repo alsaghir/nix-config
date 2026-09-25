@@ -26,6 +26,8 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    ai-rules.url = "git+ssh://git@github.com-personal/alsaghir/ai-rules.git";
+
     /*
       plasma-manager = {
         url = "github:nix-community/plasma-manager";

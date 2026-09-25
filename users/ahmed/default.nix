@@ -16,6 +16,7 @@ in
     ./justfile.nix
     inputs.sops-nix.homeManagerModules.sops
     inputs.lazyvim.homeManagerModules.default
+    inputs.ai-rules.homeManagerModules.default
     ../../home/cli.nix
     ../../home/gnome.nix
     ../../home/gui-commons.nix
