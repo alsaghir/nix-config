@@ -101,7 +101,7 @@ in
 
     kdePackages.kate
     jetbrains-toolbox
-    protonvpn-gui
+    proton-vpn
     github-copilot-app
 
   ];

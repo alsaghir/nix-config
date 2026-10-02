@@ -218,8 +218,8 @@ let
         let
           src = pkgs.fetchCrate {
             pname = "wasm-bindgen-cli";
-            version = "0.2.128";
-            hash = "sha256-a7lcXJnnZkYReja+iUO7NqqrWyv3toxnUgQb8s4IS5s=";
+            version = "0.2.129";
+            hash = "sha256-pcecKQd7E8Opw6bkFoE569epUi7gh5qpQF1e5PJY6V8=";
           };
         in
         pkgs.buildWasmBindgenCli {
@@ -227,7 +227,7 @@ let
           cargoDeps = pkgs.rustPlatform.fetchCargoVendor {
             inherit src;
             inherit (src) pname version;
-            hash = "sha256-R1Tas33Ursy8kqsxguAkG0ZhNed2n5uFTAhw1l2qlLY=";
+            hash = "sha256-vmUrWVU7kPJJxO5qIVeAkwQyWDELO1Z4Z5gitz2kco8=";
           };
         };
 
@@ -272,6 +272,20 @@ let
         pkg-config
         gcc
         gnumake
+      ];
+
+      buildInputs = with pkgs; [
+        atkmm
+        webkitgtk_4_1
+        gtk3
+        cairo
+        gdk-pixbuf
+        glib
+        pango
+        atk
+        openssl
+        libsoup_3
+        xdotool
       ];
 
       shellHook = ''

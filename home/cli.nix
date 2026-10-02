@@ -116,6 +116,7 @@ in
         "history"
         "kind"
         "kubectl"
+        "helm"
         "podman"
         "ssh"
         "ssh-agent"
@@ -370,6 +371,16 @@ in
     nix-tree
 
     kubectl
+    # Helm with the commonly-needed plugins baked in (see NixOS wiki: Helm_and_Helmfile).
+    # helm-diff: preview release changes; helm-secrets: manage encrypted values;
+    # helm-git: install charts straight from git refs.
+    (wrapHelm kubernetes-helm {
+      plugins = with kubernetes-helmPlugins; [
+        helm-diff
+        helm-secrets
+        helm-git
+      ];
+    })
     adwaita-fonts
   ];
 
