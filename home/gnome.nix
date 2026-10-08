@@ -67,6 +67,37 @@
       ];
     };
 
+    "org/gnome/shell/extensions/paperwm/keybindings" = {
+      live-alt-tab = [ "" ];
+      live-alt-tab-backward = [ "" ];
+      previous-workspace = [ "" ]; # frees <Super>Above_Tab
+      previous-workspace-backward = [ "" ]; # frees <Super><Shift>Above_Tab
+    };
+
+    "org/gnome/desktop/wm/keybindings" = {
+      switch-windows = [ "<Alt>Tab" ];
+      switch-windows-backward = [ "<Shift><Alt>Tab" ];
+      switch-applications = [ "<Super>Tab" ];
+      switch-applications-backward = [ "<Shift><Super>Tab" ];
+      switch-group = [
+        "<Alt>Above_Tab"
+        "<Super>Above_Tab"
+      ];
+      switch-group-backward = [
+        "<Shift><Alt>Above_Tab"
+        "<Shift><Super>Above_Tab"
+      ];
+    };
+
+    "org/gnome/shell/keybindings" = {
+      toggle-message-tray = [ "<Super>m" ]; # GNOME's alternate default, Super+V is PaperWM's
+      toggle-overview = [ "<Super>s" ];
+    };
+
+    "org/gnome/shell/extensions/advanced-alt-tab-window-switcher" = {
+      win-switcher-popup-filter = 1;
+    };
+
     "org/gnome/desktop/wm/preferences" = {
       button-layout = "appmenu:minimize,maximize,close";
     };
@@ -74,6 +105,7 @@
     "org/gnome/shell" = {
       always-show-log-out = true;
       enabled-extensions = [
+        "advanced-alt-tab@G-dH.github.com"
         "azwallpaper@azwallpaper.gitlab.com"
         "appindicatorsupport@rgcjonas.gmail.com"
         "Battery-Health-Charging@maniacx.github.com"
@@ -141,6 +173,7 @@
       rewaita
     ]
     ++ (with pkgs.gnomeExtensions; [
+      advanced-alttab-window-switcher
       appindicator
       battery-health-charging
       caffeine

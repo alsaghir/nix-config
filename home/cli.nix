@@ -36,6 +36,7 @@ in
   programs.fzf.enableZshIntegration = true;
   programs.git.enable = true;
   programs.github-copilot-cli.enable = true;
+  programs.htop.enable = true;
   programs.jq.enable = true;
   programs.lsd.enable = false;
   programs.lsd.enableZshIntegration = false;
