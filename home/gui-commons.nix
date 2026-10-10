@@ -29,7 +29,13 @@ in
     pkgs.firefoxpwa
   ];
 
-  programs.ghostty.enable = true;
+  programs.ghostty = {
+    enable = true;
+    settings = {
+      font-family = "Hack Nerd Font";
+      font-size = 12;
+    };
+  };
   programs.k9s.enable = true;
   programs.ptyxis.enable = true;
   programs.vesktop.enable = true;
