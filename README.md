@@ -29,29 +29,35 @@ host platforms, primary users, and user-to-host assignments. The builders in `li
 translate these into standard NixOS/Home Manager options. Host overlays are bound to
 flake inputs once and applied to both package sets.
 
-`flake.nix` explicitly selects the system modules and the Home Manager `userModules`
-and optional `hostModules` profiles. These maps only compose modules: they do not
-assign users to hosts. Registry `hosts.<host>.userModules.<user>` lists additional
-modules for that assignment. There is no automatic directory scanning or mandatory
-per-host home directory; a missing user profile fails evaluation.
+Each `user@host` Home Manager configuration is assembled from:
 
-External modules are opt-in per profile. For example, Ahmed's profile receives SOPS,
-LazyVim, and AI rules, while his laptop profile receives Flatpak. A new user does not
-inherit those integrations. Entry points with dependencies are curried and bound at
-the composition boundary using `nixpkgs.lib.modules.importApply`:
+1. Registry defaults (`home.username`, `home.homeDirectory`, `nixConfig.theme`).
+2. The user's profile `users/<user>/default.nix` (required).
+3. The user's host profile `users/<user>/<host>/default.nix` (optional).
+4. Extra modules listed in registry `hosts.<host>.userModules.<user>`.
+
+Profiles are the only modules that receive flake inputs. The builder binds them
+lexically with `lib.modules.importApply`, so a profile is a function returning a module:
 
 ```nix
-userModules.ahmed = nixpkgs.lib.modules.importApply ./users/ahmed {
-  sopsModule = inputs.sops-nix.homeManagerModules.sops;
-  lazyvimModule = inputs.lazyvim.homeManagerModules.default;
-  aiRulesModule = inputs.ai-rules.homeManagerModules.default;
-};
+{ inputs }:              # users/<user>/default.nix
+{ config, ... }:
+{
+  imports = [
+    inputs.sops-nix.homeManagerModules.sops
+    ../../home/cli.nix
+  ];
+}
 ```
 
-Ordinary modules use `config`, `lib`, and `pkgs`, not global `inputs`, `userConfig`,
-or `hostConfig` arguments. Use `config.home.homeDirectory` for home paths. The typed
-`nixConfig.theme` option accepts `"dark"` or `"light"`; the builder supplies the
-registry preference with `lib.mkDefault`, so a user or host module can override it
+Host profiles receive `{ inputs, hostname }`; take `{ ... }` when nothing is needed.
+External modules are opt-in per profile: Ahmed's profile selects SOPS, LazyVim, and
+AI rules, and his laptop profile selects Flatpak. A new user inherits none of them.
+
+Feature modules (`home/`, `nixos/`, `roles/`) use `config`, `lib`, and `pkgs`, not
+`inputs`, `userConfig`, or `hostConfig`. Use `config.home.homeDirectory` for home
+paths. The typed `nixConfig.theme` option accepts `"dark"` or `"light"`; the builder
+supplies the registry preference with `lib.mkDefault`, so a profile can override it
 normally. Use `lib.mkForce` for an intentional override of another explicit value.
 When composing desktop features independently, also import `home/options.nix`.
 
@@ -70,15 +76,13 @@ currently commented out, and this composition does not enable them.
 ## Adding a user or host
 
 1. Add identity and preferences under `users` in `users/registry.nix`.
-2. Create `users/<user>/default.nix` with a `home.stateVersion` and explicit feature
-   imports, and select it as `userModules.<user>` in `flake.nix`. Use a plain path
-   when it needs no lexical dependencies.
-3. Add the host platform, primary user, and `userModules` assignments to the registry.
-   For NixOS, create the host configuration/hardware modules and add a
-   `mkNixosSystem` call to `nixosConfigurations`.
-4. If a user needs host-specific configuration, select it under
-   `hostModules.<host>.<user>` in `flake.nix`. Otherwise no host home profile is
-   required. Keep small assignment-specific additions in registry module lists.
+2. Create `users/<user>/default.nix` (`{ inputs }: { ... }: { ... }`) with a
+   `home.stateVersion` and explicit imports.
+3. Add the host platform, primary user, and `userModules.<user>` assignment to the
+   registry. For NixOS, create the host configuration/hardware modules and add a
+   `mkNixosSystem` call to `nixosConfigurations` in `flake.nix`.
+4. Optionally create `users/<user>/<host>/default.nix` for host-specific home
+   configuration. Keep small assignment-specific additions in the registry list.
 
 ## Verification without activation
 
@@ -95,11 +99,12 @@ nix build --dry-run .#nixosConfigurations.asus-laptop.config.system.build.toplev
 nix build --dry-run '.#homeConfigurations."ahmed@asus-laptop".activationPackage'
 ```
 
-The composition check covers registry defaults, theme validation and overrides,
-standalone GNOME dark/light behavior on Linux, multiple users/hosts without Ahmed's
-external integrations, distinct lexical bindings of the same module, and opt-in
-Nix registry binding on Linux. Checks are exposed for every supported system;
-choose the native system when running them.
+The composition check covers registry defaults, profile and host-profile loading,
+missing-profile failure, theme validation and override priorities, standalone GNOME
+dark/light behavior on Linux, multiple users/hosts without Ahmed's external
+integrations, distinct lexical bindings of the same module, and opt-in Nix registry
+binding on Linux. Fixture profiles live in `tests/fixtures/users`. Checks are exposed
+for every supported system; choose the native system when running them.
 
 These commands do not activate either configuration. Review before switching;
 system and standalone Home Manager switches remain separate manual operations.

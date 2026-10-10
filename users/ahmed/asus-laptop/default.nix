@@ -1,4 +1,4 @@
-{ flatpakModule, hostname }:
+{ inputs, hostname }:
 {
   config,
   lib,
@@ -12,7 +12,7 @@ in
 
   imports = [
     (lib.modules.importApply ./justfile.nix { inherit hostname; })
-    flatpakModule
+    inputs.nix-flatpak.homeManagerModules.nix-flatpak
     ../../../home/flatpak.nix
   ];
 

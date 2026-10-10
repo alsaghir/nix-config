@@ -16,6 +16,7 @@ let
       guest = {
         username = "guest";
         homeDirectory = "/home/guest";
+        preferences.theme = "dark";
       };
     };
     hosts = {
@@ -34,47 +35,24 @@ let
           { nixConfig.theme = lib.mkForce "light"; }
         ];
       };
+      third = {
+        inherit system;
+        primaryUser = "friend";
+        userModules.friend = [ ];
+      };
     };
   };
-  builders = import ../lib { inherit lib registry; };
-  homeArgs = {
+  builders = import ../lib {
+    inherit lib registry;
+    usersDir = ./fixtures/users;
+  };
+  homes = builders.mkAllHomeConfigurations {
     inherit nixpkgs home-manager;
     inputs = { };
-    userModules = {
-      friend = {
-        home.stateVersion = "25.05";
-      };
-      guest = {
-        home.stateVersion = "25.05";
-      };
-    };
-    hostModules.second.friend = {
-      nixConfig.theme = "dark";
-      home.homeDirectory = "/srv/friend";
-    };
   };
-  homes = builders.mkAllHomeConfigurations homeArgs;
-  overrides = builders.mkAllHomeConfigurations (
-    homeArgs
-    // {
-      hostModules.first.friend = {
-        nixConfig.theme = "dark";
-      };
-    }
-  );
-  userOverrides = builders.mkAllHomeConfigurations (
-    homeArgs
-    // {
-      userModules = homeArgs.userModules // {
-        friend = {
-          home.stateVersion = "25.05";
-          nixConfig.theme = "dark";
-        };
-      };
-    }
-  );
   first = homes."friend@first".config;
   second = homes."friend@second".config;
+  third = homes."friend@third".config;
   guest = homes."guest@first".config;
   themeConfig =
     theme:
@@ -111,11 +89,26 @@ let
         })
       ];
     }).config.justfile.recipes;
-  missingBinding = builders.mkAllHomeConfigurations {
-    inherit nixpkgs home-manager;
-    inputs = { };
-    userModules = { };
-  };
+  missingProfile =
+    (import ../lib {
+      inherit lib;
+      usersDir = ./fixtures/users;
+      registry = {
+        users.ghost = {
+          username = "ghost";
+          homeDirectory = "/home/ghost";
+        };
+        hosts.first = {
+          inherit system;
+          primaryUser = "ghost";
+          userModules.ghost = [ ];
+        };
+      };
+    }).mkAllHomeConfigurations
+      {
+        inherit nixpkgs home-manager;
+        inputs = { };
+      };
   systemConfig = builders.mkNixosSystem {
     inherit nixpkgs;
     inputs = { };
@@ -136,14 +129,17 @@ assert
   builtins.attrNames homes == [
     "friend@first"
     "friend@second"
+    "friend@third"
     "guest@first"
   ];
 assert first.home.username == "friend";
 assert first.home.homeDirectory == "/home/friend";
 assert first.nixConfig.theme == "light";
-assert guest.nixConfig.theme == "dark";
+assert guest.nixConfig.theme == "light";
 assert second.home.homeDirectory == "/srv/friend";
+assert second.home.sessionVariables.PROFILE_HOST == "second";
 assert second.nixConfig.theme == "light";
+assert third.nixConfig.theme == "dark";
 assert lib.hasSuffix ".drv" homes."friend@first".activationPackage.drvPath;
 assert lib.hasSuffix ".drv" homes."friend@second".activationPackage.drvPath;
 assert lib.hasSuffix ".drv" homes."guest@first".activationPackage.drvPath;
@@ -151,8 +147,6 @@ assert !(first ? sops);
 assert !(first.programs ? lazyvim);
 assert !(first.programs ? ai-rules);
 assert !(first.services ? flatpak);
-assert overrides."friend@first".config.nixConfig.theme == "dark";
-assert userOverrides."friend@first".config.nixConfig.theme == "dark";
 assert
   pkgs.stdenv.hostPlatform.isLinux
   -> (
@@ -174,7 +168,7 @@ assert
       ];
     }).config.nixConfig.theme
   ).success;
-assert !(builtins.tryEval missingBinding."friend@first".config.home.username).success;
+assert !(builtins.tryEval missingProfile."ghost@first".config.home.username).success;
 assert lib.hasInfix "--hostname first" recipes;
 assert lib.hasInfix "--hostname second" recipes;
 assert

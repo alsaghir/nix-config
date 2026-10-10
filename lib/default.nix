@@ -2,6 +2,7 @@
 {
   lib,
   registry ? import ../users/registry.nix,
+  usersDir ? ../users,
 }:
 
 {
@@ -48,8 +49,6 @@
       home-manager,
       inputs,
       overlays ? [ ],
-      userModules,
-      hostModules ? { },
     }:
     builtins.listToAttrs (
       builtins.concatMap (
@@ -77,9 +76,13 @@
                 ];
               };
             };
+            # Profile entry points (users/<user> and optional users/<user>/<host>)
+            # are the only modules that receive flake inputs; feature modules do not.
             modules =
               let
                 userCfg = registry.users.${username};
+                userProfile = usersDir + "/${username}";
+                hostProfile = userProfile + "/${hostname}";
               in
               [
                 ../home/options.nix
@@ -90,11 +93,16 @@
                     theme = lib.mkDefault userCfg.preferences.theme;
                   };
                 }
-                (userModules.${username}
-                  or (throw "Missing Home Manager userModules.${username} profile for ${username}@${hostname}")
+                (
+                  if builtins.pathExists (userProfile + "/default.nix") then
+                    lib.modules.importApply userProfile { inherit inputs; }
+                  else
+                    throw "Missing Home Manager profile users/${username}/default.nix for ${username}@${hostname}"
                 )
               ]
-              ++ lib.optional (hostModules ? ${hostname}.${username}) hostModules.${hostname}.${username}
+              ++ lib.optional (builtins.pathExists (hostProfile + "/default.nix")) (
+                lib.modules.importApply hostProfile { inherit inputs hostname; }
+              )
               ++ hostCfg.userModules.${username};
           };
         }) userNames

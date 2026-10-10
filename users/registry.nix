@@ -32,7 +32,8 @@
     asus-laptop = {
       system = "x86_64-linux";
       primaryUser = "ahmed";
-      # Extra HM modules on top of the explicit user/host profiles in flake.nix.
+      # Users on this host, each with extra HM modules on top of users/<user>
+      # and the optional users/<user>/<host> profile.
       userModules = {
         ahmed = [
           # host-specific additions for ahmed on this machine

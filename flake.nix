@@ -85,15 +85,6 @@
         inherit (inputs) nixpkgs home-manager;
         inherit inputs;
         overlays = customOverlays;
-        userModules.ahmed = nixpkgs.lib.modules.importApply ./users/ahmed {
-          sopsModule = inputs.sops-nix.homeManagerModules.sops;
-          lazyvimModule = inputs.lazyvim.homeManagerModules.default;
-          aiRulesModule = inputs.ai-rules.homeManagerModules.default;
-        };
-        hostModules.asus-laptop.ahmed = nixpkgs.lib.modules.importApply ./users/ahmed/asus-laptop {
-          flatpakModule = inputs.nix-flatpak.homeManagerModules.nix-flatpak;
-          hostname = "asus-laptop";
-        };
       };
 
       formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.nixfmt-tree);
