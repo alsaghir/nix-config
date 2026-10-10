@@ -1,7 +1,6 @@
 {
   config,
   lib,
-  userConfig,
   pkgs,
   ...
 }:
@@ -10,26 +9,26 @@
   gtk = {
     enable = true;
     theme = {
-      name = if userConfig.preferences.theme == "dark" then "adwaita-dark" else "adwaita";
+      name = if config.nixConfig.theme == "dark" then "adwaita-dark" else "adwaita";
     };
     gtk4.theme = null;
     gtk3.extraConfig = {
-      gtk-application-prefer-dark-theme = if userConfig.preferences.theme == "dark" then 1 else 0;
+      gtk-application-prefer-dark-theme = if config.nixConfig.theme == "dark" then 1 else 0;
     };
     gtk4.extraConfig = {
-      gtk-application-prefer-dark-theme = if userConfig.preferences.theme == "dark" then 1 else 0;
+      gtk-application-prefer-dark-theme = if config.nixConfig.theme == "dark" then 1 else 0;
     };
   };
 
   dconf.settings = {
     "org/gnome/desktop/interface" = {
       font-hinting = "none";
-      color-scheme = if userConfig.preferences.theme == "dark" then "prefer-dark" else "default";
+      color-scheme = if config.nixConfig.theme == "dark" then "prefer-dark" else "default";
       cursor-theme = "Adwaita";
       locate-pointer = true;
       clock-format = "12h";
       show-battery-percentage = true;
-      gtk-theme = if userConfig.preferences.theme == "dark" then "adwaita-dark" else "adwaita";
+      gtk-theme = if config.nixConfig.theme == "dark" then "adwaita-dark" else "adwaita";
     };
 
     "org/gtk/settings/file-chooser" = {

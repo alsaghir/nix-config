@@ -1,10 +1,9 @@
 {
-  userConfig,
-  inputs,
-  pkgs,
-  config,
-  ...
+  sopsModule,
+  lazyvimModule,
+  aiRulesModule,
 }:
+{ config, ... }:
 
 let
 
@@ -14,19 +13,16 @@ in
 {
   imports = [
     ./justfile.nix
-    inputs.sops-nix.homeManagerModules.sops
-    inputs.lazyvim.homeManagerModules.default
-    inputs.ai-rules.homeManagerModules.default
+    sopsModule
+    lazyvimModule
+    aiRulesModule
     ../../home/cli.nix
     ../../home/gnome.nix
     ../../home/gui-commons.nix
     ../../home/justfile.nix
     ../../home/ssh.nix
-    ../../home/flatpak.nix
   ];
 
-  home.username = userConfig.username;
-  home.homeDirectory = userConfig.homeDirectory;
   home.stateVersion = "25.05";
 
   programs.home-manager.enable = true;

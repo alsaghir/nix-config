@@ -1,14 +1,5 @@
-{
-  hostConfig,
-  lib,
-  pkgs,
-  ...
-}:
-
-let
-  hostname = hostConfig.hostname;
-
-in
+{ hostname }:
+{ ... }:
 {
   justfile.recipes = ''
     # user-host specific recipes

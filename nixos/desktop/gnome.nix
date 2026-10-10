@@ -1,10 +1,4 @@
-{
-  config,
-  pkgs,
-  lib,
-  hostname,
-  ...
-}:
+{ pkgs, ... }:
 
 let
   gdmMonitorsConfig = pkgs.writeText "gdm_monitors.xml" ''

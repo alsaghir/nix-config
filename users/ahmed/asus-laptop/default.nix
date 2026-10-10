@@ -1,8 +1,7 @@
+{ flatpakModule, hostname }:
 {
   config,
-  pkgs,
   lib,
-  inputs,
   ...
 }:
 let
@@ -12,12 +11,9 @@ in
 {
 
   imports = [
-    ./justfile.nix
-    #inputs.plasma-manager.homeModules.plasma-manager
-    #inputs.dms.homeModules.dank-material-shell
-    #inputs.dms.homeModules.niri
-    #inputs.niri.homeModules.niri
-    inputs.nix-flatpak.homeManagerModules.nix-flatpak
+    (lib.modules.importApply ./justfile.nix { inherit hostname; })
+    flatpakModule
+    ../../../home/flatpak.nix
   ];
 
   home.activation.ensureSshPermissions = lib.hm.dag.entryBefore [ "sops-nix" ] ''

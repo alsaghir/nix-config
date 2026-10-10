@@ -1,4 +1,4 @@
-{ pkgs, inputs, ... }:
+{ pkgs, ... }:
 {
 
   services.gnome-keyring.enable = true;
@@ -63,7 +63,7 @@
         QT_QPA_PLATFORMTHEME = "qt6ct";
         QT_QPA_PLATFORMTHEME_QT6 = "qt6ct";
         QT_WAYLAND_DECORATION = "adwaita";
-       };
+      };
 
     };
   };

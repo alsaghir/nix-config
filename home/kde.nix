@@ -1,13 +1,11 @@
 {
   config,
-  lib,
   pkgs,
-  userConfig,
   ...
 }:
 
 let
-  preferDark = userConfig.preferences.theme == "dark";
+  preferDark = config.nixConfig.theme == "dark";
 in
 {
   programs.konsole.enable = true;
@@ -36,7 +34,7 @@ in
       wallpaperSlideShow = {
         path = [
           "${pkgs.kdePackages.plasma-workspace-wallpapers}/share/wallpapers/"
-          "${userConfig.homeDirectory}/Pictures/wallpapers/"
+          "${config.home.homeDirectory}/Pictures/wallpapers/"
         ];
         interval = 300;
       };

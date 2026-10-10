@@ -53,8 +53,6 @@
 
   };
 
-  # nixpkgs-stable defined in inputs and here it represents the root of the nixpkgs
-  # source tree at the stable channel commit pinned in flake.lock
   outputs =
     { self, nixpkgs, ... }@inputs:
     let
@@ -75,7 +73,6 @@
           inherit (inputs) nixpkgs;
           inherit self inputs;
           hostname = "asus-laptop";
-          system = "x86_64-linux";
           overlays = customOverlays;
           modules = [
             ./hosts/laptop/default.nix
@@ -86,11 +83,27 @@
 
       homeConfigurations = lib.mkAllHomeConfigurations {
         inherit (inputs) nixpkgs home-manager;
-        inherit self inputs;
+        inherit inputs;
         overlays = customOverlays;
+        userModules.ahmed = nixpkgs.lib.modules.importApply ./users/ahmed {
+          sopsModule = inputs.sops-nix.homeManagerModules.sops;
+          lazyvimModule = inputs.lazyvim.homeManagerModules.default;
+          aiRulesModule = inputs.ai-rules.homeManagerModules.default;
+        };
+        hostModules.asus-laptop.ahmed = nixpkgs.lib.modules.importApply ./users/ahmed/asus-laptop {
+          flatpakModule = inputs.nix-flatpak.homeManagerModules.nix-flatpak;
+          hostname = "asus-laptop";
+        };
       };
 
       formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.nixfmt-tree);
+
+      checks = forAllSystems (system: {
+        composition = import ./tests/composition.nix {
+          inherit system nixpkgs;
+          inherit (inputs) home-manager;
+        };
+      });
 
       devShells = forAllSystems (
         system:

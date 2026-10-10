@@ -2,20 +2,7 @@
 # It imports the common configuration and then layers host-specific
 # settings on top.
 
-{
-  config,
-  pkgs,
-  lib,
-  self,
-  hostname,
-  inputs,
-  ...
-}:
-let
-  userLib = import ../../lib { inherit lib; };
-  primaryUsername = userLib.getPrimaryUser hostname;
-  userConfig = userLib.getPrimaryUserConfig hostname;
-in
+{ pkgs, ... }:
 {
   imports = [
     ../../roles/boot.nix
@@ -43,11 +30,7 @@ in
 
     # User definitions
     ../../users/user.nix
-
-    # inputs.dms.nixosModules.greeter
   ];
-
-  system.configurationRevision = self.rev or self.dirtyRev or null;
 
   # Laptop-only kernel choice (keep servers/VMs on default kernel)
   boot.kernelPackages = pkgs.linuxPackages_zen;
@@ -68,6 +51,5 @@ in
   ];
 
   # Host-specific settings
-  networking.hostName = hostname;
   system.stateVersion = "25.05";
 }

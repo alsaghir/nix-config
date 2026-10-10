@@ -2,7 +2,6 @@
   pkgs,
   lib,
   config,
-  inputs,
   ...
 }:
 
@@ -49,7 +48,6 @@ in
   programs.vim.defaultEditor = true;
   programs.vim.enable = false;
 
-  
   programs.aichat = {
     enable = true;
     settings = {

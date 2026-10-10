@@ -1,18 +1,13 @@
 # Helper functions
-{ lib }:
-
-let
-  registry = import ../users/registry.nix;
-in
+{
+  lib,
+  registry ? import ../users/registry.nix,
+}:
 
 {
-  # Function to build a NixOS system configuration.
-  # It takes nixpkgs, the system architecture, a list of modules,
-  # and the stable packages as input.
   mkNixosSystem =
     {
       nixpkgs,
-      system,
       modules,
       self,
       inputs,
@@ -21,6 +16,7 @@ in
     }:
     let
       hostCfg = registry.hosts.${hostname};
+      inherit (hostCfg) system;
       pkgs = import nixpkgs {
         inherit system;
         # Host-scoped overlays (registry `extraOverlays`) are appended to the
@@ -34,23 +30,26 @@ in
           allowUnfree = true;
           nvidia.acceptLicense = true;
         };
-        # Do NOT set config here to avoid changing behavior; keep your existing config in modules
       };
     in
     nixpkgs.lib.nixosSystem {
       inherit system pkgs;
-      modules = modules;
-      specialArgs = { inherit self inputs hostname; };
-
+      modules = modules ++ [
+        {
+          networking.hostName = lib.mkDefault hostname;
+          system.configurationRevision = self.rev or self.dirtyRev or null;
+        }
+      ];
     };
 
   mkAllHomeConfigurations =
     {
       nixpkgs,
       home-manager,
-      self,
       inputs,
       overlays ? [ ],
+      userModules,
+      hostModules ? { },
     }:
     builtins.listToAttrs (
       builtins.concatMap (
@@ -78,18 +77,25 @@ in
                 ];
               };
             };
-            modules = [
-              ../users/${username}
-              ../users/${username}/${hostname}
-            ]
-            ++ hostCfg.userModules.${username};
-            extraSpecialArgs = {
-              inherit self inputs;
-              userConfig = registry.users.${username};
-              hostConfig = hostCfg // {
-                inherit hostname;
-              };
-            };
+            modules =
+              let
+                userCfg = registry.users.${username};
+              in
+              [
+                ../home/options.nix
+                {
+                  home.username = lib.mkDefault userCfg.username;
+                  home.homeDirectory = lib.mkDefault userCfg.homeDirectory;
+                  nixConfig = lib.optionalAttrs (userCfg ? preferences.theme) {
+                    theme = lib.mkDefault userCfg.preferences.theme;
+                  };
+                }
+                (userModules.${username}
+                  or (throw "Missing Home Manager userModules.${username} profile for ${username}@${hostname}")
+                )
+              ]
+              ++ lib.optional (hostModules ? ${hostname}.${username}) hostModules.${hostname}.${username}
+              ++ hostCfg.userModules.${username};
           };
         }) userNames
       ) (builtins.attrNames registry.hosts)

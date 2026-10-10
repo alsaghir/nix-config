@@ -1,9 +1,7 @@
+{ pluginRegistry }:
 {
-  lib,
   pkgs,
   config,
-  userConfig,
-  inputs,
   ...
 }:
 let
@@ -80,7 +78,7 @@ in
 
     };
     session = {
-      wallpaperPath = "${userConfig.homeDirectory}/Pictures/wallpapers/1351306.png";
+      wallpaperPath = "${config.home.homeDirectory}/Pictures/wallpapers/1351306.png";
       wallpaperCyclingEnabled = true;
       wallpaperCyclingInterval = backgroundCyclingInterval;
       perMonitorWallpaper = true;
@@ -126,14 +124,14 @@ in
     plugins = {
       dankBatteryAlerts = {
         enable = true;
-        src = inputs.dms-plugin-registry.packages.${pkgs.stdenv.hostPlatform.system}.dankBatteryAlerts;
+        src = pluginRegistry.packages.${pkgs.stdenv.hostPlatform.system}.dankBatteryAlerts;
       };
       dockerManager.enable = false;
 
       # plugin-specific settings
       mediaPlayer = {
         enable = true;
-        src = inputs.dms-plugin-registry.packages.${pkgs.stdenv.hostPlatform.system}.mediaPlayer;
+        src = pluginRegistry.packages.${pkgs.stdenv.hostPlatform.system}.mediaPlayer;
         settings = {
           preferredSource = "spotify";
         };
