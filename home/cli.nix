@@ -22,6 +22,7 @@ in
 
   programs.antigravity-cli.enable = true;
   programs.bash.enable = true;
+  programs.bat.enable = true;
   programs.claude-code.enable = true;
   programs.codex.enable = true;
   programs.direnv.enable = true;
@@ -235,6 +236,10 @@ in
     ];
 
     config = {
+      options = ''
+        -- the vscode import lives in lua/plugins/, so LazyVim's import-order check would warn inside VS Code
+        if vim.g.vscode then vim.g.lazyvim_check_order = false end
+      '';
       autocmds = ''
         vim.api.nvim_create_autocmd({ "InsertEnter" }, { command = "set norelativenumber" })
         vim.api.nvim_create_autocmd({ "InsertLeave" }, { command = "set relativenumber" })
@@ -249,6 +254,11 @@ in
     };
 
     plugins = {
+      vscode = ''
+          return {
+            { import = "lazyvim.plugins.extras.vscode", cond = vim.g.vscode ~= nil },
+          }
+      '';
       disable-luarocks = ''
         return {
           {
