@@ -5,5 +5,7 @@
 # package set of the others.
 [
   (import ./biglybt)
+  (import ./posthog)
+  (import ./github-copilot-app)
 
 ]

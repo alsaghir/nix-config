@@ -21,6 +21,7 @@
     ../../nixos/services/gaming.nix
     ../../nixos/services/nix-ld.nix
     ../../nixos/services/gui-commons.nix
+    ../../nixos/services/jellyfin.nix
     ../../nixos/services/pipewire.nix
     ../../nixos/services/printing.nix
     ../../nixos/services/virtualisation.nix

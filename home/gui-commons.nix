@@ -21,6 +21,7 @@ in
 
 {
   programs.mpv.enable = true;
+  programs.foliate.enable = true;
 
   programs.firefox = {
     enable = true;
@@ -29,6 +30,8 @@ in
       pkgs.firefoxpwa
     ];
   };
+
+  programs.thunderbird.enable = true;
 
   programs.ghostty = {
     enable = true;
@@ -109,6 +112,8 @@ in
     jetbrains-toolbox
     proton-vpn
     github-copilot-app
+
+    stamp
 
   ];
 

@@ -3,7 +3,7 @@
   # systemd.services."user@".serviceConfig.Delegate = "yes";
   virtualisation = {
     containers.enable = false;
-    containers.registries.search = [
+    containers.registries.settings.unqualified-search-registries = [
       "docker.io"
       "quay.io"
     ];
@@ -33,12 +33,9 @@
     6443 # k3s: required so that pods can reach the API server (running on port 6443 by default)
     # 2379 # k3s, etcd clients: required if using a "High Availability Embedded etcd" configuration
     # 2380 # k3s, etcd peers: required if using a "High Availability Embedded etcd" configuration
-    32997 # BiglyBT DLNA
-    40275 # BiglyBT DLNA Content
   ];
   networking.firewall.allowedUDPPorts = [
     # 8472 # k3s, flannel: required if using multi-node for inter-node networking
-    1900 # BiglyBT DLNA
   ];
   services.k3s.enable = true;
   services.k3s.role = "server";
@@ -46,5 +43,7 @@
     # "--debug" # Optionally add additional args to k3s
      "--write-kubeconfig-mode=644"
   ];
+  # kubectl/helm/k9s fall back to localhost:8080 without a kubeconfig; point them at k3s's.
+  environment.variables.KUBECONFIG = "/etc/rancher/k3s/k3s.yaml";
 
 }

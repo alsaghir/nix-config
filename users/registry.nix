@@ -44,7 +44,7 @@
       # ../overlays/default.nix. Both mkNixosSystem and mkAllHomeConfigurations
       # consume this, so a host declares them once.
       # e.g. extraOverlays = [ ../overlays/my-host-fix ];
-      extraOverlays = [ ];
+      extraOverlays = [ ../overlays/github-copilot-app-igpu ];
     };
 
     # desktop = {

@@ -111,8 +111,10 @@ in
     modesetting.enable = true;
     open = true;
     powerManagement.enable = true;
-    powerManagement.finegrained = false;
-    nvidiaPersistenced = true;
+    # Runtime D3 power-off of the dGPU when idle (PRIME offload only).
+    # nvidia-persistenced keeps the GPU awake, so it must stay off.
+    powerManagement.finegrained = true;
+    nvidiaPersistenced = false;
     nvidiaSettings = true;
     prime = {
       offload.enable = true;
