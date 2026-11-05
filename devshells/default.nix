@@ -265,6 +265,7 @@ let
           cargo-nextest
           binaryen
           lld
+          tailwindcss_4
         ]
         ++ basics;
 
