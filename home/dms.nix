@@ -137,6 +137,7 @@ in
       # Built-in replacement for the old dankBatteryAlerts plugin
       batteryNotifyLow = true;
       keyboardNumlock = true;
+      osdKeyboardLayoutEnabled = true; # OSD popup on layout switch (EN/AR)
     };
     # Same rule as settings; skip runtime state keys (monitorWallpapers, dockPins, configVersion).
     session = {
