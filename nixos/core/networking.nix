@@ -43,6 +43,13 @@
   # networking.interfaces.enp3s0.useDHCP = lib.mkDefault true;
   # networking.interfaces.wlp4s0.useDHCP = lib.mkDefault true;
 
+  # GitHub's published host key (docs.github.com: "GitHub's SSH key fingerprints"), so the
+  # first git+ssh flake fetch (private ai-rules input) never stops at a host-key prompt.
+  programs.ssh.knownHosts.github = {
+    hostNames = [ "github.com" ];
+    publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl";
+  };
+
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
   # Configure network proxy if necessary

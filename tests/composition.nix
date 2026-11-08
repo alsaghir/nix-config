@@ -51,6 +51,7 @@ let
   builders = import ../lib {
     inherit lib registry;
     usersDir = ./fixtures/users;
+    hostsDir = ./fixtures/hosts;
   };
   homes = builders.mkAllHomeConfigurations {
     inherit nixpkgs home-manager;
@@ -60,22 +61,6 @@ let
   second = homes."friend@second".config;
   third = homes."friend@third".config;
   guest = homes."guest@first".config;
-  recipes =
-    (lib.evalModules {
-      modules = [
-        {
-          options.justfile.recipes = lib.mkOption {
-            type = lib.types.lines;
-          };
-        }
-        (lib.modules.importApply ../users/ahmed/asus-laptop/justfile.nix {
-          hostname = "first";
-        })
-        (lib.modules.importApply ../users/ahmed/asus-laptop/justfile.nix {
-          hostname = "second";
-        })
-      ];
-    }).config.justfile.recipes;
   missingProfile =
     (import ../lib {
       inherit lib;
@@ -96,14 +81,13 @@ let
         inherit nixpkgs home-manager;
         inputs = { };
       };
-  systemConfig = builders.mkNixosSystem {
+  systems = builders.mkAllNixosSystems {
     inherit nixpkgs;
     inputs = { };
     self.rev = "composition-test";
-    hostname = "first";
-    modules = [
-      { system.stateVersion = "25.05"; }
-      (lib.modules.importApply ../nixos/services/nix-config.nix {
+    sharedModules = [
+      ../nixos
+      (lib.modules.importApply ../nixos/core/flake-pinning.nix {
         inputs = {
           inherit nixpkgs;
           notAFlake = { };
@@ -111,6 +95,8 @@ let
       })
     ];
   };
+  systemConfig = systems.first;
+  sysUsers = systemConfig.config.users.users;
 in
 assert
   builtins.attrNames homes == [
@@ -144,16 +130,32 @@ assert
     }).config.nixConfig.displays."eDP-1".width
   ).success;
 assert !(builtins.tryEval missingProfile."ghost@first".config.home.username).success;
-assert lib.hasInfix "--hostname first" recipes;
-assert lib.hasInfix "--hostname second" recipes;
 assert
   pkgs.stdenv.hostPlatform.isLinux
   -> (
-    systemConfig.config.networking.hostName == "first"
+    # only hosts with hosts/<host>/default.nix become NixOS systems
+    builtins.attrNames systems == [ "first" ]
+    && systemConfig.config.networking.hostName == "first"
     && systemConfig.config.nixConfig.displays."eDP-1".internal
+    && systemConfig.config.nixConfig.primaryUser == "friend"
+    && sysUsers.friend.isNormalUser
+    && sysUsers.friend.home == "/home/friend"
+    && sysUsers.guest.isNormalUser
     && systemConfig.config.system.configurationRevision == "composition-test"
     && systemConfig.pkgs.stdenv.hostPlatform.system == system
     && !systemConfig.config.nix.channel.enable
+    # all nixos/ modules import cleanly, are off unless enabled, and take host parameters
+    && !systemConfig.config.programs.niri.enable
+    && !systemConfig.config.services.desktopManager.gnome.enable
+    && !systemConfig.config.services.openssh.enable
+    && systemConfig.config.boot.loader.systemd-boot.enable
+    && !systemConfig.config.boot.loader.grub.enable
+    && !systemConfig.config.hardware.bluetooth.enable
+    && !systemConfig.config.services.k3s.enable
+    && systemConfig.config.services.jellyfin.enable
+    &&
+      systemConfig.config.systemd.services.jellyfin.serviceConfig.BindReadOnlyPaths
+      == [ "/srv/movies:/media/movies" ]
     && builtins.attrNames systemConfig.config.nix.registry == [ "nixpkgs" ]
     && systemConfig.config.nix.nixPath == [ "nixpkgs=flake:nixpkgs" ]
   );

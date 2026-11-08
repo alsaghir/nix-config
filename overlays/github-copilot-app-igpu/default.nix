@@ -1,7 +1,7 @@
 # Hybrid-GPU hosts: glvnd prefers NVIDIA's EGL vendor (10_nvidia.json), so the
 # app's WebKitGTK renderer wakes the dGPU and keeps it busy (heat, fans).
 # Force Mesa EGL (iGPU). --set-default keeps it overridable per launch.
-# /run/opengl-driver is NixOS-only, hence host-scoped (users/registry.nix).
+# /run/opengl-driver is NixOS-only, hence host-scoped (registry.nix).
 # Extend the existing wrapGAppsHook wrapper instead of wrapProgram: a second
 # wrapper changes argv[0], so the GTK app_id stops matching StartupWMClass and
 # GNOME loses the icon.

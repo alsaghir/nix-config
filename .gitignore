@@ -3,3 +3,8 @@
 .idea
 .vscode
 .aider*
+
+# installer images, nix build links
+*.iso
+result
+result-*

@@ -1,9 +1,31 @@
-# Age generated keys using age-keygen -o ~/.config/sops/age/keys.txt
+# Recipients. One key per (identity, machine); private halves never leave their machine.
+#   user keys: age-keygen -o ~/.config/sops/age/keys.txt   (read by home-manager sops-nix)
+#   host keys: derived from the SSH host key, nothing to generate or store:
+#              ssh-to-age < /etc/ssh/ssh_host_ed25519_key.pub   (read by NixOS sops-nix)
+# After changing a file's recipients: sops updatekeys <file>
+# First matching rule wins: specific paths before the users/ catch-all.
 keys:
-  - &asus_laptop age1uq0vpazn6mjyusj3nvw0xrgkecq8gxdxll9wdemgv97yp7du8ajqel5fly
+  - &ahmed_asus_laptop age1uq0vpazn6mjyusj3nvw0xrgkecq8gxdxll9wdemgv97yp7du8ajqel5fly
+  - &ahmed_home_server age1usqet4s3uazl4psz6masyws2wcy7tep8sc7yevtatnl4278y3qnqjff9tk
+  - &host_home_server age1l0s0x9hg2pyjxzmpdt7cvw3vrtznyfsug9apjfu443c7ztvnja7seepeav
 
 creation_rules:
+  # ahmed's secrets on every host
+  - path_regex: users/ahmed/[^/]+\.yaml$
+    key_groups:
+      - age:
+          - *ahmed_asus_laptop
+          - *ahmed_home_server
+
+  # ahmed@<host> and other users' secrets: laptop key only (edited there)
   - path_regex: users/.*\.yaml$
     key_groups:
       - age:
-          - *asus_laptop
+          - *ahmed_asus_laptop
+
+  # home-server system secrets: the host decrypts, ahmed's laptop key edits
+  - path_regex: hosts/home-server/.*\.yaml$
+    key_groups:
+      - age:
+          - *ahmed_asus_laptop
+          - *host_home_server

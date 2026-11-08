@@ -6,381 +6,385 @@
 }:
 
 {
+  options.nixConfig.cli.enable = lib.mkEnableOption "the terminal environment (shell, CLI tools, LazyVim, AI CLIs)";
 
-  programs.antigravity-cli.enable = true;
-  programs.bash.enable = true;
-  programs.bat.enable = true;
-  programs.claude-code.enable = true;
-  programs.codex.enable = true;
-  programs.direnv.enable = true;
-  programs.direnv.enableZshIntegration = true;
-  programs.direnv.nix-direnv.enable = true;
-  programs.eza.enable = true;
-  programs.eza.enableZshIntegration = true;
-  programs.fastfetch.enable = true;
-  programs.fd.enable = true;
-  programs.fzf.enable = true;
-  programs.fzf.enableZshIntegration = true;
-  programs.git.enable = true;
-  programs.github-copilot-cli.enable = true;
-  programs.htop.enable = true;
-  programs.jq.enable = true;
-  programs.lsd.enable = false;
-  programs.lsd.enableZshIntegration = false;
-  programs.nix-index.enable = true;
-  programs.nix-index.enableZshIntegration = true;
-  programs.ripgrep-all.enable = true;
-  programs.ripgrep.enable = true;
-  programs.starship.enable = true;
-  programs.starship.enableZshIntegration = true;
-  programs.vim.defaultEditor = true;
-  programs.vim.enable = false;
+  config = lib.mkIf config.nixConfig.cli.enable {
 
-  programs.aichat = {
-    enable = true;
-    settings = {
-      model = "gemini:gemini-2.5-flash";
-      stream = true;
-      save = true;
-      highlight = true;
-      keybindings = "vi";
+    programs.antigravity-cli.enable = true;
+    programs.bash.enable = true;
+    programs.bat.enable = true;
+    programs.claude-code.enable = true;
+    programs.codex.enable = true;
+    programs.direnv.enable = true;
+    programs.direnv.enableZshIntegration = true;
+    programs.direnv.nix-direnv.enable = true;
+    programs.eza.enable = true;
+    programs.eza.enableZshIntegration = true;
+    programs.fastfetch.enable = true;
+    programs.fd.enable = true;
+    programs.fzf.enable = true;
+    programs.fzf.enableZshIntegration = true;
+    programs.git.enable = true;
+    programs.github-copilot-cli.enable = true;
+    programs.htop.enable = true;
+    programs.jq.enable = true;
+    programs.lsd.enable = false;
+    programs.lsd.enableZshIntegration = false;
+    programs.nix-index.enable = true;
+    programs.nix-index.enableZshIntegration = true;
+    programs.ripgrep-all.enable = true;
+    programs.ripgrep.enable = true;
+    programs.starship.enable = true;
+    programs.starship.enableZshIntegration = true;
+    programs.vim.defaultEditor = true;
+    programs.vim.enable = false;
 
-      clients = [
-        {
-          type = "gemini";
-          api_base = "https://generativelanguage.googleapis.com/v1beta";
-        }
-        {
-          type = "openai-compatible";
-          name = "deepseek";
-          api_base = "https://api.deepseek.com";
-        }
-        {
-          type = "openai-compatible";
-          name = "groq";
-          api_base = "https://api.groq.com/openai/v1";
-        }
-        {
-          type = "openai-compatible";
-          name = "openrouter";
-          api_base = "https://openrouter.ai/api/v1";
-        }
-        {
-          type = "openai";
-          api_base = "https://api.openai.com/v1";
-        }
-        {
-          type = "openai-compatible";
-          name = "mistral";
-          api_base = "https://api.mistral.ai/v1";
-        }
-      ];
-    };
-  };
-  programs.aider-chat = {
-    enable = true;
-    settings = {
-      model = "deepseek/deepseek-chat";
-      git = true;
-      auto-commits = true;
-      dark-mode = true;
-    };
-  };
-
-  programs.zsh = {
-    enable = true;
-    enableCompletion = true;
-    autosuggestion.enable = true;
-    syntaxHighlighting.enable = true;
-    dotDir = "${config.xdg.configHome}/zsh";
-
-    oh-my-zsh = {
+    programs.aichat = {
       enable = true;
-      theme = "robbyrussell";
-      plugins = [
-        "git"
-        "cp"
-        "history"
-        "kind"
-        "kubectl"
-        "helm"
-        "podman"
-        "ssh"
-        "ssh-agent"
-        "sudo"
-        "systemd"
-        "eza"
-      ];
+      settings = {
+        model = "gemini:gemini-2.5-flash";
+        stream = true;
+        save = true;
+        highlight = true;
+        keybindings = "vi";
+
+        clients = [
+          {
+            type = "gemini";
+            api_base = "https://generativelanguage.googleapis.com/v1beta";
+          }
+          {
+            type = "openai-compatible";
+            name = "deepseek";
+            api_base = "https://api.deepseek.com";
+          }
+          {
+            type = "openai-compatible";
+            name = "groq";
+            api_base = "https://api.groq.com/openai/v1";
+          }
+          {
+            type = "openai-compatible";
+            name = "openrouter";
+            api_base = "https://openrouter.ai/api/v1";
+          }
+          {
+            type = "openai";
+            api_base = "https://api.openai.com/v1";
+          }
+          {
+            type = "openai-compatible";
+            name = "mistral";
+            api_base = "https://api.mistral.ai/v1";
+          }
+        ];
+      };
     };
-
-    initContent =
-      let
-        zshConfigEarlyInit = lib.mkOrder 500 ''
-          echo "Early init"
-          # source /etc/profile
-        '';
-        zshConfigBeforeCompletionInit = lib.mkOrder 550 ''echo "Before completion init"'';
-        zshConfig = lib.mkOrder 1000 ''echo "General Config init"'';
-        zshConfigLastToRun = lib.mkOrder 1500 ''
-          echo "General Config init"
-
-          # determinate-nixd completion (if installed)
-          if command -v determinate-nixd >/dev/null 2>&1; then
-            eval "$(determinate-nixd completion zsh)"
-          fi
-
-          # just completion (safe if just missing)
-          if command -v just >/dev/null 2>&1; then
-            eval "$(just --completions zsh)"
-          fi
-
-          # AI Keys
-          if [ -r "$AI_ENV_FILE" ]; then
-            set -a
-            source "$AI_ENV_FILE"
-            set +a
-          fi
-
-          echo "Last to run init"
-        '';
-      in
-      lib.mkMerge [
-        zshConfigEarlyInit
-        zshConfigBeforeCompletionInit
-        zshConfig
-        zshConfigLastToRun
-      ];
-
-  };
-
-  programs.nh = {
-    enable = true;
-    clean = {
+    programs.aider-chat = {
       enable = true;
-      extraArgs = "--keep 5";
-    };
-  };
-
-  programs.lazyvim = {
-    enable = true;
-    installCoreDependencies = false;
-
-    extras = {
-      ai."copilot-native".enable = true;
-      lang.nix = {
-        enable = true;
-        installDependencies = false;
+      settings = {
+        model = "deepseek/deepseek-chat";
+        git = true;
+        auto-commits = true;
+        dark-mode = true;
       };
-
-      lang.rust = {
-        enable = true;
-        installDependencies = false; # keep sourcing rust-analyzer/codelldb from your devshell
-        installRuntimeDependencies = false; # keep sourcing cargo/rustc from your devshell
-      };
-
-      dap.core = {
-        enable = true;
-        installDependencies = false; # keep sourcing codelldb from your devshell, same pattern as rust
-      };
-
-      lang.json = {
-        enable = true;
-        installDependencies = false;
-      };
-      lang.markdown = {
-        enable = true;
-        installDependencies = false;
-      };
-
     };
 
-    # Additional packages (optional)
-    extraPackages = with pkgs; [
-      nixd
-      alejandra
-      lua-language-server
-      stylua
-      marksman
-      vscode-langservers-extracted
-      prettier
-      copilot-language-server
+    programs.zsh = {
+      enable = true;
+      enableCompletion = true;
+      autosuggestion.enable = true;
+      syntaxHighlighting.enable = true;
+      dotDir = "${config.xdg.configHome}/zsh";
 
-      # Tools LazyVim/plugins expect on PATH
-      ripgrep
-      lazygit
-      git
-      gcc
-      mermaid-cli
-      wget
-      curl
-    ];
+      oh-my-zsh = {
+        enable = true;
+        theme = "robbyrussell";
+        plugins = [
+          "git"
+          "cp"
+          "history"
+          "kind"
+          "kubectl"
+          "helm"
+          "podman"
+          "ssh"
+          "ssh-agent"
+          "sudo"
+          "systemd"
+          "eza"
+        ];
+      };
 
-    # Only needed for languages not covered by LazyVim extras
-    treesitterParsers = with pkgs.vimPlugins.nvim-treesitter-parsers; [
-      wgsl # WebGPU Shading Language
-      templ # Go templ files
-      go
-    ];
+      initContent =
+        let
+          zshConfigEarlyInit = lib.mkOrder 500 ''
+            echo "Early init"
+            # source /etc/profile
+          '';
+          zshConfigBeforeCompletionInit = lib.mkOrder 550 ''echo "Before completion init"'';
+          zshConfig = lib.mkOrder 1000 ''echo "General Config init"'';
+          zshConfigLastToRun = lib.mkOrder 1500 ''
+            echo "General Config init"
 
-    config = {
-      options = ''
-        -- the vscode import lives in lua/plugins/, so LazyVim's import-order check would warn inside VS Code
-        if vim.g.vscode then vim.g.lazyvim_check_order = false end
-        -- lazyvim-nix's starter hardcodes "tutor" in performance.rtp.disabled_plugins (no option to change it);
-        -- source the stock plugin to restore :Tutor
-        vim.cmd.runtime("plugin/tutor.vim")
-      '';
-      autocmds = ''
-        vim.api.nvim_create_autocmd({ "InsertEnter" }, { command = "set norelativenumber" })
-        vim.api.nvim_create_autocmd({ "InsertLeave" }, { command = "set relativenumber" })
+            # determinate-nixd completion (if installed)
+            if command -v determinate-nixd >/dev/null 2>&1; then
+              eval "$(determinate-nixd completion zsh)"
+            fi
 
-        vim.api.nvim_create_autocmd("FileType", {
-          pattern = "nix",
-          callback = function(args)
-            vim.lsp.inlay_hint.enable(false, { bufnr = args.buf })
-          end,
-        })
-      '';
+            # just completion (safe if just missing)
+            if command -v just >/dev/null 2>&1; then
+              eval "$(just --completions zsh)"
+            fi
+
+            # AI Keys
+            if [ -r "$AI_ENV_FILE" ]; then
+              set -a
+              source "$AI_ENV_FILE"
+              set +a
+            fi
+
+            echo "Last to run init"
+          '';
+        in
+        lib.mkMerge [
+          zshConfigEarlyInit
+          zshConfigBeforeCompletionInit
+          zshConfig
+          zshConfigLastToRun
+        ];
+
     };
 
-    plugins = {
-      vscode = ''
-        return {
-          { import = "lazyvim.plugins.extras.vscode", cond = vim.g.vscode ~= nil },
-        }
-      '';
-      disable-luarocks = ''
-        return {
-          {
-            "folke/lazy.nvim",
-            opts = {
-              rocks = {
-                enabled = false,
-                hererocks = false,
-              },
-            },
-          },
-        }
-      '';
+    programs.nh = {
+      enable = true;
+      clean = {
+        enable = true;
+        extraArgs = "--keep 5";
+      };
+    };
 
-      treesitter-no-autoinstall = ''
-        return {
-          {
-            "nvim-treesitter/nvim-treesitter",
-            opts = {
-              auto_install = false,
-              ensure_installed = {}, -- rely entirely on Nix-provided parsers
-            },
-          },
-        }
-      '';
+    programs.lazyvim = {
+      enable = true;
+      installCoreDependencies = false;
 
-      lspconfig = ''
-        return {
-          {
-            "neovim/nvim-lspconfig",
-            opts = {
-              servers = {
-                rust_analyzer = { enabled = false }, -- rustaceanvim handles this
-                nixd = {},
-              },
-            },
-          },
-        }
-      '';
+      extras = {
+        ai."copilot-native".enable = true;
+        lang.nix = {
+          enable = true;
+          installDependencies = false;
+        };
 
-      rust-dap = ''
-        return {
-          {
-            "mrcjkb/rustaceanvim",
-            opts = function(_, opts)
-              local codelldb_symlink = vim.fn.exepath("codelldb")
-              if codelldb_symlink ~= "" then
-                local codelldb_real = vim.uv.fs_realpath(codelldb_symlink) or codelldb_symlink
-                local liblldb_path = codelldb_real:gsub("adapter/codelldb$", "lldb/lib/liblldb.so")
-                local cfg = require("rustaceanvim.config")
-                opts.dap = opts.dap or {}
-                opts.dap.adapter = cfg.get_codelldb_adapter(codelldb_real, liblldb_path)
-              else
-                vim.notify("codelldb not found on PATH — Rust debugging disabled", vim.log.levels.WARN)
-              end
-              return opts
+        lang.rust = {
+          enable = true;
+          installDependencies = false; # keep sourcing rust-analyzer/codelldb from your devshell
+          installRuntimeDependencies = false; # keep sourcing cargo/rustc from your devshell
+        };
+
+        dap.core = {
+          enable = true;
+          installDependencies = false; # keep sourcing codelldb from your devshell, same pattern as rust
+        };
+
+        lang.json = {
+          enable = true;
+          installDependencies = false;
+        };
+        lang.markdown = {
+          enable = true;
+          installDependencies = false;
+        };
+
+      };
+
+      # Additional packages (optional)
+      extraPackages = with pkgs; [
+        nixd
+        alejandra
+        lua-language-server
+        stylua
+        marksman
+        vscode-langservers-extracted
+        prettier
+        copilot-language-server
+
+        # Tools LazyVim/plugins expect on PATH
+        ripgrep
+        lazygit
+        git
+        gcc
+        mermaid-cli
+        wget
+        curl
+      ];
+
+      # Only needed for languages not covered by LazyVim extras
+      treesitterParsers = with pkgs.vimPlugins.nvim-treesitter-parsers; [
+        wgsl # WebGPU Shading Language
+        templ # Go templ files
+        go
+      ];
+
+      config = {
+        options = ''
+          -- the vscode import lives in lua/plugins/, so LazyVim's import-order check would warn inside VS Code
+          if vim.g.vscode then vim.g.lazyvim_check_order = false end
+          -- lazyvim-nix's starter hardcodes "tutor" in performance.rtp.disabled_plugins (no option to change it);
+          -- source the stock plugin to restore :Tutor
+          vim.cmd.runtime("plugin/tutor.vim")
+        '';
+        autocmds = ''
+          vim.api.nvim_create_autocmd({ "InsertEnter" }, { command = "set norelativenumber" })
+          vim.api.nvim_create_autocmd({ "InsertLeave" }, { command = "set relativenumber" })
+
+          vim.api.nvim_create_autocmd("FileType", {
+            pattern = "nix",
+            callback = function(args)
+              vim.lsp.inlay_hint.enable(false, { bufnr = args.buf })
             end,
-          },
-        }
-      '';
+          })
+        '';
+      };
 
-      dap-ui-autoclose = ''
-        return {
-          {
-            "rcarriga/nvim-dap-ui",
-            opts = function(_, opts)
-              local dap = require("dap")
+      plugins = {
+        vscode = ''
+          return {
+            { import = "lazyvim.plugins.extras.vscode", cond = vim.g.vscode ~= nil },
+          }
+        '';
+        disable-luarocks = ''
+          return {
+            {
+              "folke/lazy.nvim",
+              opts = {
+                rocks = {
+                  enabled = false,
+                  hererocks = false,
+                },
+              },
+            },
+          }
+        '';
 
-              local function reset_explorer_width()
-                vim.defer_fn(function()
-                  for _, win in ipairs(vim.api.nvim_list_wins()) do
-                    local buf = vim.api.nvim_win_get_buf(win)
-                    if vim.bo[buf].filetype == "snacks_picker_list" then
-                      vim.api.nvim_win_set_width(win, 30)
+        treesitter-no-autoinstall = ''
+          return {
+            {
+              "nvim-treesitter/nvim-treesitter",
+              opts = {
+                auto_install = false,
+                ensure_installed = {}, -- rely entirely on Nix-provided parsers
+              },
+            },
+          }
+        '';
+
+        lspconfig = ''
+          return {
+            {
+              "neovim/nvim-lspconfig",
+              opts = {
+                servers = {
+                  rust_analyzer = { enabled = false }, -- rustaceanvim handles this
+                  nixd = {},
+                },
+              },
+            },
+          }
+        '';
+
+        rust-dap = ''
+          return {
+            {
+              "mrcjkb/rustaceanvim",
+              opts = function(_, opts)
+                local codelldb_symlink = vim.fn.exepath("codelldb")
+                if codelldb_symlink ~= "" then
+                  local codelldb_real = vim.uv.fs_realpath(codelldb_symlink) or codelldb_symlink
+                  local liblldb_path = codelldb_real:gsub("adapter/codelldb$", "lldb/lib/liblldb.so")
+                  local cfg = require("rustaceanvim.config")
+                  opts.dap = opts.dap or {}
+                  opts.dap.adapter = cfg.get_codelldb_adapter(codelldb_real, liblldb_path)
+                else
+                  vim.notify("codelldb not found on PATH — Rust debugging disabled", vim.log.levels.WARN)
+                end
+                return opts
+              end,
+            },
+          }
+        '';
+
+        dap-ui-autoclose = ''
+          return {
+            {
+              "rcarriga/nvim-dap-ui",
+              opts = function(_, opts)
+                local dap = require("dap")
+
+                local function reset_explorer_width()
+                  vim.defer_fn(function()
+                    for _, win in ipairs(vim.api.nvim_list_wins()) do
+                      local buf = vim.api.nvim_win_get_buf(win)
+                      if vim.bo[buf].filetype == "snacks_picker_list" then
+                        vim.api.nvim_win_set_width(win, 30)
+                      end
                     end
-                  end
-                end, 100)
-              end
+                  end, 100)
+                end
 
-              local function on_end()
-                require("dapui").close()
-                reset_explorer_width()
-              end
+                local function on_end()
+                  require("dapui").close()
+                  reset_explorer_width()
+                end
 
-              dap.listeners.before.event_terminated["close_dapui"] = on_end
-              dap.listeners.before.event_exited["close_dapui"] = on_end
-              return opts
-            end,
-          },
-        }
-      '';
+                dap.listeners.before.event_terminated["close_dapui"] = on_end
+                dap.listeners.before.event_exited["close_dapui"] = on_end
+                return opts
+              end,
+            },
+          }
+        '';
+      };
     };
+
+    # xdg.configFile."nvim" = {
+    #   source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/nix-config/config/nvim";
+    # };
+
+    home.packages = with pkgs; [
+      usbutils
+      mesa-demos
+      vulkan-tools
+      unzip
+      just
+
+      libinput
+      openssh
+
+      safe-rm
+
+      ncdu
+      dust
+
+      nixfmt
+      statix
+      deadnix
+      nvd
+      nix-diff
+      nix-tree
+
+      kubectl
+      # Helm with the commonly-needed plugins baked in (see NixOS wiki: Helm_and_Helmfile).
+      # helm-diff: preview release changes; helm-secrets: manage encrypted values;
+      # helm-git: install charts straight from git refs.
+      (wrapHelm kubernetes-helm {
+        plugins = with kubernetes-helmPlugins; [
+          helm-diff
+          helm-secrets
+          helm-git
+        ];
+      })
+      adwaita-fonts
+    ];
+
   };
-
-  # xdg.configFile."nvim" = {
-  #   source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/nix-config/config/nvim";
-  # };
-
-  home.packages = with pkgs; [
-    usbutils
-    mesa-demos
-    vulkan-tools
-    unzip
-    just
-
-    libinput
-    openssh
-
-    safe-rm
-
-    ncdu
-    dust
-
-    nixfmt
-    statix
-    deadnix
-    nvd
-    nix-diff
-    nix-tree
-
-    kubectl
-    # Helm with the commonly-needed plugins baked in (see NixOS wiki: Helm_and_Helmfile).
-    # helm-diff: preview release changes; helm-secrets: manage encrypted values;
-    # helm-git: install charts straight from git refs.
-    (wrapHelm kubernetes-helm {
-      plugins = with kubernetes-helmPlugins; [
-        helm-diff
-        helm-secrets
-        helm-git
-      ];
-    })
-    adwaita-fonts
-  ];
-
 }

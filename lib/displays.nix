@@ -1,7 +1,7 @@
 # nixConfig.displays: a host's monitor layout, declared once in the registry
-# (users/registry.nix → hosts.<host>.displays) and injected into both NixOS and
+# (registry.nix → hosts.<host>.displays) and injected into both NixOS and
 # Home Manager by lib/default.nix. Pure option declaration, valid in either module system.
-# Consumers: home/niri.nix (outputs, kanshi), home/dms.nix (wallpaper cycling),
+# Consumers: home/desktop/niri.nix (outputs, kanshi), home/desktop/dms.nix (wallpaper cycling),
 # nixos/desktop/dms.nix (greeter layout).
 { lib, ... }:
 let

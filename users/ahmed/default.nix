@@ -1,3 +1,4 @@
+# ahmed on every host. Per-host additions: users/ahmed/<host>/default.nix.
 { inputs }:
 { config, ... }:
 
@@ -10,16 +11,21 @@ in
   imports = [
     ./justfile.nix
     inputs.sops-nix.homeManagerModules.sops
-    inputs.lazyvim.homeManagerModules.default
     inputs.ai-rules.homeManagerModules.default
-    ../../home/cli.nix
-    ../../home/justfile.nix
-    ../../home/ssh.nix
   ];
+
+  # Features on every host (modules: home/, imported for every user@host by flake.nix).
+  nixConfig = {
+    cli.enable = true;
+    ssh.enable = true;
+  };
 
   home.stateVersion = "25.05";
 
   programs.home-manager.enable = true;
+
+  # Default flake for nh (NH_FLAKE) and the justfile recipes.
+  programs.nh.flake = "${config.home.homeDirectory}/Projects/nix-config";
 
   sops = {
     # or ${config.home.homeDirectory}/.config/sops/age/keys.txt

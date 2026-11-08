@@ -1,3 +1,6 @@
+# Pins `nix run nixpkgs#…`, NIX_PATH and the flake registry to this flake's locked inputs
+# (no network lookups, same versions as the system). Needs flake inputs, so flake.nix
+# binds it with importApply in sharedModules instead of nixos/core/default.nix.
 { inputs }:
 {
   config,

@@ -1,4 +1,4 @@
-# Monitor layout for asus-laptop (schema: lib/displays.nix). Referenced from users/registry.nix.
+# Monitor layout for asus-laptop (schema: lib/displays.nix). Referenced from registry.nix.
 {
   "DP-1" = {
     width = 2560;

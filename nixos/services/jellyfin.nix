@@ -1,53 +1,47 @@
-# Jellyfin media server (web UI: http://localhost:8096).
+# Jellyfin media server (web UI: http://<host>:8096). Hosts set `mediaDirs` and, if the GPU
+# allows, upstream services.jellyfin.{hardwareAcceleration,transcoding} (see hosts/<host>/jellyfin.nix).
 #
-# Serves the primary user's torrent downloads, bind-mounted read-only into the
-# service's own mount namespace only (/home stays hidden from it). DLNA is an
-# official plugin since 10.9 and is installed from the web UI
-# (Dashboard -> Plugins -> Catalog -> DLNA). Add /media/torrents as a library.
+# DLNA is an official plugin since 10.9 and is installed from the web UI
+# (Dashboard -> Plugins -> Catalog -> DLNA).
 #
 # Control: systemctl {start,stop,status} jellyfin
-{
-  config,
-  lib,
-  ...
-}:
+{ config, lib, ... }:
 let
-  userLib = import ../../lib { inherit lib; };
-  primaryUser = userLib.getPrimaryUserConfig config.networking.hostName;
-  torrentsDir = "${primaryUser.homeDirectory}/Downloads/torrents";
+  cfg = config.nixConfig.services.jellyfin;
 in
 {
-  services.jellyfin = {
-    enable = true;
-    # 8096/8920 TCP (web), 1900 UDP (SSDP/DLNA), 7359 UDP (client discovery)
-    openFirewall = true;
-
-    # Transcode on the AMD iGPU (Ryzen 5900HS, VCN 2): power-efficient and keeps
-    # the NVIDIA dGPU asleep. by-path is stable; renderD12x numbering is not.
-    hardwareAcceleration = {
-      enable = true;
-      type = "vaapi";
-      device = "/dev/dri/by-path/pci-0000:06:00.0-render";
-    };
-    transcoding = {
-      enableHardwareEncoding = true;
-      hardwareEncodingCodecs.hevc = true;
-      hardwareDecodingCodecs = {
-        h264 = true;
-        hevc = true;
-        hevc10bit = true;
-        vp9 = true;
+  options.nixConfig.services.jellyfin = {
+    enable = lib.mkEnableOption "the Jellyfin media server";
+    mediaDirs = lib.mkOption {
+      type = lib.types.attrsOf lib.types.str;
+      default = { };
+      example = {
+        movies = "/mnt/media/Movies";
       };
+      description = ''
+        Host directories exposed read-only to Jellyfin as /media/<name>; add those paths as
+        libraries in the web UI. Nothing else on the host (including /home) is visible to it.
+      '';
     };
   };
 
-  systemd.services.jellyfin.serviceConfig = {
-    ProtectHome = true;
-    BindReadOnlyPaths = [ "${torrentsDir}:/media/torrents" ];
-  };
+  config = lib.mkIf cfg.enable {
+    services.jellyfin = {
+      enable = true;
+      # 8096/8920 TCP (web), 1900 UDP (SSDP/DLNA), 7359 UDP (client discovery)
+      openFirewall = true;
+    };
 
-  users.users.jellyfin.extraGroups = [
-    "render"
-    "video"
-  ];
+    # Media is bind-mounted read-only into the service's own mount namespace.
+    systemd.services.jellyfin.serviceConfig = {
+      ProtectHome = true;
+      BindReadOnlyPaths = lib.mapAttrsToList (name: path: "${path}:/media/${name}") cfg.mediaDirs;
+    };
+
+    # GPU access for hardware transcoding
+    users.users.jellyfin.extraGroups = [
+      "render"
+      "video"
+    ];
+  };
 }

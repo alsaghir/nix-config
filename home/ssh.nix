@@ -1,35 +1,39 @@
-{ ... }:
+{ config, lib, ... }:
 {
-  programs.ssh = {
-    enable = true;
+  options.nixConfig.ssh.enable = lib.mkEnableOption "SSH client host config";
 
-    enableDefaultConfig = false;
+  config = lib.mkIf config.nixConfig.ssh.enable {
+    programs.ssh = {
+      enable = true;
 
-    settings = {
-      "github" = {
-        hostname = "github.com";
-        user = "git";
-        identityFile = "~/.ssh/id_ed25519";
-        identitiesOnly = true;
-        addKeysToAgent = "yes";
-        PreferredAuthentications = "publickey";
-      };
+      enableDefaultConfig = false;
 
-      "ssh.dev.azure.com" = {
-        hostname = "ssh.dev.azure.com";
-        user = "git";
-        identityFile = "~/.ssh/id_rsa";
-        addKeysToAgent = "no";
-        identitiesOnly = true;
-        PreferredAuthentications = "publickey";
-      };
+      settings = {
+        "github" = {
+          hostname = "github.com";
+          user = "git";
+          identityFile = "~/.ssh/id_ed25519";
+          identitiesOnly = true;
+          addKeysToAgent = "yes";
+          PreferredAuthentications = "publickey";
+        };
 
-      # catch-all — must be last
-      "* !github" = {
-        identityFile = "~/.ssh/id_ed25519";
-        addKeysToAgent = "yes";
-        identitiesOnly = true;
-        user = "git";
+        "ssh.dev.azure.com" = {
+          hostname = "ssh.dev.azure.com";
+          user = "git";
+          identityFile = "~/.ssh/id_rsa";
+          addKeysToAgent = "no";
+          identitiesOnly = true;
+          PreferredAuthentications = "publickey";
+        };
+
+        # catch-all — must be last
+        "* !github" = {
+          identityFile = "~/.ssh/id_ed25519";
+          addKeysToAgent = "yes";
+          identitiesOnly = true;
+          user = "git";
+        };
       };
     };
   };

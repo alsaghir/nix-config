@@ -1,13 +1,8 @@
+# `justfile.recipes`: modules append recipes; the result is ~/.config/just/justfile (alias `j`).
+{ config, lib, ... }:
 {
-  config,
-  lib,
-  pkgs,
-  ...
-}:
-with lib;
-{
-  options.justfile.recipes = mkOption {
-    type = types.lines;
+  options.justfile.recipes = lib.mkOption {
+    type = lib.types.lines;
     default = "";
     description = "Accumulated recipes for the global justfile";
   };

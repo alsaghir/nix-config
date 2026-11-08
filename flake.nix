@@ -77,24 +77,25 @@
     in
     {
 
-      nixosConfigurations = {
-        asus-laptop = lib.mkNixosSystem {
-          inherit (inputs) nixpkgs;
-          inherit self inputs;
-          hostname = "asus-laptop";
-          overlays = customOverlays;
-          modules = [
-            inputs.disko.nixosModules.disko
-            ./hosts/asus-laptop/default.nix
-          ];
-        };
-
+      # One system per registry host that has hosts/<host>/default.nix.
+      nixosConfigurations = lib.mkAllNixosSystems {
+        inherit (inputs) nixpkgs;
+        inherit self inputs;
+        overlays = customOverlays;
+        # Every host gets these; hosts/<host>/default.nix enables features (nixConfig.*.enable).
+        sharedModules = [
+          inputs.disko.nixosModules.disko
+          ./nixos
+          (nixpkgs.lib.modules.importApply ./nixos/core/flake-pinning.nix { inherit inputs; })
+        ];
       };
 
       homeConfigurations = lib.mkAllHomeConfigurations {
         inherit (inputs) nixpkgs home-manager;
         inherit inputs;
         overlays = customOverlays;
+        # Every user@host gets these; users/<user>[/<host>] enables features (nixConfig.*.enable).
+        sharedModules = [ (nixpkgs.lib.modules.importApply ./home { inherit inputs; }) ];
       };
 
       formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.nixfmt-tree);

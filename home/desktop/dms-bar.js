@@ -1,4 +1,4 @@
-// Build-time helper for home/dms.nix: writes settings.json with a bar derived from the installed
+// Build-time helper for home/desktop/dms.nix: writes settings.json with a bar derived from the installed
 // DMS's own default (SettingsSpec.js barConfigs.def[0]) plus our overrides, so the bar tracks
 // upstream defaults on every DMS update. Fails the build if the default can't be found.
 // Usage: node dms-bar.js <SettingsSpec.js> <settings.json> <bar-overrides.json> <out>

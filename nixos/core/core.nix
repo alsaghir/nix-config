@@ -48,6 +48,15 @@
   # Enable zsh system-wide (required if any user’s shell = zsh)
   programs.zsh.enable = true;
 
+  # Every host is managed from a git flake (git+ssh inputs shell out to git), also before
+  # the first home-manager activation.
+  programs.git.enable = true;
+
+  environment.shellAliases = {
+    j = "just --justfile ~/.config/just/justfile";
+    rm = "rm -i";
+  };
+
   # Base tools common to all machines (keep minimal and generic)
   environment.systemPackages = with pkgs; [
     pciutils # lspci et al. for hardware inspection; helpful everywhere

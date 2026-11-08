@@ -1,4 +1,5 @@
-{ inputs, hostname }:
+# ahmed on asus-laptop: graphical desktop, Flatpak, personal SSH keys.
+{ ... }:
 {
   config,
   lib,
@@ -11,56 +12,51 @@ in
 {
 
   imports = [
-    (lib.modules.importApply ./justfile.nix { inherit hostname; })
-    (lib.modules.importApply ../../../home/profiles/desktop.nix { inherit inputs; })
-    inputs.nix-flatpak.homeManagerModules.nix-flatpak
-    ../../../home/flatpak.nix
+    ./justfile.nix
   ];
+
+  nixConfig = {
+    desktop.niri.enable = true;
+    flatpak.enable = true;
+  };
 
   home.activation.ensureSshPermissions = lib.hm.dag.entryBefore [ "sops-nix" ] ''
     $DRY_RUN_CMD mkdir -p $VERBOSE_ARG "${config.home.homeDirectory}/.ssh"
     $DRY_RUN_CMD chmod 0700 "${config.home.homeDirectory}/.ssh"
   '';
 
-  sops = {
-    # or ${config.home.homeDirectory}/.config/sops/age/keys.txt
-    age.keyFile = "${config.home.homeDirectory}/.config/sops/age/keys.txt";
+  # Personal SSH keys (age key: sops.age.keyFile in ../default.nix)
+  sops.secrets = {
+    ssh_private_key = {
+      key = "ssh_private_key";
+      path = "${config.home.homeDirectory}/.ssh/id_ed25519";
+      mode = "0600";
+      sopsFile = sshKeysSopsFile;
 
-    # Personal SSH keys
-    secrets = {
-      ssh_private_key = {
-        key = "ssh_private_key";
-        path = "${config.home.homeDirectory}/.ssh/id_ed25519";
-        mode = "0600";
-        sopsFile = sshKeysSopsFile;
-
-      };
-
-      ssh_public_key = {
-        key = "ssh_public_key";
-        path = "${config.home.homeDirectory}/.ssh/id_ed25519.pub";
-        mode = "0644";
-        sopsFile = sshKeysSopsFile;
-
-      };
-
-      rsa_ssh_private_key = {
-        key = "rsa_ssh_private_key";
-        path = "${config.home.homeDirectory}/.ssh/id_rsa";
-        mode = "0600";
-        sopsFile = sshKeysSopsFile;
-
-      };
-
-      rsa_ssh_public_key = {
-        key = "rsa_ssh_public_key";
-        path = "${config.home.homeDirectory}/.ssh/id_rsa.pub";
-        mode = "0644";
-        sopsFile = sshKeysSopsFile;
-
-      };
     };
 
-  };
+    ssh_public_key = {
+      key = "ssh_public_key";
+      path = "${config.home.homeDirectory}/.ssh/id_ed25519.pub";
+      mode = "0644";
+      sopsFile = sshKeysSopsFile;
 
+    };
+
+    rsa_ssh_private_key = {
+      key = "rsa_ssh_private_key";
+      path = "${config.home.homeDirectory}/.ssh/id_rsa";
+      mode = "0600";
+      sopsFile = sshKeysSopsFile;
+
+    };
+
+    rsa_ssh_public_key = {
+      key = "rsa_ssh_public_key";
+      path = "${config.home.homeDirectory}/.ssh/id_rsa.pub";
+      mode = "0644";
+      sopsFile = sshKeysSopsFile;
+
+    };
+  };
 }
