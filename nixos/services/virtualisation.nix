@@ -41,7 +41,7 @@
   services.k3s.role = "server";
   services.k3s.extraFlags = toString [
     # "--debug" # Optionally add additional args to k3s
-     "--write-kubeconfig-mode=644"
+    "--write-kubeconfig-mode=644"
   ];
   # kubectl/helm/k9s fall back to localhost:8080 without a kubeconfig; point them at k3s's.
   environment.variables.KUBECONFIG = "/etc/rancher/k3s/k3s.yaml";

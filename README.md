@@ -19,19 +19,19 @@ sudo nixos-rebuild switch --flake .#<your-host>
 
 - Enable or disable features by editing hosts/<your-host>/default.nix and the modules it imports.
 - Keep host‑specific choices (kernel, services, hardware toggles) in your host directory.
-- Keep reusable system features in `nixos/` and `roles/`, home features in `home/`, and package tweaks in `overlays/`.
+- Keep reusable system features in `nixos/` (shared host baseline in `nixos/core/`), home features in `home/`, and package tweaks in `overlays/`.
 - If you add secrets, use your preferred secrets tool (e.g., sops-nix) and follow its docs.
 
 ## Module composition
 
-`users/registry.nix` is the single source of truth for user identity, theme preferences,
+`users/registry.nix` is the single source of truth for user identity,
 host platforms, primary users, and user-to-host assignments. The builders in `lib/`
 translate these into standard NixOS/Home Manager options. Host overlays are bound to
 flake inputs once and applied to both package sets.
 
 Each `user@host` Home Manager configuration is assembled from:
 
-1. Registry defaults (`home.username`, `home.homeDirectory`, `nixConfig.theme`).
+1. Registry defaults (`home.username`, `home.homeDirectory`, `nixConfig.displays`).
 2. The user's profile `users/<user>/default.nix` (required).
 3. The user's host profile `users/<user>/<host>/default.nix` (optional).
 4. Extra modules listed in registry `hosts.<host>.userModules.<user>`.
@@ -52,14 +52,18 @@ lexically with `lib.modules.importApply`, so a profile is a function returning a
 
 Host profiles receive `{ inputs, hostname }`; take `{ ... }` when nothing is needed.
 External modules are opt-in per profile: Ahmed's profile selects SOPS, LazyVim, and
-AI rules, and his laptop profile selects Flatpak. A new user inherits none of them.
+AI rules; his laptop profile selects Flatpak and the graphical desktop
+(`home/profiles/desktop.nix`: niri, DMS, GUI apps), so a headless host reuses the
+user profile without a desktop. A new user inherits none of them.
 
-Feature modules (`home/`, `nixos/`, `roles/`) use `config`, `lib`, and `pkgs`, not
+Feature modules (`home/`, `nixos/`) use `config`, `lib`, and `pkgs`, not
 `inputs`, `userConfig`, or `hostConfig`. Use `config.home.homeDirectory` for home
-paths. The typed `nixConfig.theme` option accepts `"dark"` or `"light"`; the builder
-supplies the registry preference with `lib.mkDefault`, so a profile can override it
-normally. Use `lib.mkForce` for an intentional override of another explicit value.
-When composing desktop features independently, also import `home/options.nix`.
+paths. The builder supplies registry values with `lib.mkDefault`, so a profile can
+override them normally; use `lib.mkForce` for an intentional override of another
+explicit value.
+`nixConfig.displays` (schema in `lib/displays.nix`) holds the host's monitor layout
+from registry `hosts.<host>.displays`; both builders inject it, and niri outputs,
+kanshi profiles, DMS wallpaper cycling and the greeter layout are generated from it.
 
 Keep imports explicit and independent of `config`. Do not move dependencies needed
 by imports into `_module.args`, which can recurse. `importApply` preserves source
@@ -69,18 +73,19 @@ must not silently deduplicate. Select each dependency once in its profile.
 Dormant modules remain opt-in. `nixos/services/nix-config.nix` is not currently
 enabled; to select it, add
 `(nixpkgs.lib.modules.importApply ./nixos/services/nix-config.nix { inherit inputs; })`
-to the system module list. DMS requires an explicit `pluginRegistry` binding plus
-its upstream modules; KDE likewise requires plasma-manager. Their inputs are
-currently commented out, and this composition does not enable them.
+to the system module list.
 
 ## Adding a user or host
 
-1. Add identity and preferences under `users` in `users/registry.nix`.
+1. Add identity under `users` in `users/registry.nix`.
 2. Create `users/<user>/default.nix` (`{ inputs }: { ... }: { ... }`) with a
    `home.stateVersion` and explicit imports.
 3. Add the host platform, primary user, and `userModules.<user>` assignment to the
    registry. For NixOS, create the host configuration/hardware modules and add a
    `mkNixosSystem` call to `nixosConfigurations` in `flake.nix`.
+   For a desktop, put its monitors in `hosts/<host>/displays.nix` (connector names from
+   `niri msg outputs`; mark the built-in panel `internal = true`) and reference it as
+   the registry's `hosts.<host>.displays`.
 4. Optionally create `users/<user>/<host>/default.nix` for host-specific home
    configuration. Keep small assignment-specific additions in the registry list.
 
@@ -100,8 +105,8 @@ nix build --dry-run '.#homeConfigurations."ahmed@asus-laptop".activationPackage'
 ```
 
 The composition check covers registry defaults, profile and host-profile loading,
-missing-profile failure, theme validation and override priorities, standalone GNOME
-dark/light behavior on Linux, multiple users/hosts without Ahmed's external
+missing-profile failure, override priorities, display injection and validation,
+multiple users/hosts without Ahmed's external
 integrations, distinct lexical bindings of the same module, and opt-in Nix registry
 binding on Linux. Fixture profiles live in `tests/fixtures/users`. Checks are exposed
 for every supported system; choose the native system when running them.

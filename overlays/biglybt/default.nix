@@ -119,7 +119,7 @@ final: prev: rec {
       # Inject VM options and Wayland-related env into the wrapped launcher
       gappsWrapperArgs+=(
         --set JAVA_TOOL_OPTIONS "''${VMOPTS}"
-        --set GDK_BACKEND wayland
+        --set GDK_BACKEND x11
         --set _JAVA_AWT_WM_NONREPARENTING 0
         --set JDK_GTK_VERSION 3
       )

@@ -13,8 +13,6 @@ in
     inputs.lazyvim.homeManagerModules.default
     inputs.ai-rules.homeManagerModules.default
     ../../home/cli.nix
-    ../../home/gnome.nix
-    ../../home/gui-commons.nix
     ../../home/justfile.nix
     ../../home/ssh.nix
   ];

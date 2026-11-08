@@ -1,17 +1,16 @@
-# This is the main configuration file for your 'laptop' host.
-# It imports the common configuration and then layers host-specific
-# settings on top.
+# NixOS entry point for asus-laptop: selects shared modules and layers host-specific settings on top.
 
 { pkgs, ... }:
 {
   imports = [
-    ../../roles/boot.nix
-    ../../roles/core.nix
-    ../../roles/locale.nix
-    ../../roles/networking.nix
+    ../../nixos/core/boot.nix
+    ../../nixos/core/core.nix
+    ../../nixos/core/locale.nix
+    ../../nixos/core/networking.nix
 
     # Host-specific hardware scan
     ./hardware-configuration.nix
+    ./disko.nix
 
     # System profiles
     ../../nixos/desktop
@@ -25,9 +24,6 @@
     ../../nixos/services/pipewire.nix
     ../../nixos/services/printing.nix
     ../../nixos/services/virtualisation.nix
-
-    # Hardware profiles
-    # ../../profiles/kernels.nix
 
     # User definitions
     ../../users/user.nix

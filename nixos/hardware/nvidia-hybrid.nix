@@ -67,7 +67,8 @@ let
         ];
         serviceConfig = {
           Type = "oneshot";
-          ExecStart = "${pkgs.procps}/bin/pkill -f -STOP ${pkgs.gnome-shell}/bin/gnome-shell";
+          # "-": tolerate no gnome-shell running (e.g. niri session)
+          ExecStart = "-${pkgs.procps}/bin/pkill -f -STOP ${pkgs.gnome-shell}/bin/gnome-shell";
         };
       };
 
@@ -84,7 +85,7 @@ let
         ];
         serviceConfig = {
           Type = "oneshot";
-          ExecStart = "${pkgs.procps}/bin/pkill -f -CONT ${pkgs.gnome-shell}/bin/gnome-shell";
+          ExecStart = "-${pkgs.procps}/bin/pkill -f -CONT ${pkgs.gnome-shell}/bin/gnome-shell";
         };
       };
     };

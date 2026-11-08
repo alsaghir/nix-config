@@ -13,7 +13,7 @@ let
 in
 
 {
-  
+
   users.users.${userConfig.username} = {
     isNormalUser = true;
     description = userConfig.fullName;

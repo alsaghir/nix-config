@@ -9,14 +9,6 @@ let
 
   userLib = import ../lib { inherit lib; };
 
-  onlyofficeQtScale1 = userLib.mkQtScaledApp {
-    inherit pkgs;
-
-    pkg = pkgs.onlyoffice-desktopeditors;
-    scale = "1";
-    fontDpi = "96";
-  };
-
 in
 
 {
@@ -41,18 +33,23 @@ in
     };
   };
   programs.k9s.enable = true;
-  programs.ptyxis.enable = true;
   programs.vesktop.enable = true;
-  programs.vscode.enable = true;
-  programs.chromium = {
+  programs.vscode = {
     enable = true;
-    package = pkgs.brave;
+    # VS Code picks the keyring from XDG_CURRENT_DESKTOP and doesn't know "niri"; name it explicitly.
+    argvSettings = {
+      password-store = "gnome-libsecret";
+      enable-crash-reporter = false;
+    };
   };
 
   programs.zoxide.enable = true;
   gtk.enable = true;
 
   services.remmina.enable = true;
+  # HM's unit has Requires= but no After=graphical-session.target, so it starts in parallel
+  # with niri, finds no WAYLAND_DISPLAY ("cannot open display") and hits the start limit.
+  systemd.user.services.remmina.Unit.After = [ "graphical-session.target" ];
 
   xdg.configFile."autostart/vesktop.desktop" = {
     force = true;
@@ -66,9 +63,31 @@ in
     '';
   };
 
-  programs.onlyoffice = {
+  # ~/.config/mimeapps.list is now Nix-owned (read-only). Only list types claimed by several apps;
+  # a type with a single claimant already resolves on its own. More defaults in home/dms.nix (merged).
+  # Find claimants:  grep -l '<mime>' ~/.nix-profile/share/applications/*.desktop
+  # Current default: xdg-mime query default <mime>
+  # If an app fails to register a handler at runtime, add its line here.
+  xdg.mimeApps = {
     enable = true;
-    package = onlyofficeQtScale1;
+    defaultApplications = {
+      "x-scheme-handler/http" = "firefox.desktop";
+      "x-scheme-handler/https" = "firefox.desktop";
+      "text/html" = "firefox.desktop";
+      "x-scheme-handler/discord" = "vesktop.desktop";
+      "x-scheme-handler/slack" = "slack.desktop";
+      # Written at runtime by their tools into ~/.local/share/applications
+      "x-scheme-handler/jetbrains" = "jetbrainsd.desktop";
+      "x-scheme-handler/claude-cli" = "claude-code-url-handler.desktop";
+    }
+    // lib.genAttrs [
+      "image/png"
+      "image/jpeg"
+      "image/gif"
+      "image/webp"
+      "image/bmp"
+      "image/tiff"
+    ] (_: "org.nomacs.ImageLounge.desktop");
   };
 
   home.packages = with pkgs; [
@@ -81,7 +100,6 @@ in
 
     biglybt
 
-    antigravity-ide
     mission-center
 
     adwaita-icon-theme
@@ -96,8 +114,6 @@ in
       primaryDesktopFile = "org.kde.krita.desktop";
     })
 
-    xwayland-satellite
-
     slack
     (userLib.mkCleanGtk {
       inherit pkgs;
@@ -108,7 +124,6 @@ in
     _7zz-rar
     unrar
 
-    kdePackages.kate
     jetbrains-toolbox
     proton-vpn
     github-copilot-app

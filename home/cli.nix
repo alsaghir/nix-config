@@ -5,19 +5,6 @@
   ...
 }:
 
-let
-  fromGitHub =
-    ref: repo:
-    pkgs.vimUtils.buildVimPlugin {
-      pname = "${lib.strings.sanitizeDerivationName repo}";
-      version = ref;
-      src = builtins.fetchGit {
-        url = "https://github.com/${repo}.git";
-        ref = ref;
-      };
-    };
-in
-
 {
 
   programs.antigravity-cli.enable = true;
@@ -239,6 +226,9 @@ in
       options = ''
         -- the vscode import lives in lua/plugins/, so LazyVim's import-order check would warn inside VS Code
         if vim.g.vscode then vim.g.lazyvim_check_order = false end
+        -- lazyvim-nix's starter hardcodes "tutor" in performance.rtp.disabled_plugins (no option to change it);
+        -- source the stock plugin to restore :Tutor
+        vim.cmd.runtime("plugin/tutor.vim")
       '';
       autocmds = ''
         vim.api.nvim_create_autocmd({ "InsertEnter" }, { command = "set norelativenumber" })
@@ -255,9 +245,9 @@ in
 
     plugins = {
       vscode = ''
-          return {
-            { import = "lazyvim.plugins.extras.vscode", cond = vim.g.vscode ~= nil },
-          }
+        return {
+          { import = "lazyvim.plugins.extras.vscode", cond = vim.g.vscode ~= nil },
+        }
       '';
       disable-luarocks = ''
         return {

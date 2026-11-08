@@ -4,17 +4,17 @@
   hardware.bluetooth.powerOnBoot = true;
   # Explicitly install BlueZ tools (bluetoothctl, etc.) only when BT is enabled.
   hardware.bluetooth.package = pkgs.bluez;
-  
+
   services.upower.enable = true;
 
   # BlueZ main.conf settings to favor LE/HOGP stability
   hardware.bluetooth.settings = {
     General = {
-      Experimental = true;                     # Extra plugins (set false if unstable)
-      ControllerMode = "dual";                 # BR/EDR + LE (default)
-      FastConnectable = true;                  # Faster reconnect (slightly more power)
-      Privacy = "device";                      # Better LE address resolution
-      JustWorksRepairing = "always";           # Automatic re-pairing for "Just Works" devices
+      Experimental = true; # Extra plugins (set false if unstable)
+      ControllerMode = "dual"; # BR/EDR + LE (default)
+      FastConnectable = true; # Faster reconnect (slightly more power)
+      Privacy = "device"; # Better LE address resolution
+      JustWorksRepairing = "always"; # Automatic re-pairing for "Just Works" devices
     };
   };
 

@@ -34,9 +34,9 @@
       publish = {
         disable-publishing = false;
         publish-addresses = true;
+      };
     };
-    };
-    
+
   };
   networking.dhcpcd.extraConfig = "nohook resolv.conf";
 

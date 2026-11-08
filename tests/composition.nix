@@ -11,18 +11,24 @@ let
       friend = {
         username = "friend";
         homeDirectory = "/home/friend";
-        preferences.theme = "light";
       };
       guest = {
         username = "guest";
         homeDirectory = "/home/guest";
-        preferences.theme = "dark";
       };
     };
     hosts = {
       first = {
         inherit system;
         primaryUser = "friend";
+        displays."eDP-1" = {
+          width = 1920;
+          height = 1080;
+          x = 0;
+          y = 0;
+          scale = 1.25;
+          internal = true;
+        };
         userModules = {
           friend = [ ];
           guest = [ ];
@@ -32,7 +38,7 @@ let
         inherit system;
         primaryUser = "friend";
         userModules.friend = [
-          { nixConfig.theme = lib.mkForce "light"; }
+          { home.sessionVariables.PROFILE_HOST = lib.mkForce "registry"; }
         ];
       };
       third = {
@@ -54,25 +60,6 @@ let
   second = homes."friend@second".config;
   third = homes."friend@third".config;
   guest = homes."guest@first".config;
-  themeConfig =
-    theme:
-    (home-manager.lib.homeManagerConfiguration {
-      inherit pkgs;
-      modules = [
-        ../home/options.nix
-        ../home/gnome.nix
-        {
-          home = {
-            username = "friend";
-            homeDirectory = "/home/friend";
-            stateVersion = "25.05";
-          };
-          nixConfig.theme = theme;
-        }
-      ];
-    }).config;
-  dark = themeConfig "dark";
-  light = themeConfig "light";
   recipes =
     (lib.evalModules {
       modules = [
@@ -134,12 +121,12 @@ assert
   ];
 assert first.home.username == "friend";
 assert first.home.homeDirectory == "/home/friend";
-assert first.nixConfig.theme == "light";
-assert guest.nixConfig.theme == "light";
+assert guest.home.username == "guest";
 assert second.home.homeDirectory == "/srv/friend";
-assert second.home.sessionVariables.PROFILE_HOST == "second";
-assert second.nixConfig.theme == "light";
-assert third.nixConfig.theme == "dark";
+assert second.home.sessionVariables.PROFILE_HOST == "registry";
+assert first.nixConfig.displays."eDP-1".scale == 1.25;
+assert first.nixConfig.displays."eDP-1".refresh == null;
+assert third.nixConfig.displays == { };
 assert lib.hasSuffix ".drv" homes."friend@first".activationPackage.drvPath;
 assert lib.hasSuffix ".drv" homes."friend@second".activationPackage.drvPath;
 assert lib.hasSuffix ".drv" homes."guest@first".activationPackage.drvPath;
@@ -148,25 +135,13 @@ assert !(first.programs ? lazyvim);
 assert !(first.programs ? ai-rules);
 assert !(first.services ? flatpak);
 assert
-  pkgs.stdenv.hostPlatform.isLinux
-  -> (
-    dark.gtk.theme.name == "adwaita-dark"
-    && dark.gtk.gtk3.extraConfig.gtk-application-prefer-dark-theme == 1
-    && dark.gtk.gtk4.extraConfig.gtk-application-prefer-dark-theme == 1
-    && dark.dconf.settings."org/gnome/desktop/interface".color-scheme == "prefer-dark"
-    && light.gtk.theme.name == "adwaita"
-    && light.gtk.gtk3.extraConfig.gtk-application-prefer-dark-theme == 0
-    && light.gtk.gtk4.extraConfig.gtk-application-prefer-dark-theme == 0
-    && light.dconf.settings."org/gnome/desktop/interface".color-scheme == "default"
-  );
-assert
   !(builtins.tryEval
     (lib.evalModules {
       modules = [
-        ../home/options.nix
-        { nixConfig.theme = "invalid"; }
+        ../lib/displays.nix
+        { nixConfig.displays."eDP-1".width = "wide"; }
       ];
-    }).config.nixConfig.theme
+    }).config.nixConfig.displays."eDP-1".width
   ).success;
 assert !(builtins.tryEval missingProfile."ghost@first".config.home.username).success;
 assert lib.hasInfix "--hostname first" recipes;
@@ -175,6 +150,7 @@ assert
   pkgs.stdenv.hostPlatform.isLinux
   -> (
     systemConfig.config.networking.hostName == "first"
+    && systemConfig.config.nixConfig.displays."eDP-1".internal
     && systemConfig.config.system.configurationRevision == "composition-test"
     && systemConfig.pkgs.stdenv.hostPlatform.system == system
     && !systemConfig.config.nix.channel.enable

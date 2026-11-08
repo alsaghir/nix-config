@@ -1,4 +1,2 @@
 { ... }:
-{
-  nixConfig.theme = "dark";
-}
+{ }

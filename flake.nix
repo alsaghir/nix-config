@@ -1,5 +1,5 @@
 {
-  description = "Zephyrus G15 - NixOS";
+  description = "NixOS and Home Manager configurations for Ahmed's machines";
 
   inputs = {
 
@@ -19,6 +19,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    disko = {
+      url = "github:nix-community/disko";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     lazyvim.url = "github:pfassina/lazyvim-nix";
 
     rust-overlay = {
@@ -28,28 +33,32 @@
 
     ai-rules.url = "git+ssh://git@github.com/alsaghir/ai-rules.git";
 
-    /*
-      plasma-manager = {
-        url = "github:nix-community/plasma-manager";
-        inputs.nixpkgs.follows = "nixpkgs";
-        inputs.home-manager.follows = "home-manager";
-      };
+    # Dux Modular Shell (formerly DankMaterialShell). Its home-manager module
+    # is the only one supporting declarative settings/session/plugin settings.
+    dms = {
+      url = "github:duxlabs-dev/dux-shell/stable";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
-         dms = {
-          url = "github:AvengeMedia/DankMaterialShell/stable";
-          inputs.nixpkgs.follows = "nixpkgs";
-        };
+    # Only used for its home-manager `programs.niri.settings` module;
+    # the niri package itself comes from nixpkgs (binary-cached).
+    niri = {
+      url = "github:sodiboo/niri-flake";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
-        niri = {
-          url = "github:sodiboo/niri-flake";
-          inputs.nixpkgs.follows = "nixpkgs";
-        };
+    dms-plugin-registry = {
+      url = "github:duxlabs-dev/dux-plugin-registry";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
-        dms-plugin-registry = {
-          url = "github:AvengeMedia/dms-plugin-registry";
-          inputs.nixpkgs.follows = "nixpkgs";
-        };
-    */
+    # Plain source (not a flake): locked in flake.lock, bumped by `nix flake update`.
+    # Only qt6ct-shenanigans.patch is used, applied on top of nixpkgs' qt6ct.
+    qt6ct-kde-aur = {
+      # Explicit ref: AUR doesn't advertise HEAD's symref, so Nix would misread HEAD as a branch name.
+      url = "git+https://aur.archlinux.org/qt6ct-kde.git?ref=master";
+      flake = false;
+    };
 
   };
 
@@ -75,7 +84,8 @@
           hostname = "asus-laptop";
           overlays = customOverlays;
           modules = [
-            ./hosts/laptop/default.nix
+            inputs.disko.nixosModules.disko
+            ./hosts/asus-laptop/default.nix
           ];
         };
 
@@ -102,7 +112,7 @@
           pkgs = import nixpkgs {
             inherit system;
             overlays = customOverlays;
-            config.allowUnfree = true;
+            config = lib.nixpkgsConfig;
           };
         }
       );

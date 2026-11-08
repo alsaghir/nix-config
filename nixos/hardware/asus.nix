@@ -1,8 +1,8 @@
-
-{ config
-, pkgs
-, lib
-, ...
+{
+  config,
+  pkgs,
+  lib,
+  ...
 }:
 {
   # Asus stuff
@@ -28,7 +28,7 @@
     wantedBy = [ "multi-user.target" ];
     serviceConfig = {
       Type = "oneshot";
-      RemainAfterExit = true; 
+      RemainAfterExit = true;
       ExecStartPre = "${pkgs.coreutils}/bin/sleep 2";
       User = "root";
       ExecStart = "${lib.makeBinPath [ pkgs.asusctl ]}/asusctl profile set Balanced";

@@ -5,7 +5,20 @@
   usersDir ? ../users,
 }:
 
+let
+  # Single nixpkgs config for every package set the builders create (NixOS and Home Manager).
+  nixpkgsConfig = {
+    allowUnfree = true;
+    nvidia.acceptLicense = true;
+    permittedInsecurePackages = [
+      "electron-40.10.5"
+      "pnpm-10.29.2"
+    ];
+  };
+in
 {
+  inherit nixpkgsConfig;
+
   mkNixosSystem =
     {
       nixpkgs,
@@ -27,16 +40,15 @@
         # `{ ... }`.
         overlays =
           overlays ++ (builtins.map (o: import o { inherit inputs; }) (hostCfg.extraOverlays or [ ]));
-        config = {
-          allowUnfree = true;
-          nvidia.acceptLicense = true;
-        };
+        config = nixpkgsConfig;
       };
     in
     nixpkgs.lib.nixosSystem {
       inherit system pkgs;
       modules = modules ++ [
+        ./displays.nix
         {
+          nixConfig.displays = lib.mkDefault (hostCfg.displays or { });
           networking.hostName = lib.mkDefault hostname;
           system.configurationRevision = self.rev or self.dirtyRev or null;
         }
@@ -68,13 +80,7 @@
               # declares its overlays once and both builders pick them up.
               overlays =
                 overlays ++ (builtins.map (o: import o { inherit inputs; }) (hostCfg.extraOverlays or [ ]));
-              config = {
-                allowUnfree = true;
-                permittedInsecurePackages = [
-                  "electron-40.10.5"
-                  "pnpm-10.29.2"
-                ];
-              };
+              config = nixpkgsConfig;
             };
             # Profile entry points (users/<user> and optional users/<user>/<host>)
             # are the only modules that receive flake inputs; feature modules do not.
@@ -85,13 +91,11 @@
                 hostProfile = userProfile + "/${hostname}";
               in
               [
-                ../home/options.nix
+                ./displays.nix
                 {
                   home.username = lib.mkDefault userCfg.username;
                   home.homeDirectory = lib.mkDefault userCfg.homeDirectory;
-                  nixConfig = lib.optionalAttrs (userCfg ? preferences.theme) {
-                    theme = lib.mkDefault userCfg.preferences.theme;
-                  };
+                  nixConfig.displays = lib.mkDefault (hostCfg.displays or { });
                 }
                 (
                   if builtins.pathExists (userProfile + "/default.nix") then
@@ -118,38 +122,6 @@
       username = registry.hosts.${hostname}.primaryUser;
     in
     registry.users.${username};
-
-  # Function to create a wrapper around a Qt application
-  mkQtScaledApp =
-    {
-      pkgs,
-      pkg,
-      scale ? "1",
-      fontDpi ? "96",
-    }:
-    pkgs.symlinkJoin {
-      name = "${lib.getName pkg}-qt-scale-${builtins.replaceStrings [ "." ] [ "_" ] scale}";
-      paths = [ pkg ];
-      nativeBuildInputs = [ pkgs.makeWrapper ];
-      postBuild = ''
-          if [ -d "$out/bin" ]; then
-            for f in $out/bin/*; do
-              [ -f "$f" ] && [ -x "$f" ] || continue
-              wrapProgram "$f" --set QT_SCALE_FACTOR ${scale} --set QT_FONT_DPI ${fontDpi}
-            done
-          fi
-
-          if [ -d "$out/share/applications" ]; then
-          for desktop in "$out/share/applications"/*.desktop; do
-            [ -f "$desktop" ] || continue
-            # Dereference the symlink so we can edit it
-            cp --remove-destination "$(readlink -f "$desktop")" "$desktop"
-            # Repoint Exec= from the original pkg store path to our wrapped $out/bin
-            substituteInPlace "$desktop" --replace-warn "${pkg}/bin/" "$out/bin/"
-          done
-        fi
-      '';
-    };
 
   # Function to create a wrapper around a package that sets a clean GTK environment.
   mkCleanGtk =

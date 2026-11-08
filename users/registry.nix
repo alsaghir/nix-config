@@ -17,11 +17,6 @@
         "input"
         "podman"
       ];
-
-      preferences = {
-        theme = "dark"; # "dark" or "light"
-      };
-
     };
 
   };
@@ -45,6 +40,9 @@
       # consume this, so a host declares them once.
       # e.g. extraOverlays = [ ../overlays/my-host-fix ];
       extraOverlays = [ ../overlays/github-copilot-app-igpu ];
+      # Monitor layout (schema: lib/displays.nix). Also consumed by both builders;
+      # niri, kanshi, DMS and the greeter are generated from it.
+      displays = import ../hosts/asus-laptop/displays.nix;
     };
 
     # desktop = {

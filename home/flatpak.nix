@@ -23,9 +23,6 @@
       "com.getpostman.Postman"
       "com.github.IsmaelMartinez.teams_for_linux"
       "com.github.tchx84.Flatseal"
-      "im.nheko.Nheko"
-      "org.gnome.Fractal"
-      "org.kde.neochat"
 
       # You can mix forms:
       # { appId = "com.brave.Browser"; origin = "flathub"; }
