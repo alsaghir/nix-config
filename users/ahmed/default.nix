@@ -1,6 +1,6 @@
 # ahmed on every host. Per-host additions: users/ahmed/<host>/default.nix.
 { inputs }:
-{ config, ... }:
+{ config, lib, ... }:
 
 let
 
@@ -17,6 +17,7 @@ in
   # Features on every host (modules: home/, imported for every user@host by flake.nix).
   nixConfig = {
     cli.enable = true;
+    dev.enable = true;
     ssh.enable = true;
   };
 
@@ -71,4 +72,10 @@ in
   };
 
   home.sessionVariables.AI_ENV_FILE = config.sops.templates."ai-env".path;
+
+  # Host profiles decrypt their SSH keys into ~/.ssh (users/ahmed/<host>/ssh-keys.yaml).
+  home.activation.ensureSshPermissions = lib.hm.dag.entryBefore [ "sops-nix" ] ''
+    $DRY_RUN_CMD mkdir -p $VERBOSE_ARG "${config.home.homeDirectory}/.ssh"
+    $DRY_RUN_CMD chmod 0700 "${config.home.homeDirectory}/.ssh"
+  '';
 }

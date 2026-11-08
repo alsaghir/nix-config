@@ -6,15 +6,12 @@
 }:
 
 {
-  options.nixConfig.cli.enable = lib.mkEnableOption "the terminal environment (shell, CLI tools, LazyVim, AI CLIs)";
+  options.nixConfig.cli.enable = lib.mkEnableOption "the terminal environment (shell, CLI tools, LazyVim)";
 
   config = lib.mkIf config.nixConfig.cli.enable {
 
-    programs.antigravity-cli.enable = true;
     programs.bash.enable = true;
     programs.bat.enable = true;
-    programs.claude-code.enable = true;
-    programs.codex.enable = true;
     programs.direnv.enable = true;
     programs.direnv.enableZshIntegration = true;
     programs.direnv.nix-direnv.enable = true;
@@ -25,7 +22,6 @@
     programs.fzf.enable = true;
     programs.fzf.enableZshIntegration = true;
     programs.git.enable = true;
-    programs.github-copilot-cli.enable = true;
     programs.htop.enable = true;
     programs.jq.enable = true;
     programs.lsd.enable = false;
@@ -38,57 +34,7 @@
     programs.starship.enableZshIntegration = true;
     programs.vim.defaultEditor = true;
     programs.vim.enable = false;
-
-    programs.aichat = {
-      enable = true;
-      settings = {
-        model = "gemini:gemini-2.5-flash";
-        stream = true;
-        save = true;
-        highlight = true;
-        keybindings = "vi";
-
-        clients = [
-          {
-            type = "gemini";
-            api_base = "https://generativelanguage.googleapis.com/v1beta";
-          }
-          {
-            type = "openai-compatible";
-            name = "deepseek";
-            api_base = "https://api.deepseek.com";
-          }
-          {
-            type = "openai-compatible";
-            name = "groq";
-            api_base = "https://api.groq.com/openai/v1";
-          }
-          {
-            type = "openai-compatible";
-            name = "openrouter";
-            api_base = "https://openrouter.ai/api/v1";
-          }
-          {
-            type = "openai";
-            api_base = "https://api.openai.com/v1";
-          }
-          {
-            type = "openai-compatible";
-            name = "mistral";
-            api_base = "https://api.mistral.ai/v1";
-          }
-        ];
-      };
-    };
-    programs.aider-chat = {
-      enable = true;
-      settings = {
-        model = "deepseek/deepseek-chat";
-        git = true;
-        auto-commits = true;
-        dark-mode = true;
-      };
-    };
+    programs.zoxide.enable = true;
 
     programs.zsh = {
       enable = true;
@@ -352,12 +298,9 @@
 
     home.packages = with pkgs; [
       usbutils
-      mesa-demos
-      vulkan-tools
       unzip
       just
 
-      libinput
       openssh
 
       safe-rm
@@ -371,19 +314,6 @@
       nvd
       nix-diff
       nix-tree
-
-      kubectl
-      # Helm with the commonly-needed plugins baked in (see NixOS wiki: Helm_and_Helmfile).
-      # helm-diff: preview release changes; helm-secrets: manage encrypted values;
-      # helm-git: install charts straight from git refs.
-      (wrapHelm kubernetes-helm {
-        plugins = with kubernetes-helmPlugins; [
-          helm-diff
-          helm-secrets
-          helm-git
-        ];
-      })
-      adwaita-fonts
     ];
 
   };

@@ -48,12 +48,13 @@ lib/wrappers.nix     package wrappers (pure functions of pkgs)
 hosts/<host>/        NixOS entry point: feature flags, hardware, disko, displays, host facts
 nixos/               NixOS modules, all imported by nixos/default.nix
   core/              baseline for every host (always on; boot loader, users, nix, network)
-  desktop/           niri.nix (niri + DMS greeter) or gnome.nix (GDM, optional RDP), on top of common.nix and fonts.nix
+  desktop/           niri.nix (niri + DMS greeter, on top of common.nix) or gnome.nix (GDM, optional RDP); both add fonts.nix
   hardware/          asus, bluetooth, nvidia-hybrid
   services/          jellyfin, nix-ld, openssh (key-only), virtualisation
 home/                Home Manager modules, all imported by home/default.nix
-  desktop/           niri.nix session, dms.nix shell, common.nix GUI apps
-users/<user>/        Home Manager profile; users/<user>/<host>/ adds host-specific bits
+  desktop/           niri.nix session, dms.nix shell, common.nix GUI base (browser, terminal, editor, theming)
+  cli.nix dev.nix ai.nix   shell + LazyVim; Kubernetes + Copilot CLI; other AI CLIs
+users/<user>/        Home Manager profile; users/<user>/<host>/ adds host-specific bits and personal app picks
 overlays/            package fixes: default.nix is global, others are host-scoped via the registry
 ```
 
@@ -94,9 +95,10 @@ Flake inputs reach only `flake.nix`, the two aggregators it binds (`home/default
 ```
 
 Host profiles receive `{ inputs, hostname }`; take `{ inputs, ... }` or `{ ... }`.
-Ahmed's profile adds SOPS and AI rules and enables `cli`/`ssh` everywhere; his laptop
-profile enables the niri desktop and Flatpak, so a headless host reuses the user
-profile without a desktop.
+Ahmed's profile adds SOPS and AI rules and enables `cli`/`dev`/`ssh` everywhere. Shared
+`home/` modules hold features and setup; personal app picks live in host profiles: the laptop
+profile enables niri, Flatpak and `ai` and lists its apps, the home-server profile adds only
+VS Code (GNOME over RDP).
 
 Feature modules (`home/`, `nixos/`) use `config`, `lib`, and `pkgs`, not
 `inputs` or the registry. Use `config.home.homeDirectory` for home paths in Home

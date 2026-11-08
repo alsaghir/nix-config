@@ -32,7 +32,6 @@
           identityFile = "~/.ssh/id_ed25519";
           addKeysToAgent = "yes";
           identitiesOnly = true;
-          user = "git";
         };
       };
     };

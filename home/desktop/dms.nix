@@ -289,7 +289,7 @@ in
     };
 
     home.packages = with pkgs; [
-      # Desktop apps GNOME used to provide (image viewer: nomacs, in home/desktop/common.nix).
+      # Desktop apps GNOME used to provide (image viewer: nomacs, in users/ahmed/asus-laptop/default.nix).
       nautilus # file manager + portal file chooser (programs.niri.useNautilus in nixos/desktop/niri.nix)
       file-roller # archives; Nautilus "Extract"/"Compress"
       papers # PDF viewer (also its own PDF thumbnailer)

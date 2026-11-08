@@ -17,6 +17,13 @@ creation_rules:
           - *ahmed_asus_laptop
           - *ahmed_home_server
 
+  # ahmed@home-server: the server's ahmed key decrypts, the laptop key edits
+  - path_regex: users/ahmed/home-server/[^/]+\.yaml$
+    key_groups:
+      - age:
+          - *ahmed_asus_laptop
+          - *ahmed_home_server
+
   # ahmed@<host> and other users' secrets: laptop key only (edited there)
   - path_regex: users/.*\.yaml$
     key_groups:

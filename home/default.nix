@@ -14,7 +14,9 @@
     inputs.nix-flatpak.homeManagerModules.nix-flatpak
 
     ./justfile.nix
+    ./ai.nix
     ./cli.nix
+    ./dev.nix
     ./flatpak.nix
     ./ssh.nix
     ./desktop/common.nix

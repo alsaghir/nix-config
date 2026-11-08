@@ -5,7 +5,7 @@
   ...
 }:
 {
-  options.nixConfig.flatpak.enable = lib.mkEnableOption "declarative Flatpak apps";
+  options.nixConfig.flatpak.enable = lib.mkEnableOption "declarative Flatpak (remotes, overrides, background install)";
 
   config = lib.mkIf config.nixConfig.flatpak.enable {
 
@@ -21,16 +21,7 @@
         }
       ];
 
-      # Sample application: Firefox (choose one that you do NOT already install via nixpkgs
-      # if you want Flatpak auto-update behavior).
-      packages = [
-        "com.getpostman.Postman"
-        "com.github.IsmaelMartinez.teams_for_linux"
-        "com.github.tchx84.Flatseal"
-
-        # You can mix forms:
-        # { appId = "com.brave.Browser"; origin = "flathub"; }
-      ];
+      # Apps: services.flatpak.packages in the user profiles (e.g. users/ahmed/asus-laptop).
 
       update = {
         onActivation = false;

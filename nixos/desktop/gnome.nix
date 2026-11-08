@@ -1,4 +1,4 @@
-# GNOME (GDM + GNOME Shell) on top of desktop/common.nix; optional headless RDP login.
+# GNOME (GDM + GNOME Shell) with desktop/fonts.nix; optional headless RDP login.
 #
 # Remote desktop (remoteDesktop.enable): GDM's system-level RDP server on port 3389, which
 # shows the login screen and starts a GNOME session per connection (no monitor or local login
@@ -33,7 +33,9 @@ in
   config = lib.mkIf cfg.enable (
     lib.mkMerge [
       {
-        nixConfig.desktop.common.enable = lib.mkDefault true;
+        # GNOME brings its own input method, gvfs, udisks2 and fonts; skip the niri-oriented
+        # desktop/common.nix base (Flatpak, JACK low-latency audio). Add our font picks only.
+        nixConfig.desktop.fonts.enable = lib.mkDefault true;
 
         services.displayManager.gdm.enable = true;
         services.desktopManager.gnome.enable = true;
