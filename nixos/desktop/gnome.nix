@@ -2,32 +2,43 @@
 #
 # Remote desktop (remoteDesktop.enable): GDM's system-level RDP server on port 3389, which
 # shows the login screen and starts a GNOME session per connection (no monitor or local login
-# needed). Credentials and TLS certificate are runtime state, kept out of Nix (public repo).
-# One-time setup on the host:
-#   d=/var/lib/gnome-remote-desktop/.local/share/gnome-remote-desktop
-#   sudo -u gnome-remote-desktop mkdir -p $d
-#   sudo -u gnome-remote-desktop openssl req -new -newkey rsa:4096 -days 3650 -nodes -x509 \
-#     -subj "/CN=$(hostname)" -keyout $d/rdp-tls.key -out $d/rdp-tls.crt
-#   sudo grdctl --system rdp set-tls-key  $d/rdp-tls.key
-#   sudo grdctl --system rdp set-tls-cert $d/rdp-tls.crt
-#   sudo grdctl --system rdp set-credentials <rdp-user> <rdp-password>   # RDP gate, not a login
-#   sudo grdctl --system rdp enable
-#   sudo systemctl restart gnome-remote-desktop
-#   sudo grdctl --system status
+# needed). Fully declarative (gnome-remote-desktop 50.x, read from its source):
+#   settings     /etc/gnome-remote-desktop/grd.conf, [RDP] enabled/port/tls-cert/tls-key
+#   credentials  without a TPM (the TPM backend is tried first) the daemon reads
+#                ~gnome-remote-desktop/.local/share/gnome-remote-desktop/credentials.ini:
+#                [RDP] credentials=<GVariant a{sv} with 'username' and 'password'>
+# Both come from remoteDesktop.sopsFile (decrypted with the host SSH key), keys:
+#   rdp_username, rdp_password  RDP gate, not a login (GDM asks for the account afterwards);
+#                               no ' or \ in them (they are quoted into a GVariant string)
+#   rdp_tls_cert, rdp_tls_key   self-signed; stable across reinstalls, so clients trust it once
+# grdctl --system changes don't persist: grd.conf is read-only, credentials are re-rendered.
 # Client: RDP to <host>:3389 (Remmina / Windows mstsc), pass the RDP gate, then log in at GDM.
 {
   config,
   lib,
-  pkgs,
   ...
 }:
 let
   cfg = config.nixConfig.desktop.gnome;
+  grdHome = config.users.users.gnome-remote-desktop.home;
+  grdData = "${grdHome}/.local/share/gnome-remote-desktop";
+  restartUnits = [ "gnome-remote-desktop.service" ];
+  grdSecret = {
+    inherit (cfg.remoteDesktop) sopsFile;
+    owner = "gnome-remote-desktop";
+    inherit restartUnits;
+  };
 in
 {
   options.nixConfig.desktop.gnome = {
     enable = lib.mkEnableOption "the GNOME desktop with GDM";
-    remoteDesktop.enable = lib.mkEnableOption "headless RDP login to GNOME (gnome-remote-desktop, system mode)";
+    remoteDesktop = {
+      enable = lib.mkEnableOption "headless RDP login to GNOME (gnome-remote-desktop, system mode)";
+      sopsFile = lib.mkOption {
+        type = lib.types.path;
+        description = "SOPS file with rdp_username, rdp_password, rdp_tls_cert, rdp_tls_key (see header).";
+      };
+    };
   };
 
   config = lib.mkIf cfg.enable (
@@ -45,7 +56,50 @@ in
         # System-mode daemon (RDP at the GDM login screen) is not started by default.
         systemd.services.gnome-remote-desktop.wantedBy = [ "graphical.target" ];
         networking.firewall.allowedTCPPorts = [ 3389 ];
-        environment.systemPackages = [ pkgs.openssl ]; # one-time TLS certificate (header)
+
+        sops.secrets = {
+          rdp_username.sopsFile = cfg.remoteDesktop.sopsFile;
+          rdp_password.sopsFile = cfg.remoteDesktop.sopsFile;
+          rdp_tls_cert = grdSecret;
+          rdp_tls_key = grdSecret;
+        };
+
+        sops.templates."grd-credentials.ini" = {
+          owner = "gnome-remote-desktop";
+          path = "${grdData}/credentials.ini";
+          inherit restartUnits;
+          content = ''
+            [RDP]
+            credentials={'username': <'${config.sops.placeholder.rdp_username}'>, 'password': <'${config.sops.placeholder.rdp_password}'>}
+          '';
+        };
+
+        environment.etc."gnome-remote-desktop/grd.conf".text = ''
+          [RDP]
+          enabled=true
+          port=3389
+          tls-cert=${config.sops.secrets.rdp_tls_cert.path}
+          tls-key=${config.sops.secrets.rdp_tls_key.path}
+        '';
+
+        # sops-nix creates the template's parent directories as root; hand them to the daemon.
+        systemd.tmpfiles.settings."10-gnome-remote-desktop" = {
+          "${grdHome}/.local".d = {
+            user = "gnome-remote-desktop";
+            group = "gnome-remote-desktop";
+            mode = "0700";
+          };
+          "${grdHome}/.local/share".d = {
+            user = "gnome-remote-desktop";
+            group = "gnome-remote-desktop";
+            mode = "0700";
+          };
+          "${grdData}".d = {
+            user = "gnome-remote-desktop";
+            group = "gnome-remote-desktop";
+            mode = "0700";
+          };
+        };
       })
     ]
   );

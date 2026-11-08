@@ -14,7 +14,10 @@
     core.boot.loader = "grub-bios";
     desktop.gnome = {
       enable = true;
-      remoteDesktop.enable = true;
+      remoteDesktop = {
+        enable = true;
+        sopsFile = ./rdp.yaml;
+      };
     };
     services.openssh.enable = true;
   };

@@ -1,6 +1,7 @@
 {
   nixpkgs,
   home-manager,
+  sops-nix,
   system,
 }:
 let
@@ -86,6 +87,7 @@ let
     inputs = { };
     self.rev = "composition-test";
     sharedModules = [
+      sops-nix.nixosModules.sops # mirrors flake.nix; nixos/ modules set sops.* options
       ../nixos
       (lib.modules.importApply ../nixos/core/flake-pinning.nix {
         inputs = {

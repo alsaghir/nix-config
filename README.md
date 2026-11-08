@@ -48,7 +48,7 @@ lib/wrappers.nix     package wrappers (pure functions of pkgs)
 hosts/<host>/        NixOS entry point: feature flags, hardware, disko, displays, host facts
 nixos/               NixOS modules, all imported by nixos/default.nix
   core/              baseline for every host (always on; boot loader, users, nix, network)
-  desktop/           niri.nix (niri + DMS greeter, on top of common.nix) or gnome.nix (GDM, optional RDP); both add fonts.nix
+  desktop/           niri.nix (niri + DMS greeter, on top of common.nix) or gnome.nix (GDM, optional declarative RDP via sops); both add fonts.nix
   hardware/          asus, bluetooth, nvidia-hybrid
   services/          jellyfin, nix-ld, openssh (key-only), virtualisation
 home/                Home Manager modules, all imported by home/default.nix

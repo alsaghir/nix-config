@@ -85,6 +85,7 @@
         # Every host gets these; hosts/<host>/default.nix enables features (nixConfig.*.enable).
         sharedModules = [
           inputs.disko.nixosModules.disko
+          inputs.sops-nix.nixosModules.sops
           ./nixos
           (nixpkgs.lib.modules.importApply ./nixos/core/flake-pinning.nix { inherit inputs; })
         ];
@@ -103,7 +104,7 @@
       checks = forAllSystems (system: {
         composition = import ./tests/composition.nix {
           inherit system nixpkgs;
-          inherit (inputs) home-manager;
+          inherit (inputs) home-manager sops-nix;
         };
       });
 
