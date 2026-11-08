@@ -53,8 +53,13 @@ in
       }
       (lib.mkIf cfg.remoteDesktop.enable {
         services.gnome.gnome-remote-desktop.enable = true;
-        # System-mode daemon (RDP at the GDM login screen) is not started by default.
-        systemd.services.gnome-remote-desktop.wantedBy = [ "graphical.target" ];
+        systemd.services.gnome-remote-desktop = {
+          # System-mode daemon (RDP at the GDM login screen) is not started by default.
+          wantedBy = [ "graphical.target" ];
+          # The daemon only watches config files that existed at startup, and sops-nix skips
+          # restartUnits on the first activation that creates /run/secrets: restart on change.
+          restartTriggers = [ config.environment.etc."gnome-remote-desktop/grd.conf".source ];
+        };
         networking.firewall.allowedTCPPorts = [ 3389 ];
 
         sops.secrets = {
