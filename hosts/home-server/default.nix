@@ -34,5 +34,8 @@
 
   zramSwap.enable = true;
 
+  # TEMP (NTFS -> btrfs data-drive migration): lets the agent run sudo over SSH. Revert after.
+  security.sudo.wheelNeedsPassword = false;
+
   system.stateVersion = "26.11";
 }
