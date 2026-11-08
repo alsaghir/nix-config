@@ -21,5 +21,9 @@ in
     };
 
     users.users.root.openssh.authorizedKeys.keys = primaryUser.sshAuthorizedKeys;
+
+    # Clients send their own TERM (ghostty: xterm-ghostty); without its terminfo zsh's line
+    # editor can't redraw, so autosuggestions/highlighting echo stray characters.
+    environment.enableAllTerminfo = true;
   };
 }
