@@ -13,6 +13,11 @@
 #   rdp_tls_cert, rdp_tls_key   self-signed; stable across reinstalls, so clients trust it once
 # grdctl --system changes don't persist: grd.conf is read-only, credentials are re-rendered.
 # Client: RDP to <host>:3389 (Remmina / Windows mstsc), pass the RDP gate, then log in at GDM.
+# Closing the client keeps the session for reconnecting, but if the daemon restarts meanwhile
+# (a switch that changes its unit) the session can't be reclaimed (grd 50: the handover runs as
+# a user service, outside the session): GDM accepts the password and returns to the login
+# screen. Log out before such a switch, or end the orphan: `loginctl list-sessions`, then
+# `loginctl terminate-session <id>` for your session without a TTY.
 {
   config,
   lib,

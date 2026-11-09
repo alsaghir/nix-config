@@ -157,7 +157,7 @@ assert
     && systemConfig.config.services.jellyfin.enable
     &&
       systemConfig.config.systemd.services.jellyfin.serviceConfig.BindReadOnlyPaths
-      == [ "/srv/movies:/media/movies" ]
+      == [ "\"/srv/movies:/media/movies\"" ]
     && builtins.attrNames systemConfig.config.nix.registry == [ "nixpkgs" ]
     && systemConfig.config.nix.nixPath == [ "nixpkgs=flake:nixpkgs" ]
   );

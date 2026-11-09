@@ -32,10 +32,14 @@ in
       openFirewall = true;
     };
 
-    # Media is bind-mounted read-only into the service's own mount namespace.
-    systemd.services.jellyfin.serviceConfig = {
-      ProtectHome = true;
-      BindReadOnlyPaths = lib.mapAttrsToList (name: path: "${path}:/media/${name}") cfg.mediaDirs;
+    # Media is bind-mounted read-only into the service's own mount namespace. Entries are quoted
+    # so paths may contain spaces; RequiresMountsFor waits for the (nofail) disks holding them.
+    systemd.services.jellyfin = {
+      unitConfig.RequiresMountsFor = map (path: ''"${path}"'') (lib.attrValues cfg.mediaDirs);
+      serviceConfig = {
+        ProtectHome = true;
+        BindReadOnlyPaths = lib.mapAttrsToList (name: path: ''"${path}:/media/${name}"'') cfg.mediaDirs;
+      };
     };
 
     # GPU access for hardware transcoding
