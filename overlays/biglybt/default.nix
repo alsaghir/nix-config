@@ -1,5 +1,5 @@
 final: prev: rec {
-  swt = prev.swt.overrideAttrs (old: {
+  swt = prev.swt.overrideAttrs {
     preConfigure = ''
       # Check if file exists before patching
       if [[ -f library/make_linux.mak ]]; then
@@ -7,7 +7,7 @@ final: prev: rec {
           --replace "-Werror" ""
       fi
     '';
-  });
+  };
 
   biglybt = prev.biglybt.overrideAttrs (oldAttrs: rec {
     version = "4.1.0.0";

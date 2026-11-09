@@ -3,9 +3,16 @@
 { config, lib, ... }:
 
 let
-
-  aiApiKeysSopsFile = ./ai-keys.yaml;
-
+  # Secret names in ai-keys.yaml; each is exported as its upper-case name (gemini_api_key → GEMINI_API_KEY).
+  aiApiKeys = [
+    "gemini_api_key"
+    "deepseek_api_key"
+    "groq_api_key"
+    "openrouter_api_key"
+    "openai_api_key"
+    "mistral_api_key"
+    "cerebras_api_key"
+  ];
 in
 {
   imports = [
@@ -18,6 +25,7 @@ in
   nixConfig = {
     cli.enable = true;
     dev.enable = true;
+    lazyvim.enable = true;
     ssh.enable = true;
   };
 
@@ -29,46 +37,16 @@ in
   programs.nh.flake = "${config.home.homeDirectory}/Projects/nix-config";
 
   sops = {
-    # or ${config.home.homeDirectory}/.config/sops/age/keys.txt
     age.keyFile = "${config.home.homeDirectory}/.config/sops/age/keys.txt";
 
-    secrets = {
-      # AI API keys
-      "gemini_api_key" = {
-        sopsFile = aiApiKeysSopsFile;
-      };
-      "deepseek_api_key" = {
-        sopsFile = aiApiKeysSopsFile;
-      };
-      "groq_api_key" = {
-        sopsFile = aiApiKeysSopsFile;
-      };
-      "openrouter_api_key" = {
-        sopsFile = aiApiKeysSopsFile;
-      };
-      "openai_api_key" = {
-        sopsFile = aiApiKeysSopsFile;
-      };
-      "mistral_api_key" = {
-        sopsFile = aiApiKeysSopsFile;
-      };
-      "cerebras_api_key" = {
-        sopsFile = aiApiKeysSopsFile;
-      };
-    };
+    secrets = lib.genAttrs aiApiKeys (_: {
+      sopsFile = ./ai-keys.yaml;
+    });
 
-    templates."ai-env" = {
-      content = ''
-        GEMINI_API_KEY=${config.sops.placeholder.gemini_api_key}
-        DEEPSEEK_API_KEY=${config.sops.placeholder.deepseek_api_key}
-        GROQ_API_KEY=${config.sops.placeholder.groq_api_key}
-        OPENROUTER_API_KEY=${config.sops.placeholder.openrouter_api_key}
-        OPENAI_API_KEY=${config.sops.placeholder.openai_api_key}
-        MISTRAL_API_KEY=${config.sops.placeholder.mistral_api_key}
-        CEREBRAS_API_KEY=${config.sops.placeholder.cerebras_api_key}
-      '';
-    };
-
+    # KEY_NAME=value per line; sourced by zsh (home/cli.nix) via AI_ENV_FILE.
+    templates."ai-env".content = lib.concatMapStrings (
+      key: "${lib.toUpper key}=${config.sops.placeholder.${key}}\n"
+    ) aiApiKeys;
   };
 
   home.sessionVariables.AI_ENV_FILE = config.sops.templates."ai-env".path;

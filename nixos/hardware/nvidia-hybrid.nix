@@ -6,8 +6,8 @@
 }:
 let
 
-  # https://gitlab.gnome.org/GNOME/gnome-settings-daemon/-/issues/903#note_2619256
-  # TODO temp fix to prevent auto suspend after waking up
+  # Workaround: without these hooks the machine re-suspends right after resume.
+  # Drop once fixed upstream: https://gitlab.gnome.org/GNOME/gnome-settings-daemon/-/issues/903#note_2619256
   nvidiaSuspendCondition = {
     ConditionPathExists = "/proc/driver/nvidia/suspend";
   };

@@ -50,7 +50,7 @@ let
     let
       jdk = pkgs.jetbrains.jdk;
       gradle = pkgs.gradle_9;
-      chromium = pkgs.chromium;
+      inherit (pkgs) chromium;
 
       libPath = pkgs.lib.makeLibraryPath (
         with pkgs;
@@ -134,7 +134,7 @@ let
     let
       jdk = pkgs.jetbrains.jdk;
       gradle = pkgs.gradle_9;
-      maven = pkgs.maven;
+      inherit (pkgs) maven;
 
       libPath = pkgs.lib.makeLibraryPath (
         with pkgs;

@@ -18,6 +18,7 @@
     ./cli.nix
     ./dev.nix
     ./flatpak.nix
+    ./lazyvim.nix
     ./ssh.nix
     ./desktop/common.nix
     (inputs.nixpkgs.lib.modules.importApply ./desktop/dms.nix {

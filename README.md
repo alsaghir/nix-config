@@ -53,7 +53,8 @@ nixos/               NixOS modules, all imported by nixos/default.nix
   services/          jellyfin, nix-ld, openssh (key-only), virtualisation
 home/                Home Manager modules, all imported by home/default.nix
   desktop/           niri.nix session, dms.nix shell, common.nix GUI base (browser, terminal, editor, theming)
-  cli.nix dev.nix ai.nix   shell + LazyVim; Kubernetes + Copilot CLI; other AI CLIs
+  cli.nix lazyvim.nix  shell + CLI tools; LazyVim with Nix-provided LSPs/formatters
+  dev.nix ai.nix       Kubernetes + Copilot CLI; other AI CLIs
 users/<user>/        Home Manager profile; users/<user>/<host>/ adds host-specific bits and personal app picks
 overlays/            package fixes: default.nix is global, others are host-scoped via the registry
 ```
