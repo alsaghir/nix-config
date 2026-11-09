@@ -18,6 +18,8 @@
 # a user service, outside the session): GDM accepts the password and returns to the login
 # screen. Log out before such a switch, or end the orphan: `loginctl list-sessions`, then
 # `loginctl terminate-session <id>` for your session without a TTY.
+# one line per ahmed session: id, service, type
+# loginctl list-sessions --no-legend | while read s u n rest; do [ "$n" = ahmed ] && echo "$s $(loginctl show-session $s -p Service -p Type --value | tr '\n' ' ')"; done
 {
   config,
   lib,

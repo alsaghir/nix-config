@@ -52,7 +52,7 @@ nixos/               NixOS modules, all imported by nixos/default.nix
   hardware/          asus, bluetooth, nvidia-hybrid
   services/          jellyfin, nix-ld, openssh (key-only), virtualisation
 home/                Home Manager modules, all imported by home/default.nix
-  desktop/           niri.nix session, dms.nix shell, common.nix GUI base (browser, terminal, editor, theming)
+  desktop/           niri.nix session, dms.nix shell, gnome.nix GNOME dconf + extensions, common.nix GUI base (browser, terminal, editor, theming)
   cli.nix lazyvim.nix  shell + CLI tools; LazyVim with Nix-provided LSPs/formatters
   dev.nix ai.nix       Kubernetes + Copilot CLI; other AI CLIs
 users/<user>/        Home Manager profile; users/<user>/<host>/ adds host-specific bits and personal app picks

@@ -6,6 +6,8 @@ let
   sshKeysSopsFile = ./ssh-keys.yaml;
 in
 {
+  nixConfig.desktop.gnome.enable = true;
+
   programs.vscode.enable = true;
 
   # Age key: sops.age.keyFile in ../default.nix

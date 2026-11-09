@@ -21,6 +21,7 @@
     ./lazyvim.nix
     ./ssh.nix
     ./desktop/common.nix
+    ./desktop/gnome.nix
     (inputs.nixpkgs.lib.modules.importApply ./desktop/dms.nix {
       pluginRegistry = inputs.dms-plugin-registry;
       qt6ctKdeAur = inputs.qt6ct-kde-aur;
