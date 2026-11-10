@@ -91,7 +91,6 @@ in
     jetbrains-toolbox
     proton-vpn
     github-copilot-app
-    stamp
 
     # GPU / input diagnostics
     mesa-demos
