@@ -304,6 +304,7 @@ in
       nirimod
       xwayland-satellite
       gnome-tecla
+      gnome-calculator
     ];
 
   };
