@@ -28,7 +28,6 @@
       alsa.enable = true;
       alsa.support32Bit = true;
       pulse.enable = true;
-      jack.enable = true;
       # Optional low-latency tuning; remove if undesired
       extraConfig.pipewire."92-low-latency" = {
         "context.properties" = {
