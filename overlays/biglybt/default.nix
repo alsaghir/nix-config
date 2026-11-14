@@ -14,7 +14,7 @@ final: prev: rec {
 
     src = prev.fetchurl {
       url = "https://github.com/BiglySoftware/BiglyBT/releases/download/v${version}/GitHub_BiglyBT_unix.tar.gz";
-      hash = "sha256-J61AgH9WnkUunqWsYKU/hyH569QobJqh9M3lBpxCcAk=";
+      hash = "sha256-P9CscKANZUZd49tPelT8fZVVaf5P5CKnq5eAbE7H6eU=";
     };
 
     jdk25 = prev.fetchurl {
