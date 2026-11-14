@@ -17,7 +17,10 @@
 {
   writeShellApplication,
   coreutils,
+  curl,
+  findutils,
   git,
+  gnused,
   jq,
   sops,
 }:
@@ -29,7 +32,10 @@ writeShellApplication {
   # nix and ssh are the caller's (installed Nix, system ssh), not pinned here.
   runtimeInputs = [
     coreutils
+    curl
+    findutils
     git
+    gnused
     jq
     sops
   ];
@@ -74,12 +80,21 @@ writeShellApplication {
 
     $push || exit 0
 
-    # Command substitutions (not <(...)) so a failing nix aborts the script.
+    # Command substitutions (not <(...)) so a failing command aborts the script.
     closure=$(xargs nix path-info --recursive --json --json-format 1 <<<"$outputs")
     mapfile -t candidates < <(jq -r 'to_entries[] | select(.value.ca == null) | .key' <<<"$closure")
-    # Paths missing upstream are null; stderr lists them as "don't know how to build".
-    upstream=$(nix path-info --json --json-format 1 --store https://cache.nixos.org "''${candidates[@]}" 2>/dev/null)
-    mapfile -t upload < <(jq -r 'to_entries[] | select(.value == null) | .key' <<<"$upstream")
+    # One narinfo lookup per path, 32 in parallel (`nix path-info --store` asks one at a
+    # time); 200 = upstream has it, 404 = upload it, anything else aborts.
+    # shellcheck disable=SC2016 # $1 etc. belong to the inner sh
+    missing=$(printf '%s\n' "''${candidates[@]}" | xargs -P 32 -n 1 sh -c '
+      hash=$(basename "$1" | cut -d- -f1)
+      code=$(curl -s -o /dev/null -w "%{http_code}" --retry 3 "https://cache.nixos.org/$hash.narinfo")
+      case "$code" in
+        200) ;;
+        404) echo "$1" ;;
+        *) echo "ci: cache.nixos.org answered $code for $1" >&2; exit 255 ;;
+      esac' _)
+    mapfile -t upload < <(sort <<<"$missing" | sed '/^$/d')
     echo "ci: uploading ''${#upload[@]} of ''${#candidates[@]} closure paths (the rest are on cache.nixos.org)"
 
     if [ "''${#upload[@]}" -gt 0 ]; then
