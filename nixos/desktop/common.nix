@@ -1,11 +1,20 @@
 # Compositor-agnostic desktop base: audio, input, removable media, Flatpak, fonts.
 # Enabled by each desktop (nixos/desktop/niri.nix, …), rarely by hosts directly.
-{ config, lib, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 {
   options.nixConfig.desktop.common.enable = lib.mkEnableOption "the compositor-agnostic desktop base";
 
   config = lib.mkIf config.nixConfig.desktop.common.enable {
     nixConfig.desktop.fonts.enable = lib.mkDefault true;
+
+    # NetworkManager VPN plugins are opt-in (no defaults since nixpkgs dropped
+    # enableDefaultPlugins); OpenVPN for importing .ovpn files / Proton's OpenVPN protocol.
+    networking.networkmanager.plugins = [ pkgs.networkmanager-openvpn ];
 
     i18n.inputMethod = {
       enable = true;

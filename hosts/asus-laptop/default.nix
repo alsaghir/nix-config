@@ -30,6 +30,8 @@
 
   programs.steam.enable = true;
   services.printing.enable = true;
+  # VPN daemon + warp-cli; GUI: "Cloudflare WARP" launcher (warp-taskbar tray icon)
+  services.cloudflare-warp.enable = true;
 
   # System sops identity: no SSH host key here (openssh is off), so system secrets use the
   # primary user's age key (ahmed_asus_laptop in .sops.yaml); root reads it at activation.
