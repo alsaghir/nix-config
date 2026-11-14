@@ -1,22 +1,17 @@
-# Binary cache filled by CI (.github/workflows/build.yml): paths CI built that are not on
-# cache.nixos.org (overlays, kernel modules, generated configs). The bucket is private, so
-# the nix-daemon (which substitutes) gets a read-only Backblaze B2 key as AWS_* variables
-# from ./binary-cache.yaml. Without the secret the substituter fails and Nix builds locally.
+# Binary cache filled by `nix run .#ci` (ci/default.nix): paths not on cache.nixos.org
+# (overlays, kernel modules, generated configs). The bucket is private, so the nix-daemon
+# (which substitutes) gets a read-only Backblaze B2 key as AWS_* variables from
+# ./binary-cache.yaml. Without the secret the substituter fails and Nix builds locally.
 { config, ... }:
 let
-  # Same bucket as the workflow's push step.
-  bucket = "nixosstorage";
-  endpoint = "s3.us-east-005.backblazeb2.com";
-  region = "us-east-005";
-  # Public half of the CI signing key (private half: .github/secrets.yaml cache_signing_key).
-  publicKey = "nixosstorage-1:G6XSw2yUEHJScdABPIm0DGXwLmKLpVOrr1G/KbOlkMQ=";
+  cache = import ../../lib/binary-cache.nix;
 in
 {
   nix.settings = {
     # Priority 60 (cache.nixos.org is 40): only paths missing upstream are looked up here,
     # which keeps B2 transactions within the free daily allowance.
-    substituters = [ "s3://${bucket}?endpoint=${endpoint}&region=${region}&priority=60" ];
-    trusted-public-keys = [ publicKey ];
+    substituters = [ "${cache.url}&priority=60" ];
+    trusted-public-keys = [ cache.publicKey ];
   };
 
   sops.secrets = {

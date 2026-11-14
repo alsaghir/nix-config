@@ -1,8 +1,8 @@
-# Builds every NixOS and Home Manager configuration and pushes what Nix had to build
-# (not what it downloaded from cache.nixos.org) to the Backblaze B2 binary cache
+# Runs `nix run .#ci` (ci/default.nix): checks and builds every NixOS and Home Manager
+# configuration and uploads what is not on cache.nixos.org to the Backblaze B2 binary cache
 # (nixos/core/binary-cache.nix), so hosts download those paths instead of building them.
-# Weekly, it also updates flake.lock and commits it to main only after everything built
-# and was pushed.
+# Weekly, it also updates flake.lock and commits it to main only after everything built and
+# was uploaded. The same command runs locally; this file only bootstraps the runner.
 #
 # Secrets live in .github/secrets.yaml (sops); the only GitHub secret is SOPS_AGE_KEY,
 # the CI age identity (ci_github in .sops.yaml).
@@ -34,100 +34,38 @@ jobs:
     permissions:
       contents: write # push the updated flake.lock
     env:
+      SOPS_AGE_KEY: ${{ secrets.SOPS_AGE_KEY }}
       UPDATE_LOCK: ${{ github.ref == 'refs/heads/main' && (github.event_name == 'schedule' || inputs.update-lock) }}
       PUSH_CACHE: ${{ github.event_name != 'pull_request' }}
-      # Same bucket as nixos/core/binary-cache.nix.
-      CACHE_STORE: s3://nixosstorage?endpoint=s3.us-east-005.backblazeb2.com&region=us-east-005
     steps:
       - uses: actions/checkout@v7
         with:
           fetch-depth: 0 # full history, so self.rev (system.configurationRevision) matches a local clone
 
-      # Runs in the nix-daemon after every build (never for substituted paths) and records
-      # the outputs in $RUNNER_TEMP/built-paths. Fixed-output derivations (sources, e.g. the
-      # NVIDIA .run file) are skipped: hosts that substitute the built package never need them.
-      - name: Install post-build hook
-        run: |
-          cat > "$RUNNER_TEMP/post-build-hook" <<EOF
-          #!/bin/sh
-          set -eu
-          if /nix/var/nix/profiles/default/bin/nix-store --query --binding outputHash "\$DRV_PATH" >/dev/null 2>&1; then
-            exit 0
-          fi
-          printf '%s\n' \$OUT_PATHS >> "$RUNNER_TEMP/built-paths"
-          EOF
-          chmod +x "$RUNNER_TEMP/post-build-hook"
-
       - uses: cachix/install-nix-action@v31
-        with:
-          extra_nix_config: |
-            post-build-hook = ${{ runner.temp }}/post-build-hook
 
-      # sops from the locked nixpkgs (not the flake itself: evaluating it needs ai-rules,
-      # whose deploy key is one of these secrets).
-      - name: Load secrets
-        env:
-          SOPS_AGE_KEY: ${{ secrets.SOPS_AGE_KEY }}
-        run: |
-          rev=$(jq -r '.nodes[.nodes.root.inputs.nixpkgs].locked.rev' flake.lock)
-          nix shell "github:NixOS/nixpkgs/$rev#sops" -c \
-            sops decrypt --output-type json .github/secrets.yaml > "$RUNNER_TEMP/secrets.json"
-          jq -r '.b2_key_id, .b2_application_key' "$RUNNER_TEMP/secrets.json" | sed 's/^/::add-mask::/'
-
-      # Private git+ssh input (ai-rules): read-only deploy key. GitHub's host key is the one
-      # pinned in nixos/core/networking.nix.
+      # Private git+ssh input (ai-rules): read-only deploy key from .github/secrets.yaml, via
+      # sops from the locked nixpkgs (the flake itself cannot be evaluated before this).
+      # GitHub's host key is the one pinned in nixos/core/networking.nix.
       - name: Start ssh-agent
         run: |
           eval "$(ssh-agent -s)"
-          jq -r .ai_rules_deploy_key "$RUNNER_TEMP/secrets.json" | ssh-add -
+          rev=$(jq -r '.nodes[.nodes.root.inputs.nixpkgs].locked.rev' flake.lock)
+          nix shell "github:NixOS/nixpkgs/$rev#sops" -c \
+            sops decrypt --extract '["ai_rules_deploy_key"]' .github/secrets.yaml | ssh-add -
           echo "SSH_AUTH_SOCK=$SSH_AUTH_SOCK" >> "$GITHUB_ENV"
           echo "SSH_AGENT_PID=$SSH_AGENT_PID" >> "$GITHUB_ENV"
           mkdir -p ~/.ssh
           echo "github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl" >> ~/.ssh/known_hosts
 
-      - name: Update flake.lock
-        if: env.UPDATE_LOCK == 'true'
+      - name: Run ci
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          nix flake update --commit-lock-file
-
-      - name: Check
-        run: nix flake check
-
-      # Every registry host and user@host; nothing to edit here when one is added.
-      - name: Build all configurations
-        run: |
-          targets=()
-          for host in $(nix eval --json .#nixosConfigurations --apply builtins.attrNames | jq -r '.[]'); do
-            targets+=(".#nixosConfigurations.$host.config.system.build.toplevel")
-          done
-          for home in $(nix eval --json .#homeConfigurations --apply builtins.attrNames | jq -r '.[]'); do
-            targets+=(".#homeConfigurations.\"$home\".activationPackage")
-          done
-          nix build --no-link "${targets[@]}"
-
-      # nix copy skips paths already in the bucket; --no-recursive because the rest of each
-      # closure is on cache.nixos.org.
-      - name: Push to binary cache
-        if: env.PUSH_CACHE == 'true'
-        run: |
-          built="$RUNNER_TEMP/built-paths"
-          if [ ! -s "$built" ]; then
-            echo "Nothing was built; nothing to push."
-            exit 0
+          args=()
+          if [ "$UPDATE_LOCK" = true ]; then
+            args+=(--update-lock)
+          elif [ "$PUSH_CACHE" = true ]; then
+            args+=(--push)
           fi
-          secrets="$RUNNER_TEMP/secrets.json"
-          key="$RUNNER_TEMP/cache-signing-key"
-          jq -j .cache_signing_key "$secrets" > "$key"
-          AWS_ACCESS_KEY_ID=$(jq -r .b2_key_id "$secrets") \
-          AWS_SECRET_ACCESS_KEY=$(jq -r .b2_application_key "$secrets") \
-            xargs nix copy --no-recursive --to "$CACHE_STORE&compression=zstd&secret-key=$key" < <(sort -u "$built")
-
-      - name: Push flake.lock
-        if: env.UPDATE_LOCK == 'true'
-        run: git push origin HEAD:main
-
-      - name: Remove secrets
-        if: always()
-        run: rm -f "$RUNNER_TEMP/secrets.json" "$RUNNER_TEMP/cache-signing-key"
+          nix run .#ci -- "${args[@]}"

@@ -10,10 +10,10 @@ This repository provides a NixOS configuration using flakes. It’s structured t
 
 ## Update inputs
 
-CI (`.github/workflows/build.yml`) updates `flake.lock` every Saturday, builds every host
-and `user@host`, pushes what it built to the binary cache (private Backblaze B2 bucket,
-`nixos/core/binary-cache.nix`), and only then commits the lock to `main`. Hosts download
-those builds instead of compiling them:
+CI (`.github/workflows/build.yml`, running `nix run .#ci`) updates `flake.lock` every
+Saturday, builds every host and `user@host`, uploads what is not on cache.nixos.org to the
+binary cache (private Backblaze B2 bucket, `nixos/core/binary-cache.nix`), and only then
+commits the lock to `main`. Hosts download those builds instead of compiling them:
 
 ```bash
 git pull --ff-only          # just update
@@ -22,14 +22,22 @@ nh os switch                # just rebuild
 
 A local `nix flake update` (`just update-local`) gives a lock CI has not built, so
 everything not on cache.nixos.org is built locally. Run the workflow manually with
-`gh workflow run build -f update-lock=true`.
+`gh workflow run build -f update-lock=true`, or run the same pipeline locally (e.g. during a
+GitHub outage; usage in `ci/default.nix`):
 
-The cache holds only paths CI built (never those on cache.nixos.org, never sources).
+```bash
+nix run .#ci                     # check + build everything, upload nothing
+nix run .#ci -- --push           # ... and upload to the cache
+nix run .#ci -- --update-lock    # the weekly job: update lock, build, upload, commit + push
+```
+
+The cache holds only closure paths that are not on cache.nixos.org and are not sources.
 Secrets, all in sops:
 
-- `.github/secrets.yaml` (CI; recipient `ci_github`, whose private half is the only GitHub
-  secret, `SOPS_AGE_KEY`): `cache_signing_key`, `b2_key_id`/`b2_application_key`
-  (read-write key for the bucket), `ai_rules_deploy_key`.
+- `.github/secrets.yaml` (CI, and `nix run .#ci` locally; recipients `ci_github`, whose
+  private half is the only GitHub secret `SOPS_AGE_KEY`, and the laptop key):
+  `cache_signing_key`, `b2_key_id`/`b2_application_key` (read-write key for the bucket),
+  `ai_rules_deploy_key`.
 - `nixos/core/binary-cache.yaml` (every host): `b2_key_id`/`b2_application_key`
   (read-only key), passed to the nix-daemon.
 
@@ -65,7 +73,9 @@ flake.nix            inputs + outputs; the only place flake inputs are bound (sh
 registry.nix         single source of truth: users, hosts, user↔host assignment, per-host data
 lib/default.nix      builders: registry → nixosConfigurations / homeConfigurations
 lib/{displays,users}.nix   `nixConfig.*` data options the builders fill from the registry
+lib/binary-cache.nix bucket + public key of the binary cache (hosts read it, ci writes it)
 lib/wrappers.nix     package wrappers (pure functions of pkgs)
+ci/                  `nix run .#ci`: the CI pipeline (GitHub Actions runs it; so can any host)
 hosts/<host>/        NixOS entry point: feature flags, hardware, disko, displays, host facts
 nixos/               NixOS modules, all imported by nixos/default.nix
   core/              baseline for every host (always on; boot loader, users, nix, network)

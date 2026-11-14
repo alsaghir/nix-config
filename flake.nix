@@ -101,6 +101,15 @@
 
       formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.nixfmt-tree);
 
+      # `nix run .#ci`: the CI pipeline (usage: ci/default.nix).
+      apps = forAllSystems (system: {
+        ci = {
+          type = "app";
+          program = nixpkgs.lib.getExe (nixpkgs.legacyPackages.${system}.callPackage ./ci { });
+          meta.description = "Check, build every configuration, upload to the binary cache";
+        };
+      });
+
       checks = forAllSystems (system: {
         composition = import ./tests/composition.nix {
           inherit system nixpkgs;
