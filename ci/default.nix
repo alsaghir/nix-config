@@ -13,7 +13,7 @@
 #
 # Upload filter: closure paths that are neither content-addressed (sources and other
 # fixed-output downloads; hosts substitute the built package instead) nor on
-# cache.nixos.org. Re-running resumes: nix copy skips paths already in the bucket.
+# cache.nixos.org. Re-running resumes: paths already in the bucket are skipped.
 {
   writeShellApplication,
   coreutils,
@@ -22,6 +22,7 @@
   git,
   gnused,
   jq,
+  rclone,
   sops,
 }:
 let
@@ -37,6 +38,7 @@ writeShellApplication {
     git
     gnused
     jq
+    rclone
     sops
   ];
   text = ''
@@ -99,17 +101,50 @@ writeShellApplication {
 
     if [ "''${#upload[@]}" -gt 0 ]; then
       secrets=$(sops decrypt --output-type json .github/secrets.yaml)
-      key=$(umask 077 && mktemp)
-      trap 'rm -f "$key"' EXIT
-      jq -j .cache_signing_key <<<"$secrets" >"$key"
-      # Few parallel uploads, patient retries: B2 answers bursts with 503 SlowDown.
-      AWS_ACCESS_KEY_ID=$(jq -r .b2_key_id <<<"$secrets") \
-      AWS_SECRET_ACCESS_KEY=$(jq -r .b2_application_key <<<"$secrets") \
-        nix copy --no-recursive \
-          --option http-connections 4 \
-          --option download-attempts 10 \
-          --to "${cache.url}&compression=zstd&secret-key=$key" \
-          "''${upload[@]}"
+      work=$(umask 077 && mktemp -d)
+      trap 'rm -rf "$work"' EXIT
+      jq -j .cache_signing_key <<<"$secrets" >"$work/key"
+      AWS_ACCESS_KEY_ID=$(jq -r .b2_key_id <<<"$secrets")
+      AWS_SECRET_ACCESS_KEY=$(jq -r .b2_application_key <<<"$secrets")
+      export AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY
+      export RCLONE_CONFIG_B2_TYPE=s3 RCLONE_CONFIG_B2_PROVIDER=Other \
+        RCLONE_CONFIG_B2_ENV_AUTH=true RCLONE_CONFIG_B2_NO_CHECK_BUCKET=true \
+        RCLONE_CONFIG_B2_ENDPOINT=${cache.endpoint} RCLONE_CONFIG_B2_REGION=${cache.region}
+      bucket=b2:${cache.bucket}
+
+      # Resume: drop paths whose narinfo is already in the bucket.
+      have=$(rclone lsf --files-only --include '*.narinfo' "$bucket")
+      mapfile -t upload < <(printf '%s\n' "''${upload[@]}" |
+        grep -v -F -f <(sed -n 's|^\(.*\)\.narinfo$|/nix/store/\1-|p' <<<"$have") || true)
+      echo "ci: ''${#upload[@]} of them are not in the bucket yet"
+    fi
+
+    if [ "''${#upload[@]}" -gt 0 ]; then
+      # A binary cache only accepts a path whose references it already holds, but the
+      # references here mostly live on cache.nixos.org (hosts fetch them from there). So
+      # sign into a local cache seeded with stub narinfos for every other closure path,
+      # then upload only the real files.
+      mkdir "$work/cache"
+      # shellcheck disable=SC2016 # $ARGS is jq's
+      jq -r '
+        ($ARGS.positional | map({(.): true}) | add) as $up
+        | to_entries[] | select($up[.key] | not)
+        | [(.key | ltrimstr("/nix/store/") | .[0:32]), .key, .value.narHash, .value.narSize]
+        | @tsv' --args "''${upload[@]}" <<<"$closure" |
+        while IFS=$'\t' read -r hash path narHash narSize; do
+          printf 'StorePath: %s\nURL: stub\nNarHash: %s\nNarSize: %s\n' \
+            "$path" "$narHash" "$narSize" >"$work/cache/$hash.narinfo"
+        done
+      nix copy --no-recursive \
+        --to "file://$work/cache?compression=zstd&secret-key=$work/key" "''${upload[@]}"
+
+      # NARs before narinfos, so the bucket never advertises a missing NAR. Few parallel
+      # transfers: B2 answers bursts with 503 SlowDown.
+      rclone copy --ignore-existing --transfers 4 "$work/cache/nar" "$bucket/nar"
+      { echo nix-cache-info; for p in "''${upload[@]}"; do
+        echo "$(basename "$p" | cut -c1-32).narinfo"; done; } >"$work/files"
+      rclone copy --ignore-existing --transfers 4 --files-from "$work/files" \
+        "$work/cache" "$bucket"
     fi
 
     if $update_lock; then
