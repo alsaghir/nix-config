@@ -8,8 +8,25 @@ keys:
   - &ahmed_asus_laptop age1uq0vpazn6mjyusj3nvw0xrgkecq8gxdxll9wdemgv97yp7du8ajqel5fly
   - &ahmed_home_server age1usqet4s3uazl4psz6masyws2wcy7tep8sc7yevtatnl4278y3qnqjff9tk
   - &host_home_server age1l0s0x9hg2pyjxzmpdt7cvw3vrtznyfsug9apjfu443c7ztvnja7seepeav
+  # GitHub Actions; private half is the repository secret SOPS_AGE_KEY
+  - &ci_github age1eceluzjvchqnmd25ka75a3kxfg7ms8yl3vemsxmepwknyhdmgpdsduj3dt
 
 creation_rules:
+  # CI secrets (.github/workflows/build.yml): CI decrypts, the laptop key edits
+  - path_regex: \.github/secrets\.yaml$
+    key_groups:
+      - age:
+          - *ahmed_asus_laptop
+          - *ci_github
+
+  # Binary cache read-only credentials, every host (asus-laptop's system sops uses
+  # ahmed_asus_laptop: hosts/asus-laptop/default.nix)
+  - path_regex: nixos/core/binary-cache\.yaml$
+    key_groups:
+      - age:
+          - *ahmed_asus_laptop
+          - *host_home_server
+
   # ahmed's secrets on every host
   - path_regex: users/ahmed/[^/]+\.yaml$
     key_groups:

@@ -35,7 +35,12 @@ in
     disk-usage:
         nix-store --gc --print-dead | du -ch
 
+    # flake.lock is updated by CI (.github/workflows/build.yml), which also fills the binary cache
     update:
+        cd ${flake} && git pull --ff-only
+
+    # Local lock bump: whatever CI has not built yet is built on this machine
+    update-local:
         cd ${flake} && nix flake update
 
     # Update and rebuild

@@ -19,7 +19,7 @@ in
   ];
 
   nixConfig = {
-    ai.enable = true;
+    ai.enable = false;
     desktop.niri.enable = true;
     flatpak.enable = true;
   };
@@ -28,6 +28,7 @@ in
   programs.mpv.enable = true;
   programs.thunderbird.enable = true;
   programs.vesktop.enable = true;
+  programs.gh.enable = true;
 
   services.remmina.enable = true;
   # HM's unit has Requires= but no After=graphical-session.target, so it starts in parallel

@@ -2,6 +2,7 @@
 # nixConfig.core.<file> (e.g. nixConfig.core.boot.loader).
 {
   imports = [
+    ./binary-cache.nix
     ./boot.nix
     ./core.nix
     ./locale.nix

@@ -7,6 +7,10 @@
   nix.settings = {
     eval-cache = true;
     narinfo-cache-negative-ttl = 0;
+    connect-timeout = 5; # was 15
+    stalled-download-timeout = 30; # was 300: a dropped request costs 30 s, not 5 min
+    download-attempts = 3; # was 5
+    http-connections = 10;
     experimental-features = [
       "nix-command"
       "flakes"

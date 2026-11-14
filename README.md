@@ -10,10 +10,31 @@ This repository provides a NixOS configuration using flakes. It’s structured t
 
 ## Update inputs
 
+CI (`.github/workflows/build.yml`) updates `flake.lock` every Saturday, builds every host
+and `user@host`, pushes what it built to the binary cache (private Backblaze B2 bucket,
+`nixos/core/binary-cache.nix`), and only then commits the lock to `main`. Hosts download
+those builds instead of compiling them:
+
 ```bash
-nix flake update
-sudo nixos-rebuild switch --flake .#<your-host>
+git pull --ff-only          # just update
+nh os switch                # just rebuild
 ```
+
+A local `nix flake update` (`just update-local`) gives a lock CI has not built, so
+everything not on cache.nixos.org is built locally. Run the workflow manually with
+`gh workflow run build -f update-lock=true`.
+
+The cache holds only paths CI built (never those on cache.nixos.org, never sources).
+Secrets, all in sops:
+
+- `.github/secrets.yaml` (CI; recipient `ci_github`, whose private half is the only GitHub
+  secret, `SOPS_AGE_KEY`): `cache_signing_key`, `b2_key_id`/`b2_application_key`
+  (read-write key for the bucket), `ai_rules_deploy_key`.
+- `nixos/core/binary-cache.yaml` (every host): `b2_key_id`/`b2_application_key`
+  (read-only key), passed to the nix-daemon.
+
+A new host's system key (`host_<host>` in `.sops.yaml`) must be added to the
+`nixos/core/binary-cache.yaml` rule, then `sops updatekeys nixos/core/binary-cache.yaml`.
 
 ## Customize
 

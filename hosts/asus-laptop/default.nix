@@ -1,7 +1,7 @@
 # NixOS entry point for asus-laptop (built because registry.nix lists it and this file exists).
 # Every module of nixos/ is already imported (flake.nix); this file switches features on and
 # holds laptop-only facts.
-{ pkgs, ... }:
+{ config, pkgs, ... }:
 {
   imports = [
     ./hardware-configuration.nix
@@ -30,6 +30,12 @@
 
   programs.steam.enable = true;
   services.printing.enable = true;
+
+  # System sops identity: no SSH host key here (openssh is off), so system secrets use the
+  # primary user's age key (ahmed_asus_laptop in .sops.yaml); root reads it at activation.
+  sops.age.keyFile = "${
+    config.users.users.${config.nixConfig.primaryUser}.home
+  }/.config/sops/age/keys.txt";
 
   # Laptop-only kernel choice (keep servers/VMs on default kernel)
   boot.kernelPackages = pkgs.linuxPackages_zen;
