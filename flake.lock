@@ -2,11 +2,11 @@
   "nodes": {
     "ai-rules": {
       "locked": {
-        "lastModified": 1790949871,
-        "narHash": "sha256-vcGCm5g0p66Q+t4/lHKXlWpG1EUG8h1oigBteo+8x4Q=",
+        "lastModified": 1794702703,
+        "narHash": "sha256-nV0xVdUjIO37lANwd+8ysn5WZp4Y8If84XrR2UJ2+Pg=",
         "ref": "refs/heads/main",
-        "rev": "b53cbfcda7783fedae66eb570ce9d5bdbbfebf0e",
-        "revCount": 7,
+        "rev": "a30c25beca947c1c2a323dd6cf5f87cd85e9119c",
+        "revCount": 8,
         "type": "git",
         "url": "ssh://git@github.com/alsaghir/ai-rules.git"
       },
