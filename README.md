@@ -88,6 +88,7 @@ home/                Home Manager modules, all imported by home/default.nix
   dev.nix ai.nix       Kubernetes + Copilot CLI; other AI CLIs
 users/<user>/        Home Manager profile; users/<user>/<host>/ adds host-specific bits and personal app picks
 overlays/            package fixes: default.nix is global, others are host-scoped via the registry
+pkgs/<name>/package.nix  packages not in nixpkgs yet, written to its conventions (`nix build .#<name>`)
 ```
 
 ## Module composition

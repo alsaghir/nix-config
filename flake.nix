@@ -31,7 +31,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    ai-rules.url = "git+ssh://git@github.com/alsaghir/ai-rules.git";
+    ai-rules = {
+      url = "git+ssh://git@github.com/alsaghir/ai-rules.git";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     # Dux Modular Shell (formerly DankMaterialShell). Its home-manager module
     # is the only one supporting declarative settings/session/plugin settings.
@@ -100,6 +103,20 @@
       };
 
       formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.nixfmt-tree);
+
+      # This repo's own packages (pkgs/), for `nix build .#<name>` while working on them; hosts
+      # get them through overlays/.
+      packages =
+        nixpkgs.lib.genAttrs (builtins.filter (nixpkgs.lib.hasSuffix "-linux") supportedSystems)
+          (
+            system:
+            let
+              pkgs = nixpkgs.legacyPackages.${system};
+            in
+            {
+              misterdownloadmanager = pkgs.callPackage ./pkgs/misterdownloadmanager/package.nix { };
+            }
+          );
 
       # `nix run .#ci`: the CI pipeline (usage: ci/default.nix).
       apps = forAllSystems (system: {

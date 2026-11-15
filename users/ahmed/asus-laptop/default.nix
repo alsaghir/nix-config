@@ -29,6 +29,8 @@ in
   programs.thunderbird.enable = true;
   programs.vesktop.enable = true;
   programs.gh.enable = true;
+  # Its browser extension talks to the app through this host (pkgs/misterdownloadmanager).
+  programs.firefox.nativeMessagingHosts = [ pkgs.misterdownloadmanager ];
 
   services.remmina.enable = true;
   # HM's unit has Requires= but no After=graphical-session.target, so it starts in parallel
@@ -92,6 +94,7 @@ in
     jetbrains-toolbox
     proton-vpn
     github-copilot-app
+    misterdownloadmanager
 
     # GPU / input diagnostics
     mesa-demos

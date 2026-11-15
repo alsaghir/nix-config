@@ -7,5 +7,6 @@
   (import ./biglybt)
   (import ./posthog)
   (import ./github-copilot-app)
+  (import ./misterdownloadmanager)
 
 ]
