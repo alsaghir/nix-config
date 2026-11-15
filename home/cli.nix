@@ -22,7 +22,7 @@
     programs.fzf.enable = true;
     programs.fzf.enableZshIntegration = true;
     programs.git.enable = true;
-    programs.htop.enable = true;
+    programs.btop.enable = true;
     programs.jq.enable = true;
     programs.nix-index.enable = true;
     programs.nix-index.enableZshIntegration = true;
