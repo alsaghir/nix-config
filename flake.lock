@@ -1,12 +1,17 @@
 {
   "nodes": {
     "ai-rules": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
       "locked": {
-        "lastModified": 1794702703,
-        "narHash": "sha256-nV0xVdUjIO37lANwd+8ysn5WZp4Y8If84XrR2UJ2+Pg=",
+        "lastModified": 1794747552,
+        "narHash": "sha256-oHMJS4IM2LcTshRB7pUcytRwK3F56ILFZ5MRmwztZNA=",
         "ref": "refs/heads/main",
-        "rev": "a30c25beca947c1c2a323dd6cf5f87cd85e9119c",
-        "revCount": 8,
+        "rev": "391749b5d57096f3824d5fabcfb7332accfcbbfb",
+        "revCount": 9,
         "type": "git",
         "url": "ssh://git@github.com/alsaghir/ai-rules.git"
       },
