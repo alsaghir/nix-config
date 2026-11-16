@@ -44,7 +44,7 @@ let
       }
     ];
     innerPadding = 16;
-    followInterfaceStyle = false;
+    followInterfaceStyle = true;
     transparency = 0.7;
     widgetOutlineEnabled = true;
     widgetOutlineColor = "secondary";
