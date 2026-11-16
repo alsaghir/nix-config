@@ -34,6 +34,8 @@ let
   # the build); true: lists replace the stock ones. Scalars always replace. { } = stock bar.
   barOverrides = {
     replaceDefaults = false;
+    position = 3; # 0 top | 1 bottom | 2 left | 3 right
+    leftWidgets = [ "runningApps" ];
     rightWidgets = [
       # current layout (EN/AR), click to switch
       {
@@ -41,6 +43,59 @@ let
         before = "notificationButton";
       }
     ];
+    innerPadding = 16;
+    followInterfaceStyle = false;
+    transparency = 0.7;
+    widgetOutlineEnabled = true;
+    widgetOutlineColor = "secondary";
+    widgetOutlineThickness = 2;
+    fontScale = 1.4;
+    iconScale = 1.12;
+    # Island layout; unset island* keys fall back to BarWidgetDefaults.js ISLAND_DEFAULTS.
+    island = true;
+    islandAlongOffset = -199;
+    islandReserveThickness = 42;
+    islandDashTabs = true;
+    islandSatelliteGothCorners = false;
+    islandSystemOsd = false;
+  };
+
+  # Changes to the settings DMS loads whole (a declared value replaces its default, so a partial
+  # one would drop the rest), applied by dms-settings.js on top of the stock default:
+  # objects are deep-merged, lists of { id, ... } are patched per id (unknown id fails the build).
+  lockWidgetPatches = [
+    {
+      id = "lock_date";
+      enabled = true;
+    }
+    {
+      id = "lock_power";
+      enabled = true;
+    }
+  ];
+  defaultPatches = {
+    cursorSettings = {
+      theme = "Adwaita";
+      size = 32;
+      niri = {
+        hideWhenTyping = true;
+        hideAfterInactiveMs = 2000;
+      };
+    };
+    weatherProviders = [
+      {
+        id = "openmeteo";
+        enabled = false;
+      }
+      {
+        id = "metno";
+        enabled = true;
+      }
+    ];
+    lockScreenWidgetInstances = lockWidgetPatches;
+    # The greeter mirrors the lock screen's widgets (minus notifications); synced to the login
+    # screen by services.displayManager.dux-greeter.configHome (nixos/desktop/dms.nix).
+    greeterWidgetInstances = lockWidgetPatches;
   };
 
 in
@@ -118,19 +173,29 @@ in
       # GUI changes apply live but are not saved (settings.json is read-only).
       # To keep one: DMS Settings → export/copy JSON, then port only the keys you changed here.
       # Key reference: <dms-shell>/share/quickshell/dms/Common/settings/SettingsSpec.js
+      # Keys DMS loads whole (cursorSettings, weatherProviders, lock/greeter widgets) go in
+      # defaultPatches above instead; the build fails if one is also set here.
       settings = {
-        density = "spacious"; # compact | comfortable | spacious
         clockFormat = "12h"; # auto | 12h | 24h
+        firstDayOfWeek = 6; # 0 Sunday … 6 Saturday; -1 = locale
+        fontFamily = "Inter";
+        fontWeight = 600;
+        fontScale = 1.12;
+        radiusStrength = 24; # corner roundness, %
+        # niri window gaps (px), written to niri/dms/layout.kdl. -1 = auto: max(4, bar spacing);
+        # -2 = off: niri's own config decides.
+        niriLayoutGapsOverride = 8;
+        modalDarkenBackground = false;
+        dankLauncherV2BorderEnabled = true;
+        powerMenuGridLayout = true;
+        lockScreenFontFamily = "Inter";
+        lockScreenShowPowerActions = true;
+        matugenScheme = "scheme-expressive";
         # "" = first connected screen. A fixed name (e.g. "eDP-1") stops wallpaper-cycle recoloring
         # whenever that output is off (kanshi "docked" profile disables eDP-1).
         matugenTargetMonitor = ""; # Target monitor for matugen (leave empty for first connected screen)
         currentThemeCategory = "dynamic"; # generic | dynamic (wallpaper colors) | custom | registry
         currentThemeName = "dynamic"; # with category "dynamic", use "dynamic"
-        cursorSettings = {
-          theme = "Adwaita";
-          size = 24;
-
-        };
         runDmsMatugenTemplates = true;
         matugenTemplateGtk = true;
         # Qt colors come from the kcolorscheme template (DankMatugen.colors), see qt block above.
@@ -140,11 +205,45 @@ in
 
         # Built-in replacement for the old dankBatteryAlerts plugin
         batteryNotifyLow = true;
+        batteryChargeLimit = 60; # %, protects battery life when mostly plugged in
         keyboardNumlock = true;
         osdKeyboardLayoutEnabled = true; # OSD popup on layout switch (EN/AR)
+
+        # Idle timeouts in seconds; 0 = never
+        acMonitorTimeout = 10 * 60;
+        acLockTimeout = 5 * 60;
+        acSuspendTimeout = 15 * 60;
+        acPostLockMonitorTimeout = 60;
+        batteryMonitorTimeout = 60;
+        batteryLockTimeout = 60;
+        batterySuspendTimeout = 5 * 60;
+        batteryPostLockMonitorTimeout = 30;
+
+        # DMS fills the omitted dock fields from its defaults on load (DockConfig.normalize),
+        # so listing only the changes is enough.
+        dockConfigs = [
+          {
+            id = "dock";
+            name = "Dock";
+            enabled = true;
+            position = 2; # 0 top | 1 bottom | 2 left | 3 right
+            iconSize = 36;
+            itemSpacing = 4;
+            groupByApp = true;
+            separatePinnedAndRunningApps = true;
+            borderEnabled = true;
+            borderOpacity = 0.7;
+            borderThickness = 2;
+            launcherLogoMode = "apps";
+            showTrash = true;
+          }
+        ];
       };
-      # Same rule as settings; skip runtime state keys (monitorWallpapers, dockPins, configVersion).
+      # Same rule as settings; skip runtime state keys (monitorWallpapers, launcherQueryHistory, configVersion).
       session = {
+        weatherLocation = "القاهرة";
+        weatherCoordinates = "30.0443879,31.2357257";
+        dockPins.dock = [ "firefox" ];
         wallpaperPath = "${config.home.homeDirectory}/Pictures/wallpapers/1351306.png";
         wallpaperCyclingEnabled = true;
         wallpaperCyclingInterval = backgroundCyclingInterval;
@@ -213,10 +312,11 @@ in
       };
     };
 
-    # settings.json = the `settings` above + barConfigs. DMS doesn't fill missing fields of a declared
-    # bar, so a partial bar would break it; instead dms-bar.js takes the stock bar from this DMS
-    # package's SettingsSpec.js and applies barOverrides. Follows upstream on update, no manual sync;
-    # if upstream moves the default, the build fails (not the desktop).
+    # settings.json = the `settings` above + barConfigs + defaultPatches. DMS doesn't fill missing
+    # fields of a declared bar (or of the other whole-loaded keys), so a partial value would break it;
+    # instead dms-settings.js takes the stock values from this DMS package's SettingsSpec.js and
+    # applies barOverrides/defaultPatches. Follows upstream on update, no manual sync;
+    # if upstream moves a default, the build fails (not the desktop).
     xdg.configFile."dms/settings.json".source =
       let
         cfg = config.programs.dank-material-shell;
@@ -225,17 +325,20 @@ in
         pkgs.runCommand "dms-settings.json"
           {
             settings = builtins.toJSON cfg.settings;
-            bar = builtins.toJSON barOverrides;
+            overrides = builtins.toJSON {
+              bar = barOverrides;
+              patches = defaultPatches;
+            };
             passAsFile = [
               "settings"
-              "bar"
+              "overrides"
             ];
             nativeBuildInputs = [ pkgs.nodejs-slim ];
           }
           ''
-            node ${./dms-bar.js} \
+            node ${./dms-settings.js} \
               ${cfg.package}/share/quickshell/dms/Common/settings/SettingsSpec.js \
-              $settingsPath $barPath $out
+              $settingsPath $overridesPath $out
           ''
       );
 
@@ -286,7 +389,18 @@ in
     xdg.mimeApps.defaultApplications = {
       "inode/directory" = "org.gnome.Nautilus.desktop"; # VS Code also claims folders
       "application/pdf" = "org.gnome.Papers.desktop"; # browsers, LibreOffice Draw, Krita also claim PDF
-    };
+    }
+    # Text and code open in the DMS notepad (editors such as VS Code also claim these).
+    // lib.genAttrs [
+      "text/plain"
+      "text/markdown"
+      "application/json"
+      "application/x-zerosize" # empty files
+      "text/x-csrc"
+      "text/x-c++src"
+      "text/x-python"
+      "text/x-shellscript"
+    ] (_: "dev.duxlabs.shell.notepad.desktop");
 
     home.packages = with pkgs; [
       # Desktop apps GNOME used to provide (image viewer: nomacs, in users/ahmed/asus-laptop/default.nix).

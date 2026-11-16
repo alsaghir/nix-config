@@ -21,6 +21,9 @@ in
     # nixpkgs module (formerly programs.dank-material-shell.greeter from the DMS flake)
     services.displayManager.dux-greeter = {
       enable = true;
+      # Copies this user's DMS settings/session/colors at each greetd start, so the login screen
+      # matches the desktop (theme, wallpaper, greeterWidgetInstances from home/desktop/dms.nix).
+      configHome = config.nixConfig.users.${config.nixConfig.primaryUser}.homeDirectory;
       compositor = {
         name = "niri";
         # Greeter config (separate niri instance). DMS display profiles and kanshi don't apply here,
