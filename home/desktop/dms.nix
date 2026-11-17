@@ -58,6 +58,7 @@ let
     islandDashTabs = true;
     islandSatelliteGothCorners = false;
     islandSystemOsd = false;
+    islandNotificationPopups = true;
   };
 
   # Changes to the settings DMS loads whole (a declared value replaces its default, so a partial
@@ -409,6 +410,7 @@ in
       papers # PDF viewer (also its own PDF thumbnailer)
       glycin-thumbnailer # image thumbnails (same picks as the nixpkgs GNOME module)
       gst-thumbnailers # audio/video thumbnails
+      libnotify # notify-send: DMS's notification "Preview" button and scripts
 
       adw-gtk3
       # Qt client-side decorations (QT_WAYLAND_DECORATION in home/desktop/niri.nix); qt6ct-kde comes from qt.platformTheme.
