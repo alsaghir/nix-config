@@ -38,6 +38,9 @@
   sops.age.keyFile = "${
     config.users.users.${config.nixConfig.primaryUser}.home
   }/.config/sops/age/keys.txt";
+  # Secrets are set up during initrd activation, before /home would otherwise be mounted;
+  # without this the key is missing at boot and the nix-daemon gets no B2 credentials.
+  fileSystems."/home".neededForBoot = true;
 
   # Laptop-only kernel choice (keep servers/VMs on default kernel)
   boot.kernelPackages = pkgs.linuxPackages_zen;
