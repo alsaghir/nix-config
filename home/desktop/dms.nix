@@ -244,7 +244,16 @@ in
       session = {
         weatherLocation = "القاهرة";
         weatherCoordinates = "30.0443879,31.2357257";
-        dockPins.dock = [ "firefox" ];
+        # IDs as DMS records them when pinning from the dock (`dms ipc call settings dumpSession`)
+        dockPins.dock = [
+          "firefox"
+          "com.mitchellh.ghostty"
+          "github-copilot-app"
+          "BiglyBT Extreme Mod"
+          "microsoft-edge"
+          "code"
+          "thunderbird"
+        ];
         wallpaperPath = "${config.home.homeDirectory}/Pictures/wallpapers/1351306.png";
         wallpaperCyclingEnabled = true;
         wallpaperCyclingInterval = backgroundCyclingInterval;
