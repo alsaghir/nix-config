@@ -10,7 +10,7 @@ final: prev: rec {
   };
 
   biglybt = prev.biglybt.overrideAttrs (oldAttrs: rec {
-    version = "4.1.0.0";
+    version = "4.2.0.0";
 
     src = prev.fetchurl {
       url = "https://github.com/BiglySoftware/BiglyBT/releases/download/v${version}/GitHub_BiglyBT_unix.tar.gz";
@@ -39,7 +39,8 @@ final: prev: rec {
 
       # Set the correct JDK path in the wrapper script
       substituteInPlace $out/share/biglybt/.biglybt-wrapped \
-        --replace-fail 'JAVA_PROGRAM_DIR=""' 'JAVA_PROGRAM_DIR="'"$out/jre/bin/"'"'
+        --replace-fail 'JAVA_PROGRAM_DIR=""' 'JAVA_PROGRAM_DIR="'"$out/jre/bin/"'"' \
+        --replace-fail 'GDK_BACKEND=x11' 'GDK_BACKEND=wayland'
 
       # Wrap xdg-open so child apps (Dolphin) don't inherit BiglyBT's XDG_CONFIG_HOME
       mkdir -p $out/share/biglybt/bin
@@ -100,8 +101,6 @@ final: prev: rec {
       -Dawt.toolkit.name=WLToolkit
       -Djava.awt.headless=false
       -Dawt.useSystemAAFontSettings=on
-      -Dgdk.backend=x11
-      -DGDK_BACKEND=x11
       -Dsun.awt.disablegrab=true
       -Dsun.java2d.noddraw=true
       -Dswing.bufferPerWindow=false
@@ -119,7 +118,6 @@ final: prev: rec {
       # Inject VM options and Wayland-related env into the wrapped launcher
       gappsWrapperArgs+=(
         --set JAVA_TOOL_OPTIONS "''${VMOPTS}"
-        --set GDK_BACKEND x11
         --set _JAVA_AWT_WM_NONREPARENTING 0
         --set JDK_GTK_VERSION 3
       )

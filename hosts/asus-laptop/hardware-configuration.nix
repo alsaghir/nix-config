@@ -1,5 +1,4 @@
 {
-  config,
   lib,
   pkgs,
   modulesPath,
@@ -34,9 +33,6 @@
     "nova"
     "hid-uclogic"
     "wacom"
-  ];
-  boot.extraModulePackages = [
-    config.boot.kernelPackages.asus-ec-sensors
   ];
   boot.kernelParams = [
     "tsc=unstable"
