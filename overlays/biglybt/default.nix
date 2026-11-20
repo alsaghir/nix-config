@@ -18,8 +18,8 @@ final: prev: rec {
     };
 
     jdk25 = prev.fetchurl {
-      url = "https://github.com/adoptium/temurin25-binaries/releases/download/jdk-25.0.1%2B8/OpenJDK25U-jdk_x64_linux_hotspot_25.0.1_8.tar.gz";
-      hash = "sha256-ja930arP/jjJiJaJvCJKE1V953VZ2aW7kZkeaimLqg0=";
+      url = "https://github.com/adoptium/temurin25-binaries/releases/download/jdk-25.0.5.1%2B2/OpenJDK25U-jdk_x64_linux_hotspot_25.0.5.1_2.tar.gz";
+      hash = "sha256-dg+Rsiw+/JvRtk/5UFmCMb6CkozIB+MGkaDnoplaYsA=";
     };
 
     modFiles = ./extreme-mod;
