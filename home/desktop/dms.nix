@@ -213,11 +213,11 @@ in
         # Idle timeouts in seconds; 0 = never
         acMonitorTimeout = 10 * 60;
         acLockTimeout = 5 * 60;
-        acSuspendTimeout = 15 * 60;
+        acSuspendTimeout = 30 * 60;
         acPostLockMonitorTimeout = 60;
         batteryMonitorTimeout = 60;
         batteryLockTimeout = 60;
-        batterySuspendTimeout = 5 * 60;
+        batterySuspendTimeout = 15 * 60;
         batteryPostLockMonitorTimeout = 30;
 
         # DMS fills the omitted dock fields from its defaults on load (DockConfig.normalize),

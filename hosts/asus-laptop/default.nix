@@ -49,6 +49,10 @@
   hardware.opentabletdriver.enable = true;
   programs.droidcam.enable = true;
 
+  # Cap all Nix builds (system and home-manager, both go through the daemon) at half the CPU.
+  # Percent is per thread: this laptop has 16 (`nproc`), so 800% = 8 threads.
+  systemd.services.nix-daemon.serviceConfig.CPUQuota = "800%";
+
   # Laptop memory tuning: fast compressed RAM swap; keep a small swapfile fallback
   zramSwap = {
     enable = true;
