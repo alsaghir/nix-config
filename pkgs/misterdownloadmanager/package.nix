@@ -49,6 +49,8 @@ rustPlatform.buildRustPackage (finalAttrs: {
   version = "0.5.2";
 
   src = fetchFromGitHub {
+    # Version in the name changes the store path on every bump, so a stale hash fails instead of reusing the old source
+    name = "${finalAttrs.pname}-${finalAttrs.version}-source";
     owner = "anefzaoui";
     repo = "misterdownloadmanager";
     tag = "v${finalAttrs.version}";

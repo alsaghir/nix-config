@@ -15,8 +15,15 @@
     programs.direnv.enable = true;
     programs.direnv.enableZshIntegration = true;
     programs.direnv.nix-direnv.enable = true;
-    programs.eza.enable = true;
-    programs.eza.enableZshIntegration = true;
+    # icons/extraOptions become an `eza` alias, so they apply to every eza alias (ls, ll, lt, ...)
+    programs.eza = {
+      enable = true;
+      enableZshIntegration = true;
+      icons = "auto";
+      extraOptions = [ "--group-directories-first" ];
+    };
+    # Overrides the module's mkDefault `ls = "eza"` in bash and zsh
+    home.shellAliases.ls = "eza -laho";
     programs.fastfetch.enable = true;
     programs.fd.enable = true;
     programs.fzf.enable = true;

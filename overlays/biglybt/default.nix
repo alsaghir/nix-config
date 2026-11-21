@@ -9,24 +9,20 @@ final: prev: rec {
     '';
   };
 
-  biglybt = prev.biglybt.overrideAttrs (oldAttrs: rec {
+  # The nixpkgs wrapper prefixes PATH with `jre`; the launcher finds java there
+  biglybt = (prev.biglybt.override { jre = prev.jdk25; }).overrideAttrs (oldAttrs: rec {
     version = "4.2.0.0";
 
     src = prev.fetchurl {
+      # Version in the name changes the store path on every bump, so a stale hash fails instead of reusing the old tarball
+      name = "biglybt-${version}-unix.tar.gz";
       url = "https://github.com/BiglySoftware/BiglyBT/releases/download/v${version}/GitHub_BiglyBT_unix.tar.gz";
-      hash = "sha256-P9CscKANZUZd49tPelT8fZVVaf5P5CKnq5eAbE7H6eU=";
-    };
-
-    jdk25 = prev.fetchurl {
-      url = "https://github.com/adoptium/temurin25-binaries/releases/download/jdk-25.0.5.1%2B2/OpenJDK25U-jdk_x64_linux_hotspot_25.0.5.1_2.tar.gz";
-      hash = "sha256-dg+Rsiw+/JvRtk/5UFmCMb6CkozIB+MGkaDnoplaYsA=";
+      hash = "sha256-kI96ZlI/BWcqRQfKPdog8m6ANq/le2/aQoaBxMdfGBo=";
     };
 
     modFiles = ./extreme-mod;
 
     postInstall = ''
-      mkdir -p $out/jre
-      tar -xzf ${jdk25} -C $out/jre --strip-components=1
       cp -r ${modFiles}/* $out/share/biglybt/
 
       # Remove any existing StartupWMClass or Icon lines to avoid duplicates
@@ -37,45 +33,14 @@ final: prev: rec {
 
       sed -i 's|^Icon=biglybt.svg$|Icon=biglybt|' $out/share/biglybt/biglybt.desktop
 
-      # Set the correct JDK path in the wrapper script
       substituteInPlace $out/share/biglybt/.biglybt-wrapped \
-        --replace-fail 'JAVA_PROGRAM_DIR=""' 'JAVA_PROGRAM_DIR="'"$out/jre/bin/"'"' \
         --replace-fail 'GDK_BACKEND=x11' 'GDK_BACKEND=wayland'
-
-      # Wrap xdg-open so child apps (Dolphin) don't inherit BiglyBT's XDG_CONFIG_HOME
-      mkdir -p $out/share/biglybt/bin
-      cat > $out/share/biglybt/bin/xdg-open <<-'EOF'
-      #!/usr/bin/env sh
-        unset XDG_CONFIG_HOME
-        exec ${prev.xdg-utils}/bin/xdg-open "$@"
-      EOF
-      chmod +x $out/share/biglybt/bin/xdg-open
-
-      # Wrap dolphin so it uses normal KDE config when launched by BiglyBT
-      cat > $out/share/biglybt/bin/dolphin <<-'EOF'
-        #!/usr/bin/env sh
-        unset XDG_CONFIG_HOME
-        exec ${prev.kdePackages.dolphin}/bin/dolphin "$@"
-      EOF
-      chmod +x $out/share/biglybt/bin/dolphin
-
-      # Some apps call kde-open5 instead of xdg-open
-      cat > $out/share/biglybt/bin/kde-open5 <<-'EOF'
-        #!/usr/bin/env sh
-        unset XDG_CONFIG_HOME
-        exec ${prev.kdePackages.kio}/bin/kde-open5 "$@"
-      EOF
-      chmod +x $out/share/biglybt/bin/kde-open5
     '';
 
     preFixup = ''
       gappsWrapperArgs+=(
-        --prefix PATH : $out/share/biglybt/bin
-        --prefix PATH : $out/jre/bin
-        --set JAVA_HOME $out/jre
         --set BIGLYBT_ICON $out/share/biglybt/biglybt.svg
         --set GTK_THEME "Adwaita"
-        --set XDG_CONFIG_HOME "$HOME/.config/biglybt"
       )
 
       VMOPTS="$(cat <<EOV
@@ -91,8 +56,6 @@ final: prev: rec {
       --add-opens=java.base/java.util.concurrent=ALL-UNNAMED
       --add-opens=java.base/java.util=ALL-UNNAMED
       --add-opens=java.base/sun.nio.ch=ALL-UNNAMED
-      -Djava.security.properties="/app/biglybt/java-security-override.properties"
-      -Dsecurity.overridePropertiesFile=true
       -Dsun.java2d.opengl=false
       -Dsun.java2d.xrender=false
       -Dsun.java2d.d3d=false
@@ -124,7 +87,7 @@ final: prev: rec {
     '';
 
     meta = oldAttrs.meta // {
-      description = "BiglyBT BitTorrent Client with extreme mod and JDK 25";
+      description = "BiglyBT BitTorrent Client with extreme mod";
     };
   });
 }
