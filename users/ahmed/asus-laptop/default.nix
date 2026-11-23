@@ -19,7 +19,7 @@ in
   ];
 
   nixConfig = {
-    ai.enable = false;
+    ai.enable = true;
     desktop.niri.enable = true;
     flatpak.enable = true;
   };
@@ -29,6 +29,7 @@ in
   programs.thunderbird.enable = true;
   programs.vesktop.enable = true;
   programs.gh.enable = true;
+  programs.antigravity.enable = true;
 
   # Desktop widgets (home/desktop/dms.nix). Positions live in session.json, keyed by the widget ids
   # from settings.json. syncPositionAcrossScreens stores one "_synced" position, as fractions of the
