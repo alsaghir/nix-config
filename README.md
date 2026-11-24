@@ -37,9 +37,18 @@ Secrets, all in sops:
 - `.github/secrets.yaml` (CI, and `nix run .#ci` locally; recipients `ci_github`, whose
   private half is the only GitHub secret `SOPS_AGE_KEY`, and the laptop key):
   `cache_signing_key`, `b2_key_id`/`b2_application_key` (read-write key for the bucket),
-  `ai_rules_deploy_key`.
+  `ai_rules_token` (fine-grained, Contents: read on the private `ai-rules` input).
+- `users/ahmed/github.yaml` (every machine of ahmed's, including non-NixOS ones):
+  `github_token` (fine-grained, read/write on ahmed's repositories), `git_name`, `git_email`
+  (`nixConfig.git`: HTTPS credential helper for github.com, which also fetches private
+  `git+https` inputs, and the commit identity).
 - `nixos/core/binary-cache.yaml` (every host): `b2_key_id`/`b2_application_key`
   (read-only key), passed to the nix-daemon.
+
+- `ci/public-terms.yaml` (laptop, the non-NixOS machine, CI): `terms`, one per line, that
+  this public repository must never contain. `nix run .#public-terms` checks the working
+  tree (`ci` runs it first); `.githooks/pre-push` checks what is pushed, commit messages
+  included. Enable it once per clone: `git config core.hooksPath .githooks`.
 
 A new host's system key (`host_<host>` in `.sops.yaml`) must be added to the
 `nixos/core/binary-cache.yaml` rule, then `sops updatekeys nixos/core/binary-cache.yaml`.
@@ -195,14 +204,19 @@ Example: `home-server`.
    - `age-keygen -o ~/.config/sops/age/keys.txt` (user secrets): add its public key to
      `.sops.yaml`, then `sops updatekeys <file>` here. The host's own recipient (system
      secrets) is `ssh-to-age < /etc/ssh/ssh_host_ed25519_key.pub`; nothing to generate.
-   - `ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519`: add the `.pub` as a read-only deploy key
-     on the private `ai-rules` repo.
+   - Add the same user key to the `users/ahmed/github.yaml` rule, then
+     `sops updatekeys users/ahmed/github.yaml`: its GitHub token fetches the private
+     `ai-rules` input over HTTPS.
 7. Commit and push here, then on the host the repo is a read-only clone (edits happen here):
    ```bash
    git clone https://github.com/alsaghir/nix-config.git ~/Projects/nix-config
    nix shell nixpkgs#nh -c nh os switch ~/Projects/nix-config     # first time; nh is installed by home-manager
    nix shell nixpkgs#nh -c nh home switch ~/Projects/nix-config
    ```
+   The first switches fetch the private `ai-rules` input before the credential helper
+   exists, so give git a temporary credential first, e.g.
+   `nix shell nixpkgs#gh -c sh -c 'gh auth login && gh auth setup-git'` (undo with
+   `gh auth logout` and `git config --global --unset-all credential.https://github.com.helper`).
    Afterwards: `git pull && nh os switch && nh home switch` (or `just` recipes).
 
 ## Verification without activation

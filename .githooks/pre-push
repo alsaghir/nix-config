@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# Refuses a push whose files, paths or commit messages contain a denylisted term
+# (ci/public-terms.nix). Enable once per clone: git config core.hooksPath .githooks
+set -euo pipefail
+
+zero=0000000000000000000000000000000000000000
+while read -r _local_ref local_sha _remote_ref remote_sha; do
+  [ "$local_sha" = "$zero" ] && continue # branch deletion
+  nix run .#public-terms -- "$local_sha" </dev/null
+
+  # New commits only: reachable from local_sha and on no remote branch yet.
+  if [ "$remote_sha" = "$zero" ]; then
+    range=("$local_sha" --not --remotes)
+  else
+    range=("$remote_sha..$local_sha")
+  fi
+  git log --format=%B "${range[@]}" | nix run .#public-terms -- --stdin
+done

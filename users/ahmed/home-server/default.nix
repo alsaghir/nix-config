@@ -1,5 +1,5 @@
 # ahmed on home-server: GNOME over RDP (Firefox is system-wide, hosts/home-server/default.nix),
-# the server's own SSH key (read-only deploy key on ai-rules; not the laptop's personal keys).
+# the server's own SSH key (not the laptop's personal keys).
 { ... }:
 { config, ... }:
 let

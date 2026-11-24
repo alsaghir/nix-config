@@ -27,6 +27,12 @@ in
     dev.enable = true;
     lazyvim.enable = true;
     ssh.enable = true;
+    git = {
+      enable = true;
+      # github_token (fine-grained PAT), git_name, git_email (GitHub noreply address).
+      github.tokenFile = ./github.yaml;
+      identities.personal.sopsFile = ./github.yaml;
+    };
   };
 
   home.stateVersion = "25.05";

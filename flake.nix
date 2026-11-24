@@ -32,7 +32,7 @@
     };
 
     ai-rules = {
-      url = "git+ssh://git@github.com/alsaghir/ai-rules.git";
+      url = "git+https://github.com/alsaghir/ai-rules.git";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -79,6 +79,19 @@
 
     in
     {
+      # For flakes that build their own registry from these modules (e.g. a private flake
+      # holding one host's data): `mkBuilders { registry; usersDir; hostsDir; }` returns
+      # the builders below, bound to that registry.
+      lib = {
+        mkBuilders = args: import ./lib ({ inherit (nixpkgs) lib; } // args);
+        mkFetcherCaOverlay = import ./lib/fetcher-ca-overlay.nix;
+      };
+
+      # Every home/ module (off until enabled), with the third-party modules they configure.
+      homeManagerModules.default = nixpkgs.lib.modules.importApply ./home { inherit inputs; };
+
+      # The global overlays every host here gets.
+      overlays.default = nixpkgs.lib.composeManyExtensions customOverlays;
 
       # One system per registry host that has hosts/<host>/default.nix.
       nixosConfigurations = lib.mkAllNixosSystems {
@@ -99,7 +112,7 @@
         inherit inputs;
         overlays = customOverlays;
         # Every user@host gets these; users/<user>[/<host>] enables features (nixConfig.*.enable).
-        sharedModules = [ (nixpkgs.lib.modules.importApply ./home { inherit inputs; }) ];
+        sharedModules = [ self.homeManagerModules.default ];
       };
 
       formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.nixfmt-tree);
@@ -124,6 +137,13 @@
           type = "app";
           program = nixpkgs.lib.getExe (nixpkgs.legacyPackages.${system}.callPackage ./ci { });
           meta.description = "Check, build every configuration, upload to the binary cache";
+        };
+        public-terms = {
+          type = "app";
+          program = nixpkgs.lib.getExe (
+            nixpkgs.legacyPackages.${system}.callPackage ./ci/public-terms.nix { }
+          );
+          meta.description = "Fail if a term of the private denylist appears in this public repository";
         };
       });
 
