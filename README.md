@@ -84,7 +84,7 @@ lib/default.nix      builders: registry → nixosConfigurations / homeConfigurat
 lib/{displays,users}.nix   `nixConfig.*` data options the builders fill from the registry
 lib/binary-cache.nix bucket + public key of the binary cache (hosts read it, ci writes it)
 lib/wrappers.nix     package wrappers (pure functions of pkgs)
-ci/                  `nix run .#ci`: the CI pipeline (GitHub Actions runs it; so can any host)
+ci/                  `nix run .#ci`: the CI pipeline (GitHub Actions runs it; so can any host); lint.nix the statix + deadnix check
 hosts/<host>/        NixOS entry point: feature flags, hardware, disko, displays, host facts
 nixos/               NixOS modules, all imported by nixos/default.nix
   core/              baseline for every host (always on; boot loader, users, nix, network)
@@ -211,9 +211,13 @@ with a comment line per group.
 A file that grows past one concern (e.g. widget settings inside a profile) moves that
 concern into its own file beside it and imports it.
 
-A pass that only applies these rules must leave every configuration's derivation unchanged:
-compare `nix eval --raw …drvPath` (see [Verification](#verification-without-activation))
-before and after.
+`checks.<system>.lint` (ci/lint.nix, run by `nix flake check` and CI) enforces the
+mechanical part: statix anti-patterns and deadnix unused bindings. `deadnix -e` and
+`statix fix` apply their fixes.
+
+A pass that only applies these rules must leave every configuration's derivation unchanged
+apart from this flake's own source path: compare `nix eval --raw …drvPath` (see
+[Verification](#verification-without-activation)) before and after.
 
 ## Installing a new host (nixos-anywhere)
 
@@ -263,6 +267,7 @@ The formatter command checks formatting by applying it and fails if it changes f
 ```bash
 nix fmt -- --fail-on-change
 nix build .#checks.x86_64-linux.composition --no-link
+nix build .#checks.x86_64-linux.lint --no-link
 nix eval --raw .#nixosConfigurations.asus-laptop.config.system.build.toplevel.drvPath
 nix eval --raw '.#homeConfigurations."ahmed@asus-laptop".activationPackage.drvPath'
 nix build --dry-run .#nixosConfigurations.asus-laptop.config.system.build.toplevel

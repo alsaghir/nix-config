@@ -85,6 +85,8 @@
       lib = {
         mkBuilders = args: import ./lib ({ inherit (nixpkgs) lib; } // args);
         mkFetcherCaOverlay = import ./lib/fetcher-ca-overlay.nix;
+        # `checks.<system>.lint = mkLintCheck pkgs ./.;` (ci/lint.nix).
+        mkLintCheck = pkgs: pkgs.callPackage ./ci/lint.nix { };
       };
 
       # Every home/ module (off until enabled), with the third-party modules they configure.
@@ -152,6 +154,7 @@
           inherit system nixpkgs;
           inherit (inputs) home-manager sops-nix;
         };
+        lint = self.lib.mkLintCheck nixpkgs.legacyPackages.${system} ./.;
       });
 
       devShells = forAllSystems (

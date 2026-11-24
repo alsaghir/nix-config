@@ -1,4 +1,4 @@
-# Every NixOS host: NetworkManager, DNS (resolved, DNSSEC), mDNS (avahi), GitHub host key.
+# Every NixOS host: NetworkManager, DNS (resolved, DNSSEC), mDNS (avahi).
 {
   lib,
   ...
@@ -34,11 +34,4 @@
     };
   };
   networking.dhcpcd.extraConfig = "nohook resolv.conf";
-
-  # GitHub's published host key (docs.github.com: "GitHub's SSH key fingerprints"), so a
-  # first SSH connection to github.com never stops at a host-key prompt.
-  programs.ssh.knownHosts.github = {
-    hostNames = [ "github.com" ];
-    publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl";
-  };
 }
