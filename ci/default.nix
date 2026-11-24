@@ -7,9 +7,10 @@
 #   nix run .#ci -- --update-lock   update flake.lock, check, build, upload, then commit the
 #                                   lock and push it to main (the weekly job)
 #
+# First, `public-terms` (ci/public-terms.nix) checks the tree against the private denylist.
 # Uploads decrypt .github/secrets.yaml with sops (locally: your age key
-# ~/.config/sops/age/keys.txt; CI: SOPS_AGE_KEY). The private ai-rules input needs git+ssh
-# access (locally: your SSH key; CI: its deploy key).
+# ~/.config/sops/age/keys.txt; CI: SOPS_AGE_KEY). The private ai-rules input needs git+https
+# access (locally: the git credential helper of home/git.nix; CI: a read-only token).
 #
 # Upload filter: closure paths that are neither content-addressed (sources and other
 # fixed-output downloads; hosts substitute the built package instead) nor on
@@ -30,7 +31,7 @@ let
 in
 writeShellApplication {
   name = "ci";
-  # nix and ssh are the caller's (installed Nix, system ssh), not pinned here.
+  # nix is the caller's (installed Nix), not pinned here; git uses the caller's credentials.
   runtimeInputs = [
     coreutils
     curl
@@ -68,6 +69,7 @@ writeShellApplication {
       nix flake update --commit-lock-file
     fi
 
+    nix run .#public-terms
     nix flake check
 
     # Every registry host and user@host; nothing to edit here when one is added.

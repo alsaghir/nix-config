@@ -15,9 +15,12 @@
 
     ./justfile.nix
     ./ai.nix
+    ./azure.nix
+    ./certs.nix
     ./cli.nix
     ./dev.nix
     ./flatpak.nix
+    ./git.nix
     ./lazyvim.nix
     ./ssh.nix
     ./desktop/common.nix

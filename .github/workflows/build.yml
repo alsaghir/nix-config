@@ -44,19 +44,18 @@ jobs:
 
       - uses: cachix/install-nix-action@v31
 
-      # Private git+ssh input (ai-rules): read-only deploy key from .github/secrets.yaml, via
-      # sops from the locked nixpkgs (the flake itself cannot be evaluated before this).
-      # GitHub's host key is the one pinned in nixos/core/networking.nix.
-      - name: Start ssh-agent
+      # Private git+https input (ai-rules): Nix fetches it with the git CLI, which reads a
+      # read-only fine-grained token (`ai_rules_token`, Contents: read on ai-rules) from
+      # .github/secrets.yaml, via sops from the locked nixpkgs (the flake itself cannot be
+      # evaluated before this). Ephemeral runner: the token file dies with it.
+      - name: GitHub token for private inputs
         run: |
-          eval "$(ssh-agent -s)"
           rev=$(jq -r '.nodes[.nodes.root.inputs.nixpkgs].locked.rev' flake.lock)
-          nix shell "github:NixOS/nixpkgs/$rev#sops" -c \
-            sops decrypt --extract '["ai_rules_deploy_key"]' .github/secrets.yaml | ssh-add -
-          echo "SSH_AUTH_SOCK=$SSH_AUTH_SOCK" >> "$GITHUB_ENV"
-          echo "SSH_AGENT_PID=$SSH_AGENT_PID" >> "$GITHUB_ENV"
-          mkdir -p ~/.ssh
-          echo "github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl" >> ~/.ssh/known_hosts
+          token=$(nix shell "github:NixOS/nixpkgs/$rev#sops" -c \
+            sops decrypt --extract '["ai_rules_token"]' .github/secrets.yaml)
+          echo "::add-mask::$token"
+          ( umask 077; printf 'https://x-access-token:%s@github.com\n' "$token" > ~/.git-credentials )
+          git config --global credential.https://github.com.helper store
 
       - name: Run ci
         run: |

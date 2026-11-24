@@ -7,10 +7,18 @@
   config,
   ...
 }:
+let
+  cfg = config.nixConfig.lazyvim;
+in
 {
-  options.nixConfig.lazyvim.enable = lib.mkEnableOption "LazyVim (Neovim) with Nix-provided tooling";
+  options.nixConfig.lazyvim = {
+    enable = lib.mkEnableOption "LazyVim (Neovim) with Nix-provided tooling";
 
-  config = lib.mkIf config.nixConfig.lazyvim.enable {
+    # For reading and navigating Java code; builds and debugging stay in the IDE.
+    java.enable = lib.mkEnableOption "Java support (nvim-jdtls with the Nix jdtls and Lombok)";
+  };
+
+  config = lib.mkIf cfg.enable {
     programs.lazyvim = {
       enable = true;
       installCoreDependencies = false;
@@ -41,29 +49,37 @@
           enable = true;
           installDependencies = false;
         };
+        lang.java = lib.mkIf cfg.java.enable {
+          enable = true;
+          installDependencies = false;
+        };
 
       };
 
       # Additional packages (optional)
-      extraPackages = with pkgs; [
-        nixd
-        alejandra
-        lua-language-server
-        stylua
-        marksman
-        vscode-langservers-extracted
-        prettier
-        copilot-language-server
+      extraPackages =
+        with pkgs;
+        [
+          nixd
+          alejandra
+          lua-language-server
+          stylua
+          marksman
+          vscode-langservers-extracted
+          prettier
+          copilot-language-server
 
-        # Tools LazyVim/plugins expect on PATH
-        ripgrep
-        lazygit
-        git
-        gcc
-        mermaid-cli
-        wget
-        curl
-      ];
+          # Tools LazyVim/plugins expect on PATH
+          ripgrep
+          lazygit
+          git
+          gcc
+          mermaid-cli
+          wget
+          curl
+        ]
+        # Provides the `jdtls` launcher nvim-jdtls expects; Lombok is referenced by store path below.
+        ++ lib.optional cfg.java.enable jdt-language-server;
 
       # Only needed for languages not covered by LazyVim extras
       treesitterParsers = with pkgs.vimPlugins.nvim-treesitter-parsers; [
@@ -94,6 +110,29 @@
       };
 
       plugins = {
+        # Without the Lombok agent, generated members (@Getter, @Slf4j, ...) are unresolved symbols.
+        java-jdtls = lib.mkIf cfg.java.enable ''
+          return {
+            {
+              "mfussenegger/nvim-jdtls",
+              opts = function(_, opts)
+                opts.jdtls = function(config)
+                  config.cmd = config.cmd or {}
+                  table.insert(config.cmd, "--jvm-arg=-javaagent:${pkgs.lombok}/share/java/lombok.jar")
+                  config.settings = vim.tbl_deep_extend("force", config.settings or {}, {
+                    java = {
+                      -- Ask before re-importing a changed build file (a Gradle model build can be slow)
+                      configuration = { updateBuildConfiguration = "interactive" },
+                      import = { gradle = { enabled = true } },
+                    },
+                  })
+                  return config
+                end
+                return opts
+              end,
+            },
+          }
+        '';
         vscode = ''
           return {
             { import = "lazyvim.plugins.extras.vscode", cond = vim.g.vscode ~= nil },
@@ -133,6 +172,10 @@
                 servers = {
                   rust_analyzer = { enabled = false }, -- rustaceanvim handles this
                   nixd = {},
+                  -- lang.nix configures nil_ls too; nixd (flake-aware) is the only one installed
+                  nil_ls = { enabled = false },
+                  -- nvim-jdtls drives jdtls; a second lspconfig client would start it twice
+                  jdtls = { enabled = false },
                 },
               },
             },
