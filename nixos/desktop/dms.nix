@@ -38,6 +38,8 @@ in
       };
     };
 
+    security.pam.services.greetd.enableGnomeKeyring = true;
+
     # The module's preStart runs `chown *`, which skips dotfiles, so a .cache left by an older
     # greeter (different UID) blocks "Extracting embedded UI". Z = recursive chown at every boot.
     systemd.tmpfiles.settings."10-dms-greeter"."/var/lib/dms-greeter".Z = {

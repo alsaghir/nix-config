@@ -22,6 +22,9 @@ in
     };
 
     services.gnome-keyring.enable = true;
+    home.packages = with pkgs; [
+      gcr_4
+    ];
 
     home.sessionVariables = {
       NIXOS_OZONE_WL = "1";
@@ -82,6 +85,13 @@ in
         # QT_QPA_PLATFORMTHEME comes from the qt block in home/desktop/dms.nix.
         environment = {
           QT_WAYLAND_DECORATION = "adwaita";
+
+          # Make Electron/Chromium autodetect gnome-libsecret without per-app argv.json or
+          # wrappers. Covers everything niri spawns: Antigravity, VS Code, Slack, Vesktop,
+          # Signal, 1Password, misterdownloadmanager, …
+          # Keep the "niri:" prefix so niri-aware tooling (portals, DMS) still matches;
+          # don't set bare "GNOME" — that activates GNOME-isms in some libadwaita apps.
+          XDG_CURRENT_DESKTOP = "niri:GNOME";
         };
 
       };
