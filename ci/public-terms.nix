@@ -53,12 +53,12 @@ writeShellApplication {
       fi
 
       excludes=()
-      sops_files=$(git grep "''${opts[@]}" -l -E '^sops:' "''${revs[@]}" -- '*.yaml' '*.yml' '*.json' || [ $? = 1 ])
+      sops_files=$(git --no-pager grep "''${opts[@]}" -l -E '^sops:' "''${revs[@]}" -- '*.yaml' '*.yml' '*.json' || [ $? = 1 ])
       while IFS= read -r f; do
         [ -n "$f" ] && excludes+=(":(exclude)''${f#"$rev:"}")
       done <<<"$sops_files"
 
-      check git grep "''${opts[@]}" -n -I -i -w -F -f "$terms" "''${revs[@]}" -- . "''${excludes[@]}"
+      check git --no-pager grep "''${opts[@]}" -n -I -i -w -F -f "$terms" "''${revs[@]}" -- . "''${excludes[@]}"
       check grep -i -w -F -f "$terms" <<<"$all_paths"
     fi
 
