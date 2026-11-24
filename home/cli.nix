@@ -27,10 +27,11 @@ in
   config = lib.mkIf cfg.enable (
     lib.mkMerge [
       (lib.mkIf cfg.blesh.enable {
-        # Loaded before anything binds keys, attached after everything else (prompt included).
+        # Loaded before anything binds keys, attached after everything else (prompt included;
+        # integrations go up to order 2000, e.g. zoxide).
         programs.bash.initExtra = lib.mkMerge [
           (lib.mkOrder 50 ''. "${pkgs.blesh}/share/blesh/ble.sh" --noattach'')
-          (lib.mkOrder 2000 ''[[ -n "''${BLE_VERSION-}" ]] && ble-attach'')
+          (lib.mkOrder 3000 ''[[ -n "''${BLE_VERSION-}" ]] && ble-attach'')
         ];
       })
 

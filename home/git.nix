@@ -51,6 +51,9 @@ in
       (lib.mkIf (cfg.github.tokenFile != null) {
         sops.secrets.${tokenSecret}.sopsFile = cfg.github.tokenFile;
 
+        # gh's helper would answer for github.com too, with whatever account gh is logged in as.
+        programs.gh.gitCredentialHelper.enable = lib.mkDefault false;
+
         programs.git.settings = {
           # The empty entry drops helpers set before this file (e.g. gh's), so this one answers.
           credential."https://github.com".helper = [
