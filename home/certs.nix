@@ -32,7 +32,8 @@ let
       mkdir -p "$(dirname "$bundle")"
       tmp="$(mktemp "$bundle.XXXXXX")"
       cat ${baseBundle} > "$tmp"
-      for f in ${lib.escapeShellArgs cfg.runtimeCertificateFiles}; do
+      runtime=(${lib.escapeShellArgs cfg.runtimeCertificateFiles})
+      for f in "''${runtime[@]}"; do
         if [ -s "$f" ]; then cat "$f" >> "$tmp"; fi
       done
       chmod 0644 "$tmp"
