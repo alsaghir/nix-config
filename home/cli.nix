@@ -1,4 +1,6 @@
 # Terminal environment: zsh (or bash, see bashHook), CLI tools, direnv, nh.
+# Where an OS image owns ~/.bashrc, bashHook.execZsh keeps that file as the login
+# environment and continues every interactive terminal in zsh.
 {
   config,
   lib,
@@ -10,6 +12,7 @@ let
   bash = config.programs.bash;
   hookFile = ".config/home-manager/bash-hook.sh";
   marker = "home-manager bash hook";
+  handoffVar = "HM_ZSH_HANDOFF";
 in
 {
   options.nixConfig.cli = {
@@ -20,6 +23,13 @@ in
       Home Manager manages neither bash nor zsh files; the `programs.bash` configuration
       (bashrcExtra, aliases, initExtra, which tool integrations fill) is rendered to
       ~/${hookFile} instead, and one guarded line sourcing it is appended to ~/.bashrc'';
+
+    bashHook.execZsh = lib.mkEnableOption ''
+      zsh for interactive terminals on top of bashHook: ~/.bashrc still runs first, so
+      everything it exports reaches zsh, then the hook replaces the shell with zsh
+      (configured as on any other host). Lines appended to ~/.bashrc after the hook line
+      do not run in interactive shells. A shell started from zsh (`bash`, `nix develop`)
+      stays bash, since ${handoffVar} is already set'';
 
     blesh.enable = lib.mkEnableOption "ble.sh (bash line editor: autosuggestions, syntax highlighting)";
   };
@@ -33,22 +43,17 @@ in
           btop.enable = true;
           direnv = {
             enable = true;
-            enableZshIntegration = true;
             nix-direnv.enable = true;
           };
           # icons/extraOptions become an `eza` alias, so they apply to every eza alias (ls, ll, lt, ...)
           eza = {
             enable = true;
-            enableZshIntegration = true;
             icons = "auto";
             extraOptions = [ "--group-directories-first" ];
           };
           fastfetch.enable = true;
           fd.enable = true;
-          fzf = {
-            enable = true;
-            enableZshIntegration = true;
-          };
+          fzf.enable = true;
           git.enable = true;
           jq.enable = true;
           nh = {
@@ -58,19 +63,13 @@ in
               extraArgs = "--keep 5";
             };
           };
-          nix-index = {
-            enable = true;
-            enableZshIntegration = true;
-          };
+          nix-index.enable = true;
           ripgrep.enable = true;
           ripgrep-all.enable = true;
-          starship = {
-            enable = true;
-            enableZshIntegration = true;
-          };
+          starship.enable = true;
           zoxide.enable = true;
           zsh = {
-            enable = !cfg.bashHook.enable;
+            enable = !cfg.bashHook.enable || cfg.bashHook.execZsh;
             enableCompletion = true;
             autosuggestion.enable = true;
             syntaxHighlighting.enable = true;
@@ -188,7 +187,14 @@ in
           ${bash.bashrcExtra}
 
           [[ $- == *i* ]] || return 0
+          ${lib.optionalString cfg.bashHook.execZsh ''
 
+            # bashHook.execZsh: only the first interactive shell of a terminal, and only on a tty.
+            if [[ -z "''${${handoffVar}-}" && -t 0 && -t 1 ]]; then
+              export ${handoffVar}=1
+              exec ${lib.getExe config.programs.zsh.package}
+            fi
+          ''}
           if [[ ! -v BASH_COMPLETION_VERSINFO ]]; then
             . "${pkgs.bash-completion}/etc/profile.d/bash_completion.sh"
           fi
