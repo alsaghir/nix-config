@@ -1,11 +1,10 @@
 {
   config,
-  pkgs,
   lib,
+  pkgs,
   ...
 }:
 let
-
   # Workaround: without these hooks the machine re-suspends right after resume.
   # Drop once fixed upstream: https://gitlab.gnome.org/GNOME/gnome-settings-daemon/-/issues/903#note_2619256
   nvidiaSuspendCondition = {
@@ -90,7 +89,6 @@ let
       };
     };
   };
-
 in
 {
   options.nixConfig.hardware.nvidia-hybrid.enable =

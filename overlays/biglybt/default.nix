@@ -1,3 +1,4 @@
+# BiglyBT newer than nixpkgs, on JDK 25 with the Extreme Mod files, and swt without -Werror.
 final: prev: rec {
   swt = prev.swt.overrideAttrs {
     preConfigure = ''

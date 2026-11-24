@@ -2,9 +2,9 @@
 # auto-install. Language toolchains (cargo, rust-analyzer, codelldb) come from the project
 # devshell, so the Rust/DAP extras don't install them here.
 {
-  pkgs,
-  lib,
   config,
+  lib,
+  pkgs,
   ...
 }:
 let
@@ -53,7 +53,6 @@ in
           enable = true;
           installDependencies = false;
         };
-
       };
 
       # Additional packages (optional)

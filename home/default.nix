@@ -23,6 +23,7 @@
     ./git.nix
     ./lazyvim.nix
     ./ssh.nix
+    ./ssh-keys.nix
     ./desktop/common.nix
     ./desktop/gnome.nix
     (inputs.nixpkgs.lib.modules.importApply ./desktop/dms.nix {

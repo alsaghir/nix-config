@@ -1,3 +1,4 @@
+# Per-language development shells: `nix develop <flake>#<name>` (flake.nix devShells).
 { pkgs }:
 let
   # ============== SHARED BASICS ==============

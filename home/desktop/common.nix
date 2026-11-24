@@ -1,9 +1,9 @@
 # Compositor-agnostic GUI base: browser, terminal, editor, GTK and browser MIME defaults.
 # Personal app picks live in the user profiles (users/<user>/<host>/default.nix).
 {
-  pkgs,
-  lib,
   config,
+  lib,
+  pkgs,
   ...
 }:
 {

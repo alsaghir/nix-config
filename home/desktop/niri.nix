@@ -14,7 +14,6 @@ in
   options.nixConfig.desktop.niri.enable = lib.mkEnableOption "the niri session";
 
   config = lib.mkIf config.nixConfig.desktop.niri.enable {
-
     # The rest of this desktop; each can still be switched off individually.
     nixConfig.desktop = {
       common.enable = lib.mkDefault true;
@@ -93,7 +92,6 @@ in
           # don't set bare "GNOME" — that activates GNOME-isms in some libadwaita apps.
           XDG_CURRENT_DESKTOP = "niri:GNOME";
         };
-
       };
     };
 
@@ -125,6 +123,5 @@ in
         }
       ];
     };
-
   };
 }

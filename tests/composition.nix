@@ -1,3 +1,5 @@
+# The composition check (README "Verification without activation"): builds the registry
+# machinery against tests/fixtures, without Ahmed's external integrations.
 {
   nixpkgs,
   home-manager,

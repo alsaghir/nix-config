@@ -1,4 +1,4 @@
-{ lib, config, ... }:
+{ config, lib, ... }:
 {
   options.nixConfig.ai.enable = lib.mkEnableOption "AI coding/chat CLIs (Claude Code, Codex, Antigravity, aichat, aider)";
 

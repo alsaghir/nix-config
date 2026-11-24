@@ -1,21 +1,18 @@
+# Inputs, and outputs built from registry.nix by lib/default.nix. Layout and conventions: README.md.
 {
   description = "NixOS and Home Manager configurations for Ahmed's machines";
 
   inputs = {
-
+    # System
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
-    nix-flatpak = {
-      url = "github:gmodena/nix-flatpak/?ref=latest";
+    home-manager = {
+      url = "github:nix-community/home-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     sops-nix = {
       url = "github:Mic92/sops-nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    home-manager = {
-      url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -24,15 +21,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    lazyvim.url = "github:pfassina/lazyvim-nix";
-
-    rust-overlay = {
-      url = "github:oxalica/rust-overlay";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    ai-rules = {
-      url = "git+https://github.com/alsaghir/ai-rules.git";
+    # Desktop
+    # Only used for its home-manager `programs.niri.settings` module;
+    # the niri package itself comes from nixpkgs (binary-cached).
+    niri = {
+      url = "github:sodiboo/niri-flake";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -40,13 +33,6 @@
     # is the only one supporting declarative settings/session/plugin settings.
     dms = {
       url = "github:duxlabs-dev/dux-shell/stable";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    # Only used for its home-manager `programs.niri.settings` module;
-    # the niri package itself comes from nixpkgs (binary-cached).
-    niri = {
-      url = "github:sodiboo/niri-flake";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -63,6 +49,21 @@
       flake = false;
     };
 
+    nix-flatpak.url = "github:gmodena/nix-flatpak/?ref=latest";
+
+    # Development
+    lazyvim.url = "github:pfassina/lazyvim-nix";
+
+    rust-overlay = {
+      url = "github:oxalica/rust-overlay";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    # Personal: private AI instructions (fetched with the sops GitHub token, home/git.nix).
+    ai-rules = {
+      url = "git+https://github.com/alsaghir/ai-rules.git";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -76,7 +77,6 @@
         "aarch64-darwin"
       ];
       forAllSystems = nixpkgs.lib.genAttrs supportedSystems;
-
     in
     {
       # For flakes that build their own registry from these modules (e.g. a private flake

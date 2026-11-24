@@ -3,9 +3,9 @@
 # no animations (smoother stream), no idle blanking or screen lock (RDP gate + GDM already ask
 # for passwords), no laptop power/battery settings. Resolution follows the RDP client window.
 {
+  config,
   lib,
   pkgs,
-  config,
   ...
 }:
 {

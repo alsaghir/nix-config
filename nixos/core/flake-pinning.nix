@@ -9,10 +9,8 @@
 }:
 let
   flakeInputs = lib.filterAttrs (_: v: lib.isType "flake" v) inputs;
-
 in
 {
-
   # remove nix-channel related tools & configs, we use flakes instead.
   nix.channel.enable = false;
 
@@ -21,5 +19,4 @@ in
 
   # Provide channel-compat style NIX_PATH from the pinned registry
   nix.nixPath = lib.mapAttrsToList (key: _: "${key}=flake:${key}") config.nix.registry;
-
 }

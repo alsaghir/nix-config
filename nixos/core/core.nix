@@ -1,6 +1,6 @@
-{ config, pkgs, ... }:
+# Baseline of every NixOS host: boot, Nix daemon settings and caches, GC, shell, git.
+{ pkgs, ... }:
 {
-
   boot.tmp.cleanOnBoot = true;
   boot.tmp.useTmpfs = true;
 
@@ -20,15 +20,11 @@
     keep-outputs = true;
     # Keep build outputs referenced
     substituters = [
-      #"https://cosmic.cachix.org"
-      #"https://mirror.sjtu.edu.cn/nix-channels/store" # China mirrors (fast globally)
-      #"https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store"
       "https://cache.nixos.org"
       "https://nix-community.cachix.org"
       "https://numtide.cachix.org"
     ];
     trusted-public-keys = [
-      #"cosmic.cachix.org-1:Dya9IyXD4xdBehWjrkPv6rtxpmMdRel02smYzA85dPE="
       "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
       "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
       "numtide.cachix.org-1:2ps1kLBUWjxIneOy1Ik6cQjb41X0iXVXeHigyw8lox0="
@@ -52,7 +48,7 @@
   # Enable zsh system-wide (required if any user’s shell = zsh)
   programs.zsh.enable = true;
 
-  # Every host is managed from a git flake (git+ssh inputs shell out to git), also before
+  # Every host is managed from a git flake (git+https inputs shell out to git), also before
   # the first home-manager activation.
   programs.git.enable = true;
 

@@ -1,4 +1,5 @@
-{ config, pkgs, ... }:
+# Every NixOS host: Cairo time zone, British English locale.
+{ ... }:
 {
   time.timeZone = "Africa/Cairo";
   i18n.defaultLocale = "en_GB.UTF-8";

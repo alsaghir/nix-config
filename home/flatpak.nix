@@ -1,14 +1,12 @@
 {
   config,
   lib,
-  pkgs,
   ...
 }:
 {
   options.nixConfig.flatpak.enable = lib.mkEnableOption "declarative Flatpak (remotes, overrides, background install)";
 
   config = lib.mkIf config.nixConfig.flatpak.enable {
-
     services.flatpak = {
       enable = true;
 
@@ -71,7 +69,6 @@
         };
       };
       uninstallUnmanaged = false;
-
     };
 
     # This makes the Flatpak install/update run in the background
@@ -87,6 +84,5 @@
         TimeoutStartSec = "0";
       };
     };
-
   };
 }

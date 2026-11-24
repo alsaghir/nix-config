@@ -180,6 +180,41 @@ silently deduplicate.
   3. Optionally create `users/<user>/<host>/default.nix` for host-specific home
      configuration. Keep small assignment-specific additions in the registry list.
 
+## Conventions
+
+Every `.nix` file reads top to bottom in the same order. `nix fmt` owns whitespace; these
+rules own the rest. They also apply to the private flakes built on this one.
+
+1. **Header comment**: what the file is, in a line or two, plus any non-obvious why
+   (an upstream bug, a constraint). A feature module whose `enable` description already
+   says it needs a header only for the why. Usage details go next to the code they explain.
+2. **Arguments**: `{ config, lib, pkgs, ... }:`, alphabetical. Profiles add the
+   `importApply` layer first (`{ inputs }:`).
+3. **`let`**: `cfg = config.nixConfig.<path>;` first, then values, then helper functions.
+4. **`options.nixConfig.<path>`**: `enable` first, then the other options in the order the
+   config uses them.
+5. **`config`**: `lib.mkIf cfg.enable`; with sub-features,
+   `lib.mkMerge [ base (lib.mkIf cfg.<sub>.enable { … }) … ]`, base first and
+   sub-features in option order.
+
+Inside a config block, attributes are grouped by concern (programs, services, files,
+activation, secrets), one blank line between groups. A comment says *why*, never what the
+next line already says; no commented-out code, no debug output. Repeated attribute sets
+(sops secrets, systemd overrides) come from one local function or `lib.genAttrs`, so each
+entry states only what differs. sops-nix defaults `key` to the attribute name; write `key`
+only when it differs.
+
+Lists keep their order: `home.packages`, `imports` and `systemPackages` order is part of
+the derivation (and decides `buildEnv` conflicts). Add new entries next to related ones,
+with a comment line per group.
+
+A file that grows past one concern (e.g. widget settings inside a profile) moves that
+concern into its own file beside it and imports it.
+
+A pass that only applies these rules must leave every configuration's derivation unchanged:
+compare `nix eval --raw …drvPath` (see [Verification](#verification-without-activation))
+before and after.
+
 ## Installing a new host (nixos-anywhere)
 
 Remote install over SSH from this machine; it formats the disks in `hosts/<host>/disko.nix`.

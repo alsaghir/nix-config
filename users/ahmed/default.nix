@@ -56,10 +56,4 @@ in
   };
 
   home.sessionVariables.AI_ENV_FILE = config.sops.templates."ai-env".path;
-
-  # Host profiles decrypt their SSH keys into ~/.ssh (users/ahmed/<host>/ssh-keys.yaml).
-  home.activation.ensureSshPermissions = lib.hm.dag.entryBefore [ "sops-nix" ] ''
-    $DRY_RUN_CMD mkdir -p $VERBOSE_ARG "${config.home.homeDirectory}/.ssh"
-    $DRY_RUN_CMD chmod 0700 "${config.home.homeDirectory}/.ssh"
-  '';
 }

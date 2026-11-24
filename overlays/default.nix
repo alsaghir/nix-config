@@ -10,5 +10,4 @@
   (import ./misterdownloadmanager)
   # TEMPORARY: drop with NixOS/nixpkgs#576874 (azure-cli depends on fabric)
   (import ./fabric-invoke3.nix)
-
 ]

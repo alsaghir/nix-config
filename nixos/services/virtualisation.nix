@@ -1,7 +1,6 @@
 {
   config,
   lib,
-  pkgs,
   ...
 }:
 {
@@ -53,6 +52,5 @@
     ];
     # kubectl/helm/k9s fall back to localhost:8080 without a kubeconfig; point them at k3s's.
     environment.variables.KUBECONFIG = "/etc/rancher/k3s/k3s.yaml";
-
   };
 }

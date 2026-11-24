@@ -11,13 +11,12 @@
 
 { pluginRegistry, qt6ctKdeAur }:
 {
-  pkgs,
-  lib,
   config,
+  lib,
+  pkgs,
   ...
 }:
 let
-
   backgroundCyclingInterval = 3 * 60; # in seconds
 
   # nixpkgs' qt6ct + the AUR qt6ct-kde patch. The AUR repo is a flake input,
@@ -98,14 +97,12 @@ let
     # screen by services.displayManager.dux-greeter.configHome (nixos/desktop/dms.nix).
     greeterWidgetInstances = lockWidgetPatches;
   };
-
 in
 {
   options.nixConfig.desktop.dms.enable =
     lib.mkEnableOption "Dux Modular Shell (bar, launcher, notifications)";
 
   config = lib.mkIf config.nixConfig.desktop.dms.enable {
-
     # GTK apps follow DMS (wallpaper) colors: DMS matugen writes gtk-{3,4}.0/dank-colors.css,
     # gtk.css imports it. Same line DMS's "Apply GTK colors" button would write, but declarative
     # (DMS detects and respects this home-manager symlink). Restart a running GTK app to see new colors.
@@ -275,7 +272,6 @@ in
           mode = "interval";
           interval = backgroundCyclingInterval;
         }) config.nixConfig.displays;
-
       };
       clipboardSettings = {
         clearAtStartup = true;
@@ -318,7 +314,6 @@ in
             "nix-extra" # ours, not DMS-generated: see xdg.configFile."niri/dms/nix-extra.kdl" below
           ];
         };
-
       };
     };
 
@@ -431,6 +426,5 @@ in
       gnome-tecla
       gnome-calculator
     ];
-
   };
 }
