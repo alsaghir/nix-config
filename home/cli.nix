@@ -176,12 +176,15 @@ in
         # ~/.profile would provide, since login shells read the unmanaged files only.
         home.file.${hookFile}.text = ''
           # Managed by Home Manager (nixConfig.cli.bashHook). Sourced from ~/.bashrc.
-          __hm_profile="${config.home.profileDirectory}"
-          case ":$PATH:" in
-            *":$__hm_profile/bin:"*) ;;
-            *) export PATH="$__hm_profile/bin:$PATH" ;;
-          esac
-          unset __hm_profile
+          # Moved to the front even when already present: the image may put copies of the
+          # same tools (kubectl, az, gh, ...) in /usr/bin, /usr/local/bin or ~/.local/bin.
+          __hm_bin="${config.home.profileDirectory}/bin"
+          PATH=":$PATH:"
+          while [[ $PATH == *":$__hm_bin:"* ]]; do PATH="''${PATH/":$__hm_bin:"/:}"; done
+          PATH="''${PATH#:}"
+          PATH="''${PATH%:}"
+          export PATH="$__hm_bin''${PATH:+:$PATH}"
+          unset __hm_bin
           . "${config.home.sessionVariablesPackage}/etc/profile.d/hm-session-vars.sh"
 
           ${bash.bashrcExtra}
