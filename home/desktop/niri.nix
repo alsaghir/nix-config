@@ -40,7 +40,11 @@ in
       settings = {
         # xwayland-satellite: niri (>= 25.08) spawns it on demand; it only needs to be in PATH as a package
         input = {
-          focus-follows-mouse.enable = true;
+          focus-follows-mouse = {
+            enable = true;
+            max-scroll-amount = "60%";
+          };
+
           keyboard = {
             numlock = true;
             # English + Arabic; switch with Mod+Shift+Space (bind below) or click the DMS bar widget.
@@ -63,6 +67,14 @@ in
               variant = ",basic";
             };
           };
+        };
+        # Outer gaps in logical px. Left/right struts make the neighbouring column peek into them;
+        # left is sized to the DMS dock (iconSize 36 + padding) so the peek isn't hidden behind it.
+        layout.struts = {
+          left = 1;
+          right = 1;
+          top = 0;
+          bottom = 0;
         };
         binds."Mod+Shift+Space" = {
           action.switch-layout = "next";
