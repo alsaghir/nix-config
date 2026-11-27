@@ -137,6 +137,7 @@
             in
             {
               misterdownloadmanager = pkgs.callPackage ./pkgs/misterdownloadmanager/package.nix { };
+              kiri = pkgs.kdePackages.callPackage ./pkgs/kiri/package.nix { };
             }
           );
 

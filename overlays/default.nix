@@ -8,6 +8,7 @@
   (import ./posthog)
   (import ./github-copilot-app)
   (import ./misterdownloadmanager)
+  (import ./kiri)
   # TEMPORARY: drop with NixOS/nixpkgs#576874 (azure-cli depends on fabric)
   (import ./fabric-invoke3.nix)
 ]

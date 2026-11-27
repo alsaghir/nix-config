@@ -1,4 +1,4 @@
-# ahmed on asus-laptop: KDE Plasma desktop, personal apps, Flatpak, AI CLIs, personal SSH keys.
+# ahmed on asus-laptop: niri desktop with the DMS shell, personal apps, Flatpak, AI CLIs, personal SSH keys.
 { ... }:
 {
   lib,
@@ -18,7 +18,7 @@ in
 
   nixConfig = {
     ai.enable = true;
-    desktop.plasma.enable = true;
+    desktop.niri.enable = true;
     flatpak.enable = true;
 
     # Personal keys (age key: sops.age.keyFile in ../default.nix).

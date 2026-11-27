@@ -10,7 +10,7 @@
   ];
 
   nixConfig = {
-    desktop.plasma.enable = true;
+    desktop.niri.enable = true;
     hardware = {
       asus = {
         enable = true;

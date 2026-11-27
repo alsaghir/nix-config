@@ -32,6 +32,7 @@
     };
 
     home.packages = with pkgs; [
+      kiri
       kdePackages.krohnkite
       kdePackages.dynamic-workspaces
       klassy
@@ -142,13 +143,22 @@
         };
       };
 
+      # Kiri's own on/off switch, so Plugins.kiriEnabled is left to it rather than declared: it
+      # also swaps KWin effects and settings (focus policy, rows, snapping) and restores them.
+      # Upstream's install.sh binds the same key.
+      hotkeys.commands.kiri-mode = {
+        name = "Switch Kiri / Plasma";
+        key = "Meta+Ctrl+Shift+K";
+        command = "${lib.getExe pkgs.kiri} toggle";
+      };
+
       configFile = {
         kwinrc = {
           Plugins = {
             desktopchangeosdEnabled = true;
             dynamic_workspacesEnabled = true;
-            krohnkiteEnabled = true;
-          };
+            krohnkiteEnabled = false;
+        };
 
           "Effect-slide".SlideBackground = false;
 

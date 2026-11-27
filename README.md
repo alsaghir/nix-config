@@ -139,7 +139,7 @@ Flake inputs reach only `flake.nix`, the two aggregators it binds (`home/default
 Host profiles receive `{ inputs, hostname }`; take `{ inputs, ... }` or `{ ... }`.
 Ahmed's profile adds SOPS and AI rules and enables `cli`/`dev`/`ssh` everywhere. Shared
 `home/` modules hold features and setup; personal app picks live in host profiles: the laptop
-profile enables Plasma, Flatpak and `ai` and lists its apps, the home-server profile adds only
+profile enables niri (DMS shell), Flatpak and `ai` and lists its apps, the home-server profile adds only
 VS Code (GNOME over RDP).
 
 Feature modules (`home/`, `nixos/`) use `config`, `lib`, and `pkgs`, not
