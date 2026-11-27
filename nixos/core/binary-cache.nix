@@ -28,6 +28,7 @@ in
   };
 
   # "-": optional, so the daemon still starts before the secret exists (e.g. first install).
-  systemd.services.nix-daemon.serviceConfig.EnvironmentFile =
-    "-${config.sops.templates."nix-daemon-b2.env".path}";
+  systemd.services.nix-daemon.serviceConfig.EnvironmentFile = "-${
+    config.sops.templates."nix-daemon-b2.env".path
+  }";
 }

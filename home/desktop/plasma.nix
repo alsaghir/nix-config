@@ -158,7 +158,7 @@
             desktopchangeosdEnabled = true;
             dynamic_workspacesEnabled = true;
             krohnkiteEnabled = false;
-        };
+          };
 
           "Effect-slide".SlideBackground = false;
 

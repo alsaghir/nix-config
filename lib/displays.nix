@@ -2,7 +2,7 @@
 # (registry.nix → hosts.<host>.displays) and injected into both NixOS and
 # Home Manager by lib/default.nix. Pure option declaration, valid in either module system.
 # Consumers: home/desktop/niri.nix (outputs, kanshi), home/desktop/dms.nix (wallpaper cycling),
-# nixos/desktop/dms.nix, nixos/desktop/noctalia.nix (greeter layout).
+# nixos/desktop/dms.nix (greeter layout).
 { lib, ... }:
 let
   inherit (lib) mkOption types;

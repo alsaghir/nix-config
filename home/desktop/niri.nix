@@ -163,17 +163,8 @@ in
   options.nixConfig.desktop.niri = {
     enable = lib.mkEnableOption "the niri session";
 
-    shell = lib.mkOption {
-      type = lib.types.enum [
-        "dms"
-        "noctalia"
-      ];
-      default = "dms";
-      description = "Desktop shell (bar, launcher, notifications, lock screen) run in the niri session.";
-    };
-
-    # Set by the shell module (home/desktop/dms.nix, home/desktop/noctalia.nix): the files its theme
-    # generator writes from the wallpaper, which GTK and Qt apps below load to follow its colours.
+    # Set by the shell module (home/desktop/dms.nix): the files its theme generator writes from
+    # the wallpaper, which GTK and Qt apps below load to follow its colours.
     palette = {
       gtkCss = lib.mkOption {
         type = lib.types.str;
@@ -198,8 +189,7 @@ in
     # The rest of this desktop; each can still be switched off individually.
     nixConfig.desktop = {
       common.enable = lib.mkDefault true;
-      dms.enable = lib.mkDefault (cfg.shell == "dms");
-      noctalia.enable = lib.mkDefault (cfg.shell == "noctalia");
+      dms.enable = lib.mkDefault true;
     };
 
     services.gnome-keyring.enable = true;

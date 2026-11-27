@@ -11,9 +11,7 @@ in
 {
   imports = [
     ./justfile.nix
-    # Inert while their shell is off; kept so switching shells is one flag.
     ./dms-widgets.nix
-    ./noctalia-widgets.nix
   ];
 
   nixConfig = {

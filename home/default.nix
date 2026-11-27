@@ -34,9 +34,6 @@
       qt6ctKdeAur = inputs.qt6ct-kde-aur;
       inherit (inputs.niri.lib) kdl;
     })
-    (inputs.nixpkgs.lib.modules.importApply ./desktop/noctalia.nix {
-      inherit (inputs.niri.lib) kdl;
-    })
     ./desktop/plasma.nix
   ];
 }
