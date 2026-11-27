@@ -22,6 +22,8 @@ pkgs.testers.runNixOSTest {
       virtualisation = {
         memorySize = 4096;
         cores = 2;
+        # Jellyfin refuses to start with less than 2 GiB free in /var/lib/jellyfin.
+        diskSize = 4096;
       };
     };
     client = {
@@ -35,6 +37,8 @@ pkgs.testers.runNixOSTest {
 
     with subtest("SSH offers public-key authentication only"):
         home_server.wait_for_unit("sshd.service")
+        # The client's backdoor shell is up before its LAN interface.
+        client.wait_until_succeeds("ping -c 1 -W 1 home-server", timeout=60)
         for user in ["ahmed", "root"]:
             out = client.fail(
                 f"ssh -o BatchMode=yes -o StrictHostKeyChecking=no {user}@home-server true 2>&1"
@@ -53,7 +57,7 @@ pkgs.testers.runNixOSTest {
 
     with subtest("GDM shows the login screen"):
         home_server.wait_for_unit("display-manager.service")
-        home_server.wait_until_succeeds("pgrep -u gdm gnome-shell", timeout=300)
+        home_server.wait_until_succeeds("pgrep -u gdm-greeter gnome-shell", timeout=120)
         home_server.sleep(10)
         home_server.screenshot("gdm")
   '';
