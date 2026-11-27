@@ -39,7 +39,10 @@
       };
       # Overlays for this host only, on top of the global overlays/default.nix.
       # Applied to both its NixOS and Home Manager package sets.
-      extraOverlays = [ ./overlays/github-copilot-app-igpu ];
+      extraOverlays = [
+        ./overlays/github-copilot-app-igpu
+        ./overlays/plasma-workspace-xdg-data-dirs
+      ];
       # Monitor layout (schema: lib/displays.nix), injected into NixOS and Home Manager;
       # niri, kanshi, DMS and the greeter are generated from it.
       displays = import ./hosts/asus-laptop/displays.nix;
