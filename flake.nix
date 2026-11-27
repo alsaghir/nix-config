@@ -41,6 +41,13 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # Declarative KDE Plasma settings (home-manager module only).
+    plasma-manager = {
+      url = "github:nix-community/plasma-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.home-manager.follows = "home-manager";
+    };
+
     # Plain source (not a flake): locked in flake.lock, bumped by `nix flake update`.
     # Only qt6ct-shenanigans.patch is used, applied on top of nixpkgs' qt6ct.
     qt6ct-kde-aur = {

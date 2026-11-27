@@ -7,11 +7,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1795542431,
-        "narHash": "sha256-XOyPq6xNUzOd2fwSJr44Iyz0nM4m0K/v3Ef6eyBTnFQ=",
+        "lastModified": 1795725447,
+        "narHash": "sha256-HpQ7r5AkqpDtjEwhdPiYRNDbL9hsA8Cufa40rlgLucY=",
         "ref": "refs/heads/main",
-        "rev": "f73368df21e7d12b05dedf119cf5b980fad47574",
-        "revCount": 18,
+        "rev": "f0c8cdcaa2fb653625d48fbce479025cb39be29b",
+        "revCount": 51,
         "type": "git",
         "url": "https://github.com/alsaghir/ai-rules.git"
       },
@@ -294,6 +294,29 @@
         "type": "github"
       }
     },
+    "plasma-manager": {
+      "inputs": {
+        "home-manager": [
+          "home-manager"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1785762349,
+        "narHash": "sha256-jZhZkzAwc7f3exzcTDJWP2WCAchCv0iNC3UF/QsahdQ=",
+        "owner": "nix-community",
+        "repo": "plasma-manager",
+        "rev": "a19a2a029fa180911bd89c554dca1616e10f4c1d",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-community",
+        "repo": "plasma-manager",
+        "type": "github"
+      }
+    },
     "qt6ct-kde-aur": {
       "flake": false,
       "locked": {
@@ -322,6 +345,7 @@
         "niri": "niri",
         "nix-flatpak": "nix-flatpak",
         "nixpkgs": "nixpkgs_2",
+        "plasma-manager": "plasma-manager",
         "qt6ct-kde-aur": "qt6ct-kde-aur",
         "rust-overlay": "rust-overlay",
         "sops-nix": "sops-nix"
