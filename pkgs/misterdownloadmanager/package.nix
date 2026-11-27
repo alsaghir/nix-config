@@ -1,6 +1,5 @@
 # Written to nixpkgs conventions so it can move as is to
-# pkgs/by-name/mi/misterdownloadmanager/package.nix; this repo exposes it through
-# overlays/misterdownloadmanager until then.
+# pkgs/by-name/mi/misterdownloadmanager/package.nix; overlays/pkgs.nix loads it until then.
 {
   lib,
   rustPlatform,
@@ -22,6 +21,7 @@
   libxkbcommon,
   libxrandr,
   vulkan-loader,
+  versionCheckHook,
   wayland,
   writeCBin,
 }:
@@ -152,6 +152,11 @@ rustPlatform.buildRustPackage (finalAttrs: {
       ]
     } "$out/bin/misterdownloadmanager"
   '';
+
+  nativeInstallCheckInputs = [ versionCheckHook ];
+  # mainProgram is the GUI; the CLI prints the same version without a display.
+  versionCheckProgram = "${placeholder "out"}/bin/misterdownloadmanager-cli";
+  doInstallCheck = true;
 
   passthru.updateScript = nix-update-script { };
 

@@ -98,6 +98,7 @@ home/                Home Manager modules, all imported by home/default.nix
 users/<user>/        Home Manager profile; users/<user>/<host>/ adds host-specific bits and personal app picks
 overlays/            package fixes: default.nix is global, others are host-scoped via the registry
 pkgs/<name>/package.nix  packages not in nixpkgs yet, written to its conventions (`nix build .#<name>`); loaded by overlays/pkgs.nix like pkgs/by-name
+tests/               composition.nix (registry machinery, fixtures/), home-server.nix (VM test)
 ```
 
 ## Module composition
@@ -285,6 +286,19 @@ for every supported system; choose the native system when running them.
 
 These commands do not activate either configuration. Review before switching;
 system and standalone Home Manager switches remain separate manual operations.
+
+### VM test
+
+`checks.x86_64-linux.home-server` (tests/home-server.nix) boots home-server's real modules
+in a QEMU VM next to a client VM. It checks that SSH offers only public-key login (for ahmed and
+root), that Jellyfin answers on port 8096 from the LAN, that nix-daemon starts without the binary
+cache secret, and that GDM shows the login screen. Sops secrets can't be decrypted in the VM,
+so RDP is not covered. The test needs KVM, takes a few minutes and is part of `nix flake check`.
+
+```bash
+nix build -L .#checks.x86_64-linux.home-server   # result/gdm.png: screenshot of the login screen
+nix run .#checks.x86_64-linux.home-server.driverInteractive   # Python REPL: start_all(), home_server.shell_interact()
+```
 
 ## Notes
 

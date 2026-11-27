@@ -147,13 +147,26 @@
         };
       });
 
-      checks = forAllSystems (system: {
-        composition = import ./tests/composition.nix {
-          inherit system nixpkgs;
-          inherit (inputs) home-manager sops-nix;
-        };
-        lint = self.lib.mkLintCheck nixpkgs.legacyPackages.${system} ./.;
-      });
+      checks = forAllSystems (
+        system:
+        let
+          homeServer = self.nixosConfigurations.home-server;
+        in
+        {
+          composition = import ./tests/composition.nix {
+            inherit system nixpkgs;
+            inherit (inputs) home-manager sops-nix;
+          };
+          lint = self.lib.mkLintCheck nixpkgs.legacyPackages.${system} ./.;
+        }
+        # VM test (needs KVM): only on the host's own platform.
+        // nixpkgs.lib.optionalAttrs (system == homeServer.pkgs.stdenv.hostPlatform.system) {
+          home-server = import ./tests/home-server.nix {
+            pkgs = nixpkgs.legacyPackages.${system};
+            nixosConfiguration = homeServer;
+          };
+        }
+      );
 
       devShells = forAllSystems (
         system:
