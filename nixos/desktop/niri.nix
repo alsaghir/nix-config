@@ -10,6 +10,12 @@
       dms.enable = lib.mkDefault true;
     };
 
+    # niri-only: on Plasma, KWin must launch the input method itself (System Settings → Virtual Keyboard).
+    i18n.inputMethod = {
+      enable = true;
+      type = "ibus";
+    };
+
     programs.niri.enable = true;
     # Default true: Nautilus backs xdg-desktop-portal-gnome's FileChooser (same UI as the file manager).
     # programs.niri.useNautilus = false;

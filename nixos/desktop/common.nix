@@ -16,11 +16,6 @@
     # enableDefaultPlugins); OpenVPN for importing .ovpn files / Proton's OpenVPN protocol.
     networking.networkmanager.plugins = [ pkgs.networkmanager-openvpn ];
 
-    i18n.inputMethod = {
-      enable = true;
-      type = "ibus";
-    };
-
     services.flatpak.enable = true;
     services.libinput.enable = true;
 

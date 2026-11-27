@@ -20,14 +20,15 @@
         inter
         inter-nerdfont
       ];
+      # mkBefore: desktops append their own defaults (plasma6: Noto Sans, Hack); ours stay first.
       fontconfig.defaultFonts = {
-        serif = [ "Noto Serif" ];
-        sansSerif = [
+        serif = lib.mkBefore [ "Noto Serif" ];
+        sansSerif = lib.mkBefore [
           "Inter"
           "Symbols Nerd Font"
           "Symbols Nerd Font Mono"
         ];
-        monospace = [
+        monospace = lib.mkBefore [
           "Hack Nerd Font"
           "Symbols Nerd Font"
           "Hack"

@@ -6,5 +6,6 @@
     ./fonts.nix
     ./gnome.nix
     ./niri.nix
+    ./plasma.nix
   ];
 }
