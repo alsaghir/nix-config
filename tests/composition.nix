@@ -162,6 +162,7 @@ assert
       == [ "\"/srv/movies:/media/movies\"" ]
     && builtins.attrNames systemConfig.config.nix.registry == [ "nixpkgs" ]
     && systemConfig.config.nix.nixPath == [ "nixpkgs=flake:nixpkgs" ]
+    && systemConfig.config.nix.settings.flake-registry == ""
   );
 pkgs.runCommandLocal "module-composition-check" { } ''
   touch "$out"

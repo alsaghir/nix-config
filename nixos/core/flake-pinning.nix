@@ -16,6 +16,9 @@ in
 
   # Pin registry entries to your flake inputs to avoid network fetches during eval
   nix.registry = lib.mapAttrs (_: v: { flake = v; }) flakeInputs;
+  # No download of the global registry: an alias that isn't pinned above fails instead of
+  # silently resolving to whatever upstream points it at. Use full refs (github:owner/repo) for others.
+  nix.settings.flake-registry = "";
 
   # Provide channel-compat style NIX_PATH from the pinned registry
   nix.nixPath = lib.mapAttrsToList (key: _: "${key}=flake:${key}") config.nix.registry;

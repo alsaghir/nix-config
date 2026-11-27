@@ -97,7 +97,7 @@ home/                Home Manager modules, all imported by home/default.nix
   dev.nix ai.nix       Kubernetes + Copilot CLI; other AI CLIs
 users/<user>/        Home Manager profile; users/<user>/<host>/ adds host-specific bits and personal app picks
 overlays/            package fixes: default.nix is global, others are host-scoped via the registry
-pkgs/<name>/package.nix  packages not in nixpkgs yet, written to its conventions (`nix build .#<name>`)
+pkgs/<name>/package.nix  packages not in nixpkgs yet, written to its conventions (`nix build .#<name>`); loaded by overlays/pkgs.nix like pkgs/by-name
 ```
 
 ## Module composition
@@ -280,7 +280,7 @@ NixOS systems only for hosts with a host directory, account creation from the re
 every `nixos/` module importing cleanly and staying off unless enabled, module parameters,
 multiple users/hosts without Ahmed's external
 integrations, distinct lexical bindings of the same module, and flake-input pinning (Nix registry
-binding) on Linux. Fixtures live in `tests/fixtures/{users,hosts}`. Checks are exposed
+binding, global registry off) on Linux. Fixtures live in `tests/fixtures/{users,hosts}`. Checks are exposed
 for every supported system; choose the native system when running them.
 
 These commands do not activate either configuration. Review before switching;

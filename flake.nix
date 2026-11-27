@@ -120,7 +120,7 @@
       formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.nixfmt-tree);
 
       # This repo's own packages (pkgs/), for `nix build .#<name>` while working on them; hosts
-      # get them through overlays/.
+      # get them through the same overlay, built against plain nixpkgs here.
       packages =
         nixpkgs.lib.genAttrs (builtins.filter (nixpkgs.lib.hasSuffix "-linux") supportedSystems)
           (
@@ -128,9 +128,7 @@
             let
               pkgs = nixpkgs.legacyPackages.${system};
             in
-            {
-              misterdownloadmanager = pkgs.callPackage ./pkgs/misterdownloadmanager/package.nix { };
-            }
+            import ./overlays/pkgs.nix pkgs pkgs
           );
 
       # `nix run .#ci`: the CI pipeline (usage: ci/default.nix).
