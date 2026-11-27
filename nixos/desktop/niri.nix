@@ -14,7 +14,6 @@ in
       dms.enable = lib.mkDefault true;
     };
 
-    # niri-only: on Plasma, KWin must launch the input method itself (System Settings → Virtual Keyboard).
     i18n.inputMethod = {
       enable = true;
       type = "ibus";

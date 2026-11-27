@@ -88,11 +88,11 @@ ci/                  `nix run .#ci`: the CI pipeline (GitHub Actions runs it; so
 hosts/<host>/        NixOS entry point: feature flags, hardware, disko, displays, host facts
 nixos/               NixOS modules, all imported by nixos/default.nix
   core/              baseline for every host (always on; boot loader, users, nix, network)
-  desktop/           niri.nix (niri + the DMS greeter in dms.nix, on top of common.nix), plasma.nix (KDE Plasma 6 + Plasma Login Manager, KWallet, on top of common.nix) or gnome.nix (GDM, optional declarative RDP via sops); all add fonts.nix
+  desktop/           niri.nix (niri + the DMS greeter in dms.nix, on top of common.nix) or gnome.nix (GDM, optional declarative RDP via sops); all add fonts.nix
   hardware/          asus, bluetooth, nvidia-hybrid
   services/          jellyfin, nix-ld, openssh (key-only), virtualisation
 home/                Home Manager modules, all imported by home/default.nix
-  desktop/           niri.nix session, dms.nix shell, plasma.nix Plasma (plasma-manager), gnome.nix GNOME dconf + extensions, common.nix GUI base (browser, terminal, editor, theming)
+  desktop/           niri.nix session, dms.nix shell, gnome.nix GNOME dconf + extensions, common.nix GUI base (browser, terminal, editor, theming)
   cli.nix lazyvim.nix  shell + CLI tools; LazyVim with Nix-provided LSPs/formatters
   dev.nix ai.nix       Kubernetes + Copilot CLI; other AI CLIs
 users/<user>/        Home Manager profile; users/<user>/<host>/ adds host-specific bits and personal app picks
@@ -117,7 +117,7 @@ Every registry host with `hosts/<host>/default.nix` becomes a NixOS system made 
 Each `user@host` Home Manager configuration is assembled from:
 
 1. `sharedModules` from `flake.nix`: `home/` (all modules, plus the third-party
-   modules they configure: niri, DMS, plasma-manager, LazyVim, nix-flatpak).
+   modules they configure: niri, DMS, LazyVim, nix-flatpak).
 2. Registry defaults (`home.username`, `home.homeDirectory`, `nixConfig.displays`).
 3. The user's profile `users/<user>/default.nix` (required).
 4. The user's host profile `users/<user>/<host>/default.nix` (optional).

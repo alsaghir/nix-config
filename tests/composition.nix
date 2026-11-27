@@ -151,7 +151,6 @@ assert
     # all nixos/ modules import cleanly, are off unless enabled, and take host parameters
     && !systemConfig.config.programs.niri.enable
     && !systemConfig.config.services.desktopManager.gnome.enable
-    && !systemConfig.config.services.desktopManager.plasma6.enable
     && !systemConfig.config.services.openssh.enable
     && systemConfig.config.boot.loader.systemd-boot.enable
     && !systemConfig.config.boot.loader.grub.enable

@@ -12,7 +12,6 @@
     inputs.lazyvim.homeManagerModules.default
     inputs.niri.homeModules.niri
     inputs.nix-flatpak.homeManagerModules.nix-flatpak
-    inputs.plasma-manager.homeModules.plasma-manager
 
     ./justfile.nix
     ./ai.nix
@@ -34,6 +33,5 @@
       qt6ctKdeAur = inputs.qt6ct-kde-aur;
       inherit (inputs.niri.lib) kdl;
     })
-    ./desktop/plasma.nix
   ];
 }
