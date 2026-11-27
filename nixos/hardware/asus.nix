@@ -4,11 +4,45 @@
   pkgs,
   ...
 }:
-{
-  options.nixConfig.hardware.asus.enable =
-    lib.mkEnableOption "ASUS laptop support (asusd, supergfxd, OpenRGB)";
+let
+  cfg = config.nixConfig.hardware.asus;
 
-  config = lib.mkIf config.nixConfig.hardware.asus.enable {
+  # asusd restores its last settings from /etc/asusd/asusd.ron, which `asusctl` edits at runtime;
+  # these oneshots re-apply the declared values on every boot instead.
+  asusctlOneshot = description: args: {
+    inherit description;
+    after = [
+      "supergfxd.service"
+      "asusd.service"
+      "dbus.service"
+    ];
+    requires = [ "asusd.service" ];
+    wantedBy = [ "multi-user.target" ];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+      ExecStartPre = "${pkgs.coreutils}/bin/sleep 2";
+      User = "root";
+      ExecStart = "${lib.getExe' pkgs.asusctl "asusctl"} ${lib.escapeShellArgs args}";
+    };
+  };
+in
+{
+  options.nixConfig.hardware.asus = {
+    enable = lib.mkEnableOption "ASUS laptop support (asusd, supergfxd, OpenRGB)";
+
+    chargeLimit = lib.mkOption {
+      type = lib.types.nullOr (lib.types.ints.between 20 100);
+      default = null;
+      example = 60;
+      description = ''
+        Battery charge limit in percent, applied through asusd (which re-applies it after resume).
+        null leaves whatever was last set by asusctl or a shell's power settings.
+      '';
+    };
+  };
+
+  config = lib.mkIf cfg.enable {
     # Asus stuff
     security.polkit.enable = true;
     services.hardware.openrgb = {
@@ -20,23 +54,19 @@
     services.asusd = {
       enable = true;
     };
-    # This service forces the desired profile after boot
-    systemd.services.set-asus-profile = {
-      description = "Set Default ASUS Profile to Balanced";
-      after = [
-        "supergfxd.service"
-        "asusd.service"
-        "dbus.service"
+    systemd.services = {
+      set-asus-profile = asusctlOneshot "Set Default ASUS Profile to Balanced" [
+        "profile"
+        "set"
+        "Balanced"
       ];
-      requires = [ "asusd.service" ];
-      wantedBy = [ "multi-user.target" ];
-      serviceConfig = {
-        Type = "oneshot";
-        RemainAfterExit = true;
-        ExecStartPre = "${pkgs.coreutils}/bin/sleep 2";
-        User = "root";
-        ExecStart = "${lib.makeBinPath [ pkgs.asusctl ]}/asusctl profile set Balanced";
-      };
+      set-asus-charge-limit = lib.mkIf (cfg.chargeLimit != null) (
+        asusctlOneshot "Set ASUS battery charge limit" [
+          "battery"
+          "limit"
+          (toString cfg.chargeLimit)
+        ]
+      );
     };
 
     # =========================
@@ -62,7 +92,6 @@
         SOUND_POWER_SAVE_ON_BAT = 1;
         WIFI_PWR_ON_AC = "off";
         WIFI_PWR_ON_BAT = "on";
-        STOP_CHARGE_THRESH_BAT0 = "60";
       };
     };
   };

@@ -12,7 +12,10 @@
   nixConfig = {
     desktop.plasma.enable = true;
     hardware = {
-      asus.enable = true;
+      asus = {
+        enable = true;
+        chargeLimit = 60;
+      };
       bluetooth.enable = true;
       nvidia-hybrid.enable = true;
     };
