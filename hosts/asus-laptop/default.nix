@@ -10,7 +10,7 @@
   ];
 
   nixConfig = {
-    desktop.niri.enable = true;
+    desktop.plasma.enable = true;
     hardware = {
       asus.enable = true;
       bluetooth.enable = true;

@@ -1,4 +1,4 @@
-# ahmed on asus-laptop: niri desktop, personal apps, Flatpak, AI CLIs, personal SSH keys.
+# ahmed on asus-laptop: KDE Plasma desktop, personal apps, Flatpak, AI CLIs, personal SSH keys.
 { ... }:
 {
   lib,
@@ -11,12 +11,13 @@ in
 {
   imports = [
     ./justfile.nix
+    # Inert while DMS is off; kept so switching back to niri is one flag.
     ./dms-widgets.nix
   ];
 
   nixConfig = {
     ai.enable = true;
-    desktop.niri.enable = true;
+    desktop.plasma.enable = true;
     flatpak.enable = true;
 
     # Personal keys (age key: sops.age.keyFile in ../default.nix).
@@ -42,7 +43,7 @@ in
 
   services.remmina.enable = true;
   # HM's unit has Requires= but no After=graphical-session.target, so it starts in parallel
-  # with niri, finds no WAYLAND_DISPLAY ("cannot open display") and hits the start limit.
+  # with the compositor, finds no WAYLAND_DISPLAY ("cannot open display") and hits the start limit.
   systemd.user.services.remmina.Unit.After = [ "graphical-session.target" ];
 
   xdg.configFile."autostart/vesktop.desktop" = {
@@ -57,7 +58,7 @@ in
     '';
   };
 
-  # Merged with home/desktop/common.nix (browser) and home/desktop/dms.nix.
+  # Merged with home/desktop/common.nix (browser) and the active desktop module.
   xdg.mimeApps.defaultApplications = {
     "x-scheme-handler/discord" = "vesktop.desktop";
     "x-scheme-handler/slack" = "slack.desktop";
