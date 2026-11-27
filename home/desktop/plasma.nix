@@ -18,7 +18,7 @@
 
     # kde-gtk-config rewrites gtk-{3,4}.0/settings.ini and ~/.gtkrc-2.0 from Plasma's settings;
     # Home Manager's read-only copies of those files would break that sync. Explicit so that
-    # enabling DMS (which sets it true) alongside Plasma fails evaluation instead.
+    # enabling niri (which sets it true) alongside Plasma fails evaluation instead.
     gtk.enable = false;
 
     home.sessionVariables.NIXOS_OZONE_WL = "1";

@@ -11,8 +11,9 @@ in
 {
   imports = [
     ./justfile.nix
-    # Inert while DMS is off; kept so switching back to niri is one flag.
+    # Inert while their shell is off; kept so switching shells is one flag.
     ./dms-widgets.nix
+    ./noctalia-widgets.nix
   ];
 
   nixConfig = {

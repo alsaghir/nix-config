@@ -88,11 +88,11 @@ ci/                  `nix run .#ci`: the CI pipeline (GitHub Actions runs it; so
 hosts/<host>/        NixOS entry point: feature flags, hardware, disko, displays, host facts
 nixos/               NixOS modules, all imported by nixos/default.nix
   core/              baseline for every host (always on; boot loader, users, nix, network)
-  desktop/           niri.nix (niri + DMS greeter, on top of common.nix), plasma.nix (KDE Plasma 6 + Plasma Login Manager, KWallet, on top of common.nix) or gnome.nix (GDM, optional declarative RDP via sops); all add fonts.nix
+  desktop/           niri.nix (niri + its shell's greeter: dms.nix or noctalia.nix, on top of common.nix), plasma.nix (KDE Plasma 6 + Plasma Login Manager, KWallet, on top of common.nix) or gnome.nix (GDM, optional declarative RDP via sops); all add fonts.nix
   hardware/          asus, bluetooth, nvidia-hybrid
   services/          jellyfin, nix-ld, openssh (key-only), virtualisation
 home/                Home Manager modules, all imported by home/default.nix
-  desktop/           niri.nix session, dms.nix shell, plasma.nix Plasma (plasma-manager), gnome.nix GNOME dconf + extensions, common.nix GUI base (browser, terminal, editor, theming)
+  desktop/           niri.nix session, dms.nix or noctalia.nix shell (`nixConfig.desktop.niri.shell`; shared values in shell-preferences.nix), plasma.nix Plasma (plasma-manager), gnome.nix GNOME dconf + extensions, common.nix GUI base (browser, terminal, editor, theming)
   cli.nix lazyvim.nix  shell + CLI tools; LazyVim with Nix-provided LSPs/formatters
   dev.nix ai.nix       Kubernetes + Copilot CLI; other AI CLIs
 users/<user>/        Home Manager profile; users/<user>/<host>/ adds host-specific bits and personal app picks
@@ -151,7 +151,7 @@ upstream options (e.g. `hosts/asus-laptop/jellyfin.nix`). The builder supplies
 registry values with `lib.mkDefault`, so a profile can override them normally; use
 `lib.mkForce` for an intentional override of another explicit value.
 `nixConfig.displays` (schema in `lib/displays.nix`) holds the host's monitor layout;
-niri outputs, kanshi profiles, DMS wallpaper cycling and the greeter layout are
+niri outputs, kanshi profiles, DMS wallpaper cycling and the greeter layouts are
 generated from it.
 
 Keep imports independent of `config` (enable flags gate `config`, never `imports`).

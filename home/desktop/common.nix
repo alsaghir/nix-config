@@ -38,7 +38,7 @@
 
     # ~/.config/mimeapps.list is now Nix-owned (read-only). Only list types claimed by several apps;
     # a type with a single claimant already resolves on its own. More defaults (merged) in
-    # home/desktop/dms.nix and the user profiles.
+    # home/desktop/niri.nix, home/desktop/dms.nix and the user profiles.
     # Find claimants:  grep -l '<mime>' ~/.nix-profile/share/applications/*.desktop
     # Current default: xdg-mime query default <mime>
     # If an app fails to register a handler at runtime, add its line here.

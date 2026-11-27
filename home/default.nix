@@ -29,9 +29,14 @@
     ./desktop/gnome.nix
     (inputs.nixpkgs.lib.modules.importApply ./desktop/dms.nix {
       pluginRegistry = inputs.dms-plugin-registry;
-      qt6ctKdeAur = inputs.qt6ct-kde-aur;
     })
-    ./desktop/niri.nix
+    (inputs.nixpkgs.lib.modules.importApply ./desktop/niri.nix {
+      qt6ctKdeAur = inputs.qt6ct-kde-aur;
+      inherit (inputs.niri.lib) kdl;
+    })
+    (inputs.nixpkgs.lib.modules.importApply ./desktop/noctalia.nix {
+      inherit (inputs.niri.lib) kdl;
+    })
     ./desktop/plasma.nix
   ];
 }
